@@ -1,0 +1,7 @@
+.MuiDataGrid-columnHeaders{
+  background-color: #F7F7F7;
+}
+
+.MuiDataGrid-row:nth-child(odd) {
+  background-color: #F3FAFD;
+}

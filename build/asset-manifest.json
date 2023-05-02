@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/static/css/main.fa8a9cd1.css",
+    "main.js": "/static/js/main.5204dd43.js",
+    "static/js/787.31ea675c.chunk.js": "/static/js/787.31ea675c.chunk.js",
+    "static/media/LoginBg_ahl.jpg": "/static/media/LoginBg_ahl.1b24a20d96a7734877a8.jpg",
+    "static/media/P3S-logo-200px.png": "/static/media/P3S-logo-200px.01157e5d1e307ac9e569.png",
+    "static/media/P3S-logo.jpg": "/static/media/P3S-logo.55e0f18b2944dc58e021.jpg",
+    "static/media/AHL_Logo.jpeg": "/static/media/AHL_Logo.9f0b22fa40cd10cb1033.jpeg",
+    "index.html": "/index.html",
+    "main.fa8a9cd1.css.map": "/static/css/main.fa8a9cd1.css.map",
+    "main.5204dd43.js.map": "/static/js/main.5204dd43.js.map",
+    "787.31ea675c.chunk.js.map": "/static/js/787.31ea675c.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.fa8a9cd1.css",
+    "static/js/main.5204dd43.js"
+  ]
+}
