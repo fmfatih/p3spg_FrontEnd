@@ -1,5 +1,6 @@
+import { useLocation } from 'react-router-dom'
 import { Stack, useMediaQuery, useTheme } from "@mui/material";
-import { PropsWithChildren, useEffect } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { Header, HeaderProps } from "../molecules";
 import { Sidebar } from "../organisms";
 import { initialUserInfoState, useUserInfo } from "../../store/User.state";
@@ -7,6 +8,7 @@ import dayjs from "dayjs";
 import { useSetSnackBar } from "../../store/Snackbar.state";
 import { useNavigate } from "react-router-dom";
 import { StorageKeys } from "../../common/storageKeys";
+import { useGetUserMenuList } from '../../hooks';
 
 export type AdminTemplateProps = PropsWithChildren<{
   headerProps: HeaderProps;
@@ -16,6 +18,36 @@ export const AdminTemplate = ({
   headerProps,
   children,
 }: AdminTemplateProps) => {
+  let title = "";
+  const [hideSaveButton, setHideSaveButton] = useState(false);
+  const pathNameSplitted = useLocation().pathname.split('/');
+  const pathName = pathNameSplitted[pathNameSplitted.length - 1];
+  const { data: userMenu } = useGetUserMenuList();
+  userMenu?.data.forEach((menuItem) => {
+    if(menuItem.childs?.length){
+      menuItem.childs.forEach((childMenu) => {
+        if(childMenu.id === pathName){
+          title = childMenu.title;
+        }
+      })
+    }
+  })
+
+  console.log("CABER")
+  console.log(pathName)
+
+  useEffect(() => {
+    userMenu?.data.forEach((menuItem) => {
+      if(menuItem.childs?.length){
+        menuItem.childs.forEach((childMenu) => {
+          if(childMenu.id === pathName){
+            setHideSaveButton(!childMenu.create);
+          }
+        })
+      }
+    })
+  }, [pathName, userMenu?.data])
+
   const navigate = useNavigate();
   const theme = useTheme();
   const [userInfo, setUserInfo] = useUserInfo();
@@ -45,7 +77,7 @@ export const AdminTemplate = ({
     <Stack direction="row">
       {isDesktop && <Sidebar />}
       <Stack minHeight={isDesktop ? undefined : '100vh'} flex={1}>
-        <Header {...headerProps} />
+        <Header {...headerProps} headerTitle={pathName === 'dashboard' ? "Ana Ekran" : title} hideAddButton={pathName === "dashboard" || hideSaveButton}/>
         <Stack
           borderRadius={3}
           m={isDesktop ? 2 : 1}

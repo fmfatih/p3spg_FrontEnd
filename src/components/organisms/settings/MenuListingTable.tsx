@@ -10,6 +10,7 @@ import { DeleteConfirmModal, Table } from "../../molecules";
 import {
   DeleteMenuRequest,
   IMenu,
+  useAuthorization,
   useDeleteMenu,
   useGetMenuList,
 } from "../../../hooks";
@@ -27,6 +28,7 @@ export const MenuListingTable = ({
   isMenuOpen,
 }: MenuListingTableProps) => {
   const theme = useTheme();
+  const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
@@ -166,31 +168,30 @@ export const MenuListingTable = ({
 
   const columns: GridColDef[] = useMemo(() => {
     return [
-      { field: "id", headerName: "Menü ID", width: 150 },
-      { field: "name", headerName: "Menü Adı", width: 150 },
-      { field: "menuType", headerName: "Menü Tipi", width: 150 },
-      { field: "order", headerName: "Sıra No", width: 150 },
-      { field: "description", headerName: "Menü Açıklaması", width: 150 },
-      { field: "url", headerName: "Menü Url", width: 150 },
-      { field: "media", headerName: "Menü İkon Bilgisi", width: 150 },
-      { field: "feId", headerName: "Önyüz ID", width: 150 },
-      { field: "feType", headerName: "Önyüz Menü Tipi", width: 150 },
-      { field: "exactMatch", headerName: "Tam Eşleşme", width: 150 },
       {
         field: "actions",
         type: "actions",
         width: 80,
         getActions: (params) => [
-          //<GridActionsCellItem label="Düzenle" showInMenu />,
-          <GridActionsCellItem
+          !!showDelete ? <GridActionsCellItem
             label="Sil"
             onClick={deleteRow(params.row)}
             showInMenu
-          />,
+          /> : <></>,
         ],
       },
+      { field: "id", headerName: "Menü ID", width: 150 },
+      { field: "name", headerName: "Menü Adı", width: 350 },
+      { field: "menuType", headerName: "Menü Tipi", width: 150 },
+      { field: "order", headerName: "Sıra No", width: 150 },
+      { field: "description", headerName: "Menü Açıklaması", width: 150 },
+      { field: "url", headerName: "Menü Url", width: 150 },
+      { field: "media", headerName: "Menü İkon Bilgisi", width: 150 },
+      { field: "feId", headerName: "Önyüz ID", width: 300 },
+      { field: "feType", headerName: "Önyüz Menü Tipi", width: 150 },
+      { field: "exactMatch", headerName: "Tam Eşleşme", width: 150 },
     ];
-  }, [deleteRow]);
+  }, [deleteRow, showDelete]);
 
   const onSave = () => {
     getMenuList(
@@ -238,7 +239,7 @@ export const MenuListingTable = ({
               rowCount={tableData.totalItems}
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               isRowSelectable={() => false}
-              onRowClick={onRowClick}
+              onRowClick={!!showUpdate ? onRowClick : () => null}
               disableColumnMenu
               rows={tableData.result}
               columns={columns}

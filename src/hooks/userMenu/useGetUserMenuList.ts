@@ -11,6 +11,10 @@ export enum IMenuTypes {
 
 export type IUserMenu = {
   id: string;
+  create?: boolean;
+  read?: boolean;
+  delete?: boolean;
+  update?: boolean;
   title: string;
   type: IMenuTypes;
   icon: string;

@@ -11,6 +11,7 @@ import {
   DeleteMerchantRequest,
   IMerchant,
   IVPosRouting,
+  useAuthorization,
   useDeleteVPosRouting,
   useGetVPosRoutingList,
 } from "../../../hooks";
@@ -21,15 +22,15 @@ import { downloadExcel } from "../../../util/downloadExcel";
 
 export const BankRedirectListingTable = () => {
   const theme = useTheme();
+  const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const navigate = useNavigate();
-  const [tableData, setTableData] =
-    useState<PagingResponse<Array<IVPosRouting>>>();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
   });
-  const { mutate: getVPosRoutingList, isLoading } = useGetVPosRoutingList();
+  const { data: vposRoutingListResponse, mutate: getVPosRoutingList, isLoading } = useGetVPosRoutingList();
+  const tableData = vposRoutingListResponse?.data
 
   const editRow = React.useCallback(
     (vPosRouting: IVPosRouting) => () => {
@@ -66,9 +67,7 @@ export const BankRedirectListingTable = () => {
       },
       {
         onSuccess: (data) => {
-          if (data.isSuccess) {
-            setTableData(data?.data);
-          } else {
+          if (!data.isSuccess) {
             setSnackbar({
               severity: "error",
               description: data.message,
@@ -94,7 +93,6 @@ export const BankRedirectListingTable = () => {
 
   const handleChangePagination = (model: GridPaginationModel) => {
     setPaginationModel(model);
-    setTableData(undefined);
 
     getVPosRoutingList(
       {
@@ -105,9 +103,7 @@ export const BankRedirectListingTable = () => {
       },
       {
         onSuccess: (data) => {
-          if (data.isSuccess) {
-            setTableData(data?.data);
-          } else {
+          if (!data.isSuccess) {
             setSnackbar({
               severity: "error",
               description: data.message,
@@ -165,6 +161,25 @@ export const BankRedirectListingTable = () => {
   const columns: GridColDef[] = useMemo(() => {
     return [
       {
+        field: "actions",
+        type: "actions",
+        width: 80,
+        getActions: (params) => {
+          return [
+            !!showUpdate ? <GridActionsCellItem
+              label="Düzenle"
+              onClick={editRow(params.row)}
+              showInMenu
+            /> : <></>,
+            !!showDelete ? <GridActionsCellItem
+              label="Sil"
+              onClick={deleteRow(params.row)}
+              showInMenu
+            /> : <></>,
+          ];
+        },
+      },
+      {
         field: "issuerCardBankName",
         headerName: "Yönlendirelecek Kartın Bankası",
         width: 350,
@@ -195,27 +210,8 @@ export const BankRedirectListingTable = () => {
         width: 200,
       },
       { field: "createUserName", headerName: "Düzenleyen", width: 200 },
-      {
-        field: "actions",
-        type: "actions",
-        width: 80,
-        getActions: (params) => {
-          return [
-            <GridActionsCellItem
-              label="Düzenle"
-              onClick={editRow(params.row)}
-              showInMenu
-            />,
-            <GridActionsCellItem
-              label="Sil"
-              onClick={deleteRow(params.row)}
-              showInMenu
-            />,
-          ];
-        },
-      },
     ];
-  }, [deleteRow, editRow]);
+  }, [deleteRow, editRow, showDelete, showUpdate]);
 
   const onSave = () => {
     getVPosRoutingList(

@@ -24,6 +24,7 @@ import {
   DeleteCampaignRequest,
   useCampaignDelete,
   PagingResponse,
+  useAuthorization,
 } from "../../../hooks";
 import { Button, Loading } from "../../atoms";
 import {
@@ -37,6 +38,7 @@ import { downloadExcel } from "../../../util/downloadExcel";
 
 export const CampaignListTable = () => {
   const theme = useTheme();
+  const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [tableData, setTableData] = useState<PagingResponse<Array<any>>>();
   const [paginationModel, setPaginationModel] = React.useState({
@@ -211,6 +213,18 @@ export const CampaignListTable = () => {
   const columns: GridColDef[] = useMemo(() => {
     return [
       {
+        field: "actions",
+        type: "actions",
+        width: 80,
+        getActions: (params) => [
+          !!showDelete ? <GridActionsCellItem
+            label="Sil"
+            onClick={deleteRow(params.row)}
+            showInMenu
+          /> : <></>,
+        ],
+      },
+      {
         field: "startDateFormatted",
         headerName: "Başlangıç Tarihi",
         width: 200,
@@ -274,20 +288,8 @@ export const CampaignListTable = () => {
           return `${params.value} TL`;
         },
       },
-      {
-        field: "actions",
-        type: "actions",
-        width: 80,
-        getActions: (params) => [
-          <GridActionsCellItem
-            label="Sil"
-            onClick={deleteRow(params.row)}
-            showInMenu
-          />,
-        ],
-      },
     ];
-  }, [deleteRow]);
+  }, [deleteRow, showDelete]);
 
   const onSave = () => {
     console.log("burda");

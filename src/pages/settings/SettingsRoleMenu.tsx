@@ -23,7 +23,7 @@ export const SettingsRoleMenu = () => {
         onClickAddButton: handleAddButton,
       }}
     >
-      <RoleMenuListingTable onRowClick={handleRowClick} />
+      <RoleMenuListingTable isMenuOpen={isOpen} onRowClick={handleRowClick} />
       {isOpen && (
         <RoleMenuAddModal
           roleMenu={roleMenuData}

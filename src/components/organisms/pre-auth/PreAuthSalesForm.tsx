@@ -11,13 +11,13 @@ import {
   useGetPaymentModelSettingsList,
   usePaymentSales,
   IPaymentPreAuthRequest,
+  useAuthorization,
 } from "../../../hooks";
 import {
   InputControl,
   FormatInputControl,
   SelectControl,
   NumericFormatInputControl,
-  BaseModal,
 } from "../../molecules";
 import {
   addPreAuthFormSchema,
@@ -28,6 +28,7 @@ import { useSetSnackBar } from "../../../store/Snackbar.state";
 
 export const PreAuthSalesForm = () => {
   const theme = useTheme();
+  const {showCreate} = useAuthorization();
   const [html, setHtml] = useState();
   const [isHtmlOpen, setIsHtmlOpen] = useState(false);
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
@@ -278,12 +279,14 @@ export const PreAuthSalesForm = () => {
               </FormControl>
             </Stack>
             <Stack direction="row" justifyContent="flex-end" width={isDesktop ? 800 : 'auto'}>
-              <Button
-                sx={{ width: 100 }}
-                onClick={handleSubmit(onSubmit)}
-                variant="contained"
-                text={"Öde"}
-              />
+              {!!showCreate && (
+                <Button
+                  sx={{ width: 100 }}
+                  onClick={handleSubmit(onSubmit)}
+                  variant="contained"
+                  text={"Öde"}
+                />
+              )}
             </Stack>
           </Stack>
         </Stack>

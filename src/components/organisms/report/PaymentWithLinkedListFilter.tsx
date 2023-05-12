@@ -25,6 +25,7 @@ import {
   useGetPaymentWithLinkedList,
   usePassiveLinkedPayment,
   IPaymentWithLinkedListItem,
+  useAuthorization,
 } from "../../../hooks";
 import { PagingResponse } from "../../../hooks/_types";
 import {
@@ -35,6 +36,7 @@ import {
 import { useSetSnackBar } from "../../../store/Snackbar.state";
 
 export const PaymentWithLinkedListFilter = () => {
+  const {showDelete, showUpdate} = useAuthorization();
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const { data: rawMerchantList } = useGetAllMerchantList();
@@ -207,6 +209,18 @@ export const PaymentWithLinkedListFilter = () => {
 
   const columns: GridColDef[] = useMemo(() => {
     return [
+      {
+        field: "actions",
+        type: "actions",
+        width: 80,
+        getActions: (params) => [
+          !!showDelete ? <GridActionsCellItem
+            label="Sil"
+            onClick={deleteRow(params.row)}
+            showInMenu
+          /> : <></>,
+        ],
+      },
       { field: "merchantId", headerName: "Üye İşyeri No.", width: 150 },
       { field: "merchantName", headerName: "Üye İşyeri Adı", width: 430 },
       {
@@ -220,20 +234,8 @@ export const PaymentWithLinkedListFilter = () => {
         width: 220,
       },
       { field: "status", headerName: "Durum", width: 200 },
-      {
-        field: "actions",
-        type: "actions",
-        width: 80,
-        getActions: (params) => [
-          <GridActionsCellItem
-            label="Sil"
-            onClick={deleteRow(params.row)}
-            showInMenu
-          />,
-        ],
-      },
     ];
-  }, [deleteRow]);
+  }, [deleteRow, showDelete]);
 
   const onSave = () => {
     GetPaymentWithLinkedList(

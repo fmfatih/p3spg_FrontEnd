@@ -11,6 +11,7 @@ import {
   useGetParameterList,
   DeleteParameterRequest,
   useDeleteParameter,
+  useAuthorization,
 } from "../../../hooks";
 import { Loading } from "../../atoms";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
@@ -28,6 +29,7 @@ export const ParameterListingTable = ({
 }: ParameterListingTableProps) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const {showDelete, showUpdate} = useAuthorization();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
@@ -175,10 +177,6 @@ export const ParameterListingTable = ({
   };
   const columns: GridColDef[] = useMemo(() => {
     return [
-      { field: "id", headerName: "Parametre ID", flex: 1 },
-      { field: "groupCode", headerName: "Group Kodu", flex: 1 },
-      { field: "key", headerName: "Anahtar", flex: 1 },
-      { field: "value", headerName: "Değer", flex: 1 },
       {
         field: "actions",
         type: "actions",
@@ -189,15 +187,19 @@ export const ParameterListingTable = ({
             label="Düzenle"
             showInMenu
           />, */
-          <GridActionsCellItem
+          !!showDelete ? <GridActionsCellItem
             label="Sil"
             onClick={deleteRow(params.row)}
             showInMenu
-          />,
+          /> : null,
         ],
       },
+      { field: "id", headerName: "Parametre ID", flex: 1 },
+      { field: "groupCode", headerName: "Group Kodu", flex: 1 },
+      { field: "key", headerName: "Anahtar", flex: 1 },
+      { field: "value", headerName: "Değer", flex: 1 },
     ];
-  }, [deleteRow]);
+  }, [deleteRow, showDelete]);
 
   const onSave = () => {
     getParameterList(
@@ -245,7 +247,7 @@ export const ParameterListingTable = ({
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               isRowSelectable={() => false}
               disableColumnMenu
-              onRowClick={onRowClick}
+              onRowClick={!!showUpdate ? onRowClick : () => null}
               rows={tableData.result}
               columns={columns}
               exportFileName="Parametre Listesi"

@@ -11,6 +11,7 @@ import {
   useGetCardTypeList,
   useCampaignAdd,
   ICampaignAddRequest,
+  useAuthorization,
 } from "../../../hooks";
 import {  useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +26,7 @@ import { useSetSnackBar } from "../../../store/Snackbar.state";
 
 export const CampaignAddForm = () => {
   const theme = useTheme();
+  const {showCreate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const { mutate: CampaignAdd } =
     useCampaignAdd();
@@ -130,6 +132,8 @@ export const CampaignAddForm = () => {
     });
     setSelectedBins(list);
   };
+
+  const handleBack = () => navigate("/dashboard");
 
   getValues();
 
@@ -296,11 +300,14 @@ export const CampaignAddForm = () => {
             </FormControl>
           </Stack>
           <Stack direction={isDesktop ? "row" : 'column'} justifyContent="flex-end" width={isDesktop ? 800 : 'auto'}>
-            <Button
-              onClick={handleSubmit(onSubmit)}
-              variant="contained"
-              text={"Kaydet"}
-            />
+            {!!showCreate && (
+              <Button
+                onClick={handleSubmit(onSubmit)}
+                variant="contained"
+                text={"Kaydet"}
+              />
+            )} 
+            <Button onClick={handleBack} sx={{ mx: 2 }} text={"Iptal"} />
           </Stack>
         </Stack>
       </Stack>

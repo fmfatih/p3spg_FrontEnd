@@ -6,6 +6,7 @@ import {
   useGetCurrencyCodeList,
   usePaymentWithLinked,
   IPaymentWithLinkedRequest,
+  useAuthorization,
 } from "../../../hooks";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import {
@@ -38,6 +39,7 @@ import { default as dayjs } from "dayjs";
 
 export const PaymentWithLinkedForm = () => {
   const theme = useTheme();
+  const {showCreate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const { data: rawAcquirerBankList } = useGetAcquirerBankList();
   const { data: rawMerchantList } = useGetAllMerchantList();
@@ -298,11 +300,13 @@ export const PaymentWithLinkedForm = () => {
               </FormControl>
             </Stack>
             <Stack direction="row" justifyContent="flex-end" width={isDesktop ? 800 : 'auto'}>
-              <Button
-                onClick={handleSubmit(onSubmit)}
-                variant="contained"
-                text={"Ödeme Lİnkİ Oluştur"}
-              />
+              {!!showCreate && (
+                <Button
+                  onClick={handleSubmit(onSubmit)}
+                  variant="contained"
+                  text={"Ödeme Lİnkİ Oluştur"}
+                />
+              )}
             </Stack>
             {currentUrl && (
               <Stack direction="row" justifyContent="center" width={isDesktop ? 800 : 'auto'}>

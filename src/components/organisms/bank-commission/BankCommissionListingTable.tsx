@@ -16,6 +16,7 @@ import {
   useDeleteCommissionParameter,
   useGetCommissionParameterList,
   PagingResponse,
+  useAuthorization,
 } from "../../../hooks";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
@@ -41,6 +42,7 @@ export const BankCommissionListingTable = ({
   onRowClick,
 }: BankCommissionListingTableProps) => {
   const theme = useTheme();
+  const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [tableData, setTableData] =
     useState<PagingResponse<Array<ICommissionParameter>>>();
@@ -189,6 +191,23 @@ export const BankCommissionListingTable = ({
 
   const columns: GridColDef[] = useMemo(() => {
     return [
+      {
+        field: "actions",
+        type: "actions",
+        width: 80,
+        getActions: (params) => [
+          !!showUpdate ? <GridActionsCellItem
+            onClick={editRow(params.row)}
+            label="Düzenle"
+            showInMenu
+          /> : <></>,
+          !!showDelete ? <GridActionsCellItem
+            label="Sil"
+            onClick={deleteRow(params.row)}
+            showInMenu
+          /> : <></>,
+        ],
+      },
       { field: "profileCode", headerName: "Profil", width: 200 },
       { field: "merchantId", headerName: "Üye İşyeri Kodu", width: 150 },
       { field: "merchantName", headerName: "Üye İşyeri Adı", width: 380 },
@@ -313,26 +332,8 @@ export const BankCommissionListingTable = ({
         headerName: "Güncelleyen Kullanıcı",
         width: 200,
       },
-
-      {
-        field: "actions",
-        type: "actions",
-        width: 80,
-        getActions: (params) => [
-          <GridActionsCellItem
-            onClick={editRow(params.row)}
-            label="Düzenle"
-            showInMenu
-          />,
-          <GridActionsCellItem
-            label="Sil"
-            onClick={deleteRow(params.row)}
-            showInMenu
-          />,
-        ],
-      },
     ];
-  }, [deleteRow, editRow]);
+  }, [deleteRow, editRow, showDelete, showUpdate]);
 
   const onSave = () => {
     getCommissionParameterList(

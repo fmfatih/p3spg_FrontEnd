@@ -12,6 +12,7 @@ import { Loading, StatusBar } from "../../atoms";
 import {
   DeleteMemberVPosRequest,
   IMemberVPos,
+  useAuthorization,
   useGetMemberVPosList,
   useMemberVPosDelete,
   useMemberVPosUpdate,
@@ -35,6 +36,7 @@ export const BankListingActiveTable = ({
   onRowClick,
 }: BankListingTableProps) => {
   const theme = useTheme();
+  const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
@@ -147,6 +149,25 @@ export const BankListingActiveTable = ({
 
   const columns: GridColDef[] = useMemo(() => {
     return [
+      {
+        field: "update",
+        type: "actions",
+        width: 80,
+        getActions: (params) => {
+          return [
+            !!showUpdate ? <GridActionsCellItem
+              label="Düzenle"
+              onClick={editRow(params.row)}
+              showInMenu
+            /> : <></>,
+            !!showDelete ? <GridActionsCellItem
+              label="Sil"
+              onClick={deleteRow(params.row)}
+              showInMenu
+            /> : <></>,
+          ];
+        },
+      },
       { field: "bankName", headerName: "Banka Adı", width: 400 },
       {
         field: "createUserName",
@@ -194,34 +215,8 @@ export const BankListingActiveTable = ({
           ];
         },
       },
-      {
-        field: "update",
-        type: "actions",
-        width: 80,
-        getActions: (params) => {
-          return [
-            <GridActionsCellItem
-              label="Düzenle"
-              onClick={editRow(params.row)}
-              showInMenu
-            />,
-            <GridActionsCellItem
-              label="Sil"
-              onClick={deleteRow(params.row)}
-              showInMenu
-            />,
-          ];
-        },
-      },
     ];
-  }, [
-    deleteRow,
-    editRow,
-    getMemberVPosList,
-    memberVPosUpdate,
-    paginationModel.page,
-    paginationModel.pageSize,
-  ]);
+  }, [deleteRow, editRow, getMemberVPosList, memberVPosUpdate, paginationModel.page, paginationModel.pageSize, showDelete, showUpdate]);
 
   const handleChangePagination = (model: GridPaginationModel) => {
     setPaginationModel(model);

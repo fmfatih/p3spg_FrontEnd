@@ -7,6 +7,7 @@ import {
   useGetIssuerBankList,
   useGetAcquirerBankList,
   useGetTransactionSubTypeSettingsList,
+  useAuthorization,
 } from "../../../hooks";
 import {
   Box,
@@ -31,14 +32,16 @@ import {
   BankAddRedirectFormValuesType,
   initialBankAddRedirectState,
 } from "./_formTypes";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
 import { useUserInfo } from "../../../store/User.state";
 
 export const BankRedirectAddForm = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const vPosRouting = useLocation().state as unknown as IVPosRouting;
+  const {showCreate} = useAuthorization();
   const [userInfo] = useUserInfo();
   const { control, reset, handleSubmit, setValue } =
     useForm<BankAddRedirectFormValuesType>({
@@ -245,6 +248,8 @@ export const BankRedirectAddForm = () => {
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
+  const handleBack = () => navigate("/dashboard");
+
   return (
     <>
       {(isLoading || isUpdateLoading) && <Loading />}
@@ -422,12 +427,14 @@ export const BankRedirectAddForm = () => {
           direction="row"
           justifyContent="flex-end"
         >
-          <Button
-            onClick={handleSubmit(onSubmit)}
-            variant="contained"
-            text={vPosRouting && vPosRouting.id > 0 ? "Güncelle" : "Kaydet"}
-          />
-          <Button sx={{ mx: 2 }} text={"Iptal"} />
+          {!!showCreate && (
+            <Button
+              onClick={handleSubmit(onSubmit)}
+              variant="contained"
+              text={vPosRouting && vPosRouting.id > 0 ? "Güncelle" : "Kaydet"}
+            />
+          )}
+          <Button onClick={handleBack} sx={{ mx: 2 }} text={"Iptal"} />
         </Stack>
       </Stack>
     </>

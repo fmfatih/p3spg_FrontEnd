@@ -17,7 +17,6 @@ export type HeaderProps = {
 
 export const Header = ({
   onClickAddButton,
-  onClickDownloadButton,
   hideAddButton = false,
   headerTitle,
 }: HeaderProps) => {

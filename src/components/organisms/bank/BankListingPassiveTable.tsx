@@ -6,18 +6,17 @@ import {
   GridPaginationModel,
 } from "@mui/x-data-grid";
 import { useEffect, useMemo, useState } from "react";
-import { IconButton, Stack, useMediaQuery, useTheme } from "@mui/material";
+import { Stack, useMediaQuery, useTheme } from "@mui/material";
 import { DeleteConfirmModal, Table } from "../../molecules";
 import { Loading, StatusBar } from "../../atoms";
 import {
   IMemberVPos,
   PagingResponse,
+  useAuthorization,
   useGetMemberVPosList,
 } from "../../../hooks";
-import { DeleteOutlineTwoTone } from "@mui/icons-material";
 import React from "react";
 import { DeleteMemberVPosRequest, useMemberVPosDelete } from "../../../hooks";
-import { useNavigate } from "react-router-dom";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
 import { downloadExcel } from "../../../util/downloadExcel";
 
@@ -35,6 +34,7 @@ export const BankListingPassiveTable = ({
   onRowClick,
 }: BankListingTableProps) => {
   const theme = useTheme();
+  const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [tableData, setTableData] =
     useState<PagingResponse<Array<IMemberVPos>>>();
@@ -173,6 +173,20 @@ export const BankListingPassiveTable = ({
 
   const columns: GridColDef[] = useMemo(() => {
     return [
+      {
+        field: "update",
+        type: "actions",
+        width: 80,
+        getActions: (params) => {
+          return [
+            !!showDelete ? <GridActionsCellItem
+              label="Sil"
+              onClick={deleteRow(params.row)}
+              showInMenu
+            /> : <></>,
+          ];
+        },
+      },
       { field: "bankName", headerName: "Banka Adı", width: 400 },
       {
         field: "createUserName",
@@ -186,22 +200,8 @@ export const BankListingPassiveTable = ({
         headerName: "Durum",
         width: 100,
       },
-      {
-        field: "update",
-        type: "actions",
-        width: 80,
-        getActions: (params) => {
-          return [
-            <GridActionsCellItem
-              label="Sil"
-              onClick={deleteRow(params.row)}
-              showInMenu
-            />,
-          ];
-        },
-      },
     ];
-  }, [deleteRow]);
+  }, [deleteRow, showDelete]);
 
   const onSave = () => {
     getMemberVPosList(

@@ -30,6 +30,7 @@ import {
   IMerchantAddRequest,
   IMerchant,
   useMerchantUpdate,
+  useAuthorization,
 } from "../../../hooks";
 import { useEffect, useMemo, useState } from "react";
 import { useUserMerchantId } from "./Merchant.state";
@@ -53,23 +54,34 @@ export const MerchantAddFormCompanyStep = ({
 }: MerchantAddFormCompanyStepProps) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
-
+  const {showCreate} = useAuthorization();
   const { mutate: addMerchant, isLoading } = useMerchantAdd();
   const { mutate: updateMerchant, isLoading: updateLoading } =
     useMerchantUpdate();
   const [, setMerchantId] = useUserMerchantId();
   const [taxAdministrations, setTaxAdministrations] = useState([]);
-  const { data: rawMerchantStatus } = useGetMerchantStatusList({});
-  const { data: rawMerchantTypes } = useGetMerchantTypeList({});
-  const { data: rawPosTypes } = useGetPosTypeList({});
-  const { data: rawMerchantList } = useGetAllMerchantList();
+  const { data: rawMerchantStatus, isLoading: isMerchantStatusLoading } =
+    useGetMerchantStatusList({});
+  const { data: rawMerchantTypes, isLoading: isMerchantTypeLoading } =
+    useGetMerchantTypeList({});
+  const { data: rawPosTypes, isLoading: isPosTypeLoading } = useGetPosTypeList(
+    {}
+  );
+  const { data: rawMerchantList, isLoading: isMerchantListLoading } =
+    useGetAllMerchantList();
   const {
     data: rawMerchantCategoryList,
     isLoading: isMerchantCategoryLoading,
   } = useGetMerchantCategoryList({});
-  const { data: rawCommissionProfileList } = useGetCommissionProfileList({});
-  const { data: rawCityList } = useGetCityList({});
-  const { mutate: getTaxAdministrationList } = useGetTaxAdministrationList();
+  const {
+    data: rawCommissionProfileList,
+    isLoading: isCommissionProfileListLoading,
+  } = useGetCommissionProfileList({});
+  const { data: rawCityList, isLoading: isCityListLoading } = useGetCityList(
+    {}
+  );
+  const { mutate: getTaxAdministrationList, isLoading: isTaxListLoading } =
+    useGetTaxAdministrationList();
   const { control, reset, handleSubmit, setValue, getValues } =
     useForm<FirstStepFormValuesType>({
       resolver: zodResolver(firstStepFormSchema),
@@ -206,7 +218,9 @@ export const MerchantAddFormCompanyStep = ({
       mobilePos: false,
       vpos: false,
       pos: false,
-      parentMerchantId: Number(selectedMerchant?.value),
+      parentMerchantId: selectedMerchant?.value
+        ? Number(selectedMerchant?.value)
+        : 0,
       merchantName,
       tradeName,
       tradeRegistrationNumber,
@@ -351,316 +365,336 @@ export const MerchantAddFormCompanyStep = ({
     setValue,
   ]);
 
+  const hasLoading =
+    isMerchantCategoryLoading ||
+    isLoading ||
+    isMerchantListLoading ||
+    isMerchantStatusLoading ||
+    updateLoading ||
+    isMerchantStatusLoading ||
+    isMerchantTypeLoading ||
+    isPosTypeLoading ||
+    isCommissionProfileListLoading ||
+    isCityListLoading ||
+    isTaxListLoading;
   return (
     <>
-      {isLoading && <Loading />}
-      <Stack pt={3} flex={1} justifyContent="space-between">
-        <Stack px={isDesktop ? 4 : 1} mb={3} spacing={3}>
-          <Stack
-            width={isDesktop ? 800 : "auto"}
-            spacing={4}
-            direction={isDesktop ? "row" : "column"}
-          >
-            <Box sx={{ width: isDesktop ? "50%" : "100%" }}>
-              <Typography color="text.default" variant="overline">
-                İşyeri Tipi
-              </Typography>
-              {merchantTypes && (
-                <RadioButtonsControl
-                  row
-                  id="merchantType"
-                  control={control}
-                  defaultValue={merchantTypes[0]?.value}
-                  items={merchantTypes}
-                />
-              )}
-            </Box>
-            <Box sx={{ width: isDesktop ? "50%" : "100%" }}>
-              <Typography color="text.default" variant="overline">
-                POS Tipi
-              </Typography>
-              {posTypes && (
-                <CheckboxesControl
-                  row
-                  id="posList"
-                  control={control}
-                  items={posTypes}
-                />
-              )}
-            </Box>
-          </Stack>
-          <Stack
-            width={isDesktop ? 800 : "auto"}
-            spacing={3}
-            direction={isDesktop ? "row" : "column"}
-          >
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-              {merchantList && (
-                <Controller
-                  control={control}
-                  name="parentMerchantId"
-                  render={() => {
-                    return (
-                      <>
-                        <Autocomplete
-                          sx={{ mr: isDesktop ? 3 : 0 }}
-                          onChange={(event, selectedValue) => {
-                            setSelectedMerchant(selectedValue);
-                            setValue(
-                              "parentMerchantId",
-                              selectedValue?.value || 0
-                            );
-                          }}
-                          id="parentMerchantId"
-                          options={merchantList}
-                          value={selectedMerchant}
-                          getOptionLabel={(option: {
-                            label: string;
-                            value: number;
-                          }) => option.label}
-                          renderInput={(params) => (
-                            <TextField {...params} label="Ana İşyeri" />
-                          )}
-                        />
-                      </>
-                    );
-                  }}
-                />
-              )}
-            </FormControl>
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-              {merchantStatuses && (
-                <SelectControl
+      {hasLoading ? (
+        <Loading />
+      ) : (
+        <Stack pt={3} flex={1} justifyContent="space-between">
+          <Stack px={isDesktop ? 4 : 1} mb={3} spacing={3}>
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={4}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <Box sx={{ width: isDesktop ? "50%" : "100%" }}>
+                <Typography color="text.default" variant="overline">
+                  İşyeri Tipi
+                </Typography>
+                {merchantTypes && (
+                  <RadioButtonsControl
+                    row
+                    id="merchantType"
+                    control={control}
+                    defaultValue={merchantTypes[0]?.value}
+                    items={merchantTypes}
+                  />
+                )}
+              </Box>
+              <Box sx={{ width: isDesktop ? "50%" : "100%" }}>
+                <Typography color="text.default" variant="overline">
+                  POS Tipi
+                </Typography>
+                {posTypes && (
+                  <CheckboxesControl
+                    row
+                    id="posList"
+                    control={control}
+                    items={posTypes}
+                  />
+                )}
+              </Box>
+            </Stack>
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                {merchantList && (
+                  <Controller
+                    control={control}
+                    name="parentMerchantId"
+                    render={() => {
+                      return (
+                        <>
+                          <Autocomplete
+                            sx={{ mr: isDesktop ? 3 : 0 }}
+                            onChange={(event, selectedValue) => {
+                              setSelectedMerchant(selectedValue);
+                              setValue(
+                                "parentMerchantId",
+                                selectedValue?.value || 0
+                              );
+                            }}
+                            id="parentMerchantId"
+                            options={merchantList}
+                            value={selectedMerchant}
+                            getOptionLabel={(option: {
+                              label: string;
+                              value: number;
+                            }) => option.label}
+                            renderInput={(params) => (
+                              <TextField {...params} label="Ana İşyeri" />
+                            )}
+                          />
+                        </>
+                      );
+                    }}
+                  />
+                )}
+              </FormControl>
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                {merchantStatuses && (
+                  <SelectControl
+                    sx={{ mr: isDesktop ? 3 : 0 }}
+                    id="merchantStatusType"
+                    control={control}
+                    label="İşyeri Durumu"
+                    items={merchantStatuses}
+                  />
+                )}
+              </FormControl>
+            </Stack>
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                <InputControl
                   sx={{ mr: isDesktop ? 3 : 0 }}
-                  id="merchantStatusType"
+                  id="merchantName"
                   control={control}
-                  label="İşyeri Durumu"
-                  items={merchantStatuses}
+                  label="İşyeri Adı"
                 />
-              )}
-            </FormControl>
-          </Stack>
-          <Stack
-            width={isDesktop ? 800 : "auto"}
-            spacing={3}
-            direction={isDesktop ? "row" : "column"}
-          >
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-              <InputControl
-                sx={{ mr: isDesktop ? 3 : 0 }}
-                id="merchantName"
-                control={control}
-                label="İşyeri Adı"
-              />
-            </FormControl>
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-              <InputControl
-                sx={{ mr: isDesktop ? 3 : 0 }}
-                id="tradeName"
-                control={control}
-                label="İşyeri Ticari Adı"
-              />
-            </FormControl>
-          </Stack>
-          <Stack
-            width={isDesktop ? 800 : "auto"}
-            spacing={3}
-            direction={isDesktop ? "row" : "column"}
-          >
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-              <InputControl
-                sx={{ mr: isDesktop ? 3 : 0 }}
-                id="tradeRegistrationNumber"
-                control={control}
-                label="Sicil No"
-                numeric
-              />
-            </FormControl>
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-              {commissionProfileList && (
-                <SelectControl
+              </FormControl>
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                <InputControl
                   sx={{ mr: isDesktop ? 3 : 0 }}
-                  id="commissionProfileCode"
+                  id="tradeName"
                   control={control}
-                  label="Çalışma Koşulu"
-                  items={commissionProfileList}
+                  label="İşyeri Ticari Adı"
                 />
-              )}
-            </FormControl>
-          </Stack>
-          <FormControl sx={{ width: isDesktop ? 800 : "auto" }}>
-            <InputControl
-              sx={{ mr: isDesktop ? 3 : 0 }}
-              id="webSite"
-              control={control}
-              label="Web Sitesi"
-            />
-          </FormControl>
-          <Stack
-            width={isDesktop ? 800 : "auto"}
-            spacing={3}
-            direction={isDesktop ? "row" : "column"}
-          >
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-              {cityList && (
-                <Controller
-                  control={control}
-                  name="city"
-                  render={({
-                    field: { onChange, value },
-                    fieldState: { error },
-                  }) => {
-                    return (
-                      <>
-                        <Autocomplete
-                          sx={{ mr: isDesktop ? 3 : 0 }}
-                          id="city"
-                          options={cityList}
-                          value={selectedCity || null}
-                          onChange={(event, selectedValue) => {
-                            setSelectedCity(selectedValue);
-                            onChange(onChange);
-                          }}
-                          getOptionLabel={(option: {
-                            label: string;
-                            value: number;
-                          }) => option.label}
-                          renderInput={(params) => (
-                            <TextField {...params} label="Vergi Dairesi İli" />
-                          )}
-                        />
-                      </>
-                    );
-                  }}
-                />
-              )}
-            </FormControl>
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-              <InputControl
-                sx={{ mr: isDesktop ? 3 : 0 }}
-                id="taxNumber"
-                control={control}
-                label="Vergi Numarası"
-                numeric
-                maxLength={10}
-              />
-            </FormControl>
-          </Stack>
-          <Stack
-            width={isDesktop ? 800 : "auto"}
-            spacing={3}
-            direction={isDesktop ? "row" : "column"}
-          >
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-              {taxAdministrations && (
-                <SelectControl
+              </FormControl>
+            </Stack>
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                <InputControl
                   sx={{ mr: isDesktop ? 3 : 0 }}
-                  id="taxOfficeCode"
+                  id="tradeRegistrationNumber"
                   control={control}
-                  label="Vergi Dairesi"
-                  items={taxAdministrations}
+                  label="Sicil No"
+                  numeric
                 />
-              )}
-            </FormControl>
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+              </FormControl>
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                {commissionProfileList && (
+                  <SelectControl
+                    sx={{ mr: isDesktop ? 3 : 0 }}
+                    id="commissionProfileCode"
+                    control={control}
+                    label="Çalışma Koşulu"
+                    items={commissionProfileList}
+                  />
+                )}
+              </FormControl>
+            </Stack>
+            <FormControl sx={{ width: isDesktop ? 800 : "auto" }}>
               <InputControl
                 sx={{ mr: isDesktop ? 3 : 0 }}
-                id="citizenshipNumber"
+                id="webSite"
                 control={control}
-                label="Kimlik Numarası"
-                numeric
-                maxLength={11}
+                label="Web Sitesi"
               />
             </FormControl>
-          </Stack>
-          <Stack
-            width={isDesktop ? 800 : "auto"}
-            spacing={3}
-            direction={isDesktop ? "row" : "column"}
-          >
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-              {merchantCategoryList && (
-                <Controller
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                {cityList && (
+                  <Controller
+                    control={control}
+                    name="city"
+                    render={({
+                      field: { onChange, value },
+                      fieldState: { error },
+                    }) => {
+                      return (
+                        <>
+                          <Autocomplete
+                            sx={{ mr: isDesktop ? 3 : 0 }}
+                            id="city"
+                            options={cityList}
+                            value={selectedCity || null}
+                            onChange={(event, selectedValue) => {
+                              setSelectedCity(selectedValue);
+                              onChange(onChange);
+                            }}
+                            getOptionLabel={(option: {
+                              label: string;
+                              value: number;
+                            }) => option.label}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                label="Vergi Dairesi İli"
+                              />
+                            )}
+                          />
+                        </>
+                      );
+                    }}
+                  />
+                )}
+              </FormControl>
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                <InputControl
+                  sx={{ mr: isDesktop ? 3 : 0 }}
+                  id="taxNumber"
                   control={control}
-                  name="mcc"
-                  render={() => {
-                    return (
-                      <>
-                        <Autocomplete
-                          sx={{ mr: isDesktop ? 3 : 0 }}
-                          options={merchantCategoryList}
-                          onChange={(event, selectedValue) => {
-                            setSelectedMcc(selectedValue);
-                            setValue(
-                              "mcc",
-                              selectedValue?.value?.toString() || ""
-                            );
-                          }}
-                          value={selectedMcc || null}
-                          id="mcc"
-                          loading={isMerchantCategoryLoading}
-                          getOptionLabel={(option: {
-                            label: string;
-                            value: string;
-                          }) => option.label}
-                          renderInput={(params) => (
-                            <TextField {...params} label="MCC" />
-                          )}
-                        />
-                      </>
-                    );
-                  }}
+                  label="Vergi Numarası"
+                  numeric
+                  maxLength={10}
                 />
-              )}
-            </FormControl>
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-              <DatePickerControl
-                sx={{ mr: isDesktop ? 3 : 0 }}
-                id="openingDate"
-                control={control}
-                label="İşyeri Açılış Tarihi"
-                defaultValue={dayjs()}
-              />
-            </FormControl>
+              </FormControl>
+            </Stack>
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                {taxAdministrations && (
+                  <SelectControl
+                    sx={{ mr: isDesktop ? 3 : 0 }}
+                    id="taxOfficeCode"
+                    control={control}
+                    label="Vergi Dairesi"
+                    items={taxAdministrations}
+                  />
+                )}
+              </FormControl>
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                <InputControl
+                  sx={{ mr: isDesktop ? 3 : 0 }}
+                  id="citizenshipNumber"
+                  control={control}
+                  label="Kimlik Numarası"
+                  numeric
+                  maxLength={11}
+                />
+              </FormControl>
+            </Stack>
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                {merchantCategoryList && (
+                  <Controller
+                    control={control}
+                    name="mcc"
+                    render={() => {
+                      return (
+                        <>
+                          <Autocomplete
+                            sx={{ mr: isDesktop ? 3 : 0 }}
+                            options={merchantCategoryList}
+                            onChange={(event, selectedValue) => {
+                              setSelectedMcc(selectedValue);
+                              setValue(
+                                "mcc",
+                                selectedValue?.value?.toString() || ""
+                              );
+                            }}
+                            value={selectedMcc || null}
+                            id="mcc"
+                            loading={isMerchantCategoryLoading}
+                            getOptionLabel={(option: {
+                              label: string;
+                              value: string;
+                            }) => option.label}
+                            renderInput={(params) => (
+                              <TextField {...params} label="MCC" />
+                            )}
+                          />
+                        </>
+                      );
+                    }}
+                  />
+                )}
+              </FormControl>
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                <DatePickerControl
+                  sx={{ mr: isDesktop ? 3 : 0 }}
+                  id="openingDate"
+                  control={control}
+                  label="İşyeri Açılış Tarihi"
+                  defaultValue={dayjs()}
+                />
+              </FormControl>
+            </Stack>
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                <DatePickerControl
+                  sx={{ mr: isDesktop ? 3 : 0 }}
+                  id="aggreementDate"
+                  control={control}
+                  label="İşyeri Sözleşme Tarihi"
+                  defaultValue={dayjs()}
+                />
+              </FormControl>
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                <DatePickerControl
+                  sx={{ mr: isDesktop ? 3 : 0 }}
+                  id="closedDate"
+                  control={control}
+                  label="İşyeri Kapanış Tarihi"
+                />
+              </FormControl>
+            </Stack>
           </Stack>
           <Stack
-            width={isDesktop ? 800 : "auto"}
-            spacing={3}
-            direction={isDesktop ? "row" : "column"}
+            borderTop="1px solid #E6E9ED"
+            direction="row"
+            py={2}
+            px={4}
+            justifyContent="flex-end"
           >
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-              <DatePickerControl
-                sx={{ mr: isDesktop ? 3 : 0 }}
-                id="aggreementDate"
-                control={control}
-                label="İşyeri Sözleşme Tarihi"
-                defaultValue={dayjs()}
+            {!!showCreate && (
+              <Button
+                variant="contained"
+                text="Devam"
+                onClick={handleSubmit(onSubmit)}
               />
-            </FormControl>
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-              <DatePickerControl
-                sx={{ mr: isDesktop ? 3 : 0 }}
-                id="closedDate"
-                control={control}
-                label="İşyeri Kapanış Tarihi"
-              />
-            </FormControl>
+            )}
           </Stack>
         </Stack>
-        <Stack
-          borderTop="1px solid #E6E9ED"
-          direction="row"
-          py={2}
-          px={4}
-          justifyContent="flex-end"
-        >
-          <Button
-            variant="contained"
-            text="Devam"
-            onClick={handleSubmit(onSubmit)}
-          />
-        </Stack>
-      </Stack>
+      )}
     </>
   );
 };

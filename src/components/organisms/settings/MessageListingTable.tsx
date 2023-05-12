@@ -12,6 +12,7 @@ import {
   useGetResourceList,
   DeleteResourceRequest,
   useDeleteResource,
+  useAuthorization,
 } from "../../../hooks";
 import { Loading } from "../../atoms";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
@@ -26,6 +27,7 @@ export const MessageListingTable = ({
   isModalOpen,
 }: MessageListingTableProps) => {
   const theme = useTheme();
+  const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
@@ -171,26 +173,25 @@ export const MessageListingTable = ({
 
   const columns: GridColDef[] = useMemo(() => {
     return [
-      { field: "key", headerName: "Mesaj Kodu", width: 190 },
-      { field: "value", headerName: "Mesaj Açıklaması", flex: 1 },
-      { field: "resourceTypeName", headerName: "Mesaj Türü", width: 190 },
-      { field: "order", headerName: "Entegrasyon Mesaj Kodu", width: 220 },
-      { field: "language", headerName: "Dil", width: 190 },
       {
         field: "actions",
         type: "actions",
         width: 80,
         getActions: (params) => [
-          //<GridActionsCellItem label="Düzenle" showInMenu />,
-          <GridActionsCellItem
+          !!showDelete ? <GridActionsCellItem
             label="Sil"
             onClick={deleteRow(params.id)}
             showInMenu
-          />,
+          /> : null,
         ],
       },
+      { field: "key", headerName: "Mesaj Kodu", width: 190 },
+      { field: "value", headerName: "Mesaj Açıklaması", flex: 1 },
+      { field: "resourceTypeName", headerName: "Mesaj Türü", width: 190 },
+      { field: "order", headerName: "Entegrasyon Mesaj Kodu", width: 220 },
+      { field: "language", headerName: "Dil", width: 190 },
     ];
-  }, []);
+  }, [deleteRow, showDelete]);
 
   const onSave = () => {
     getResourceList(
@@ -236,7 +237,7 @@ export const MessageListingTable = ({
               paginationMode="server"
               rowCount={tableData.totalItems}
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
-              onRowClick={onRowClick}
+              onRowClick={!!showUpdate ? onRowClick : () => null}
               isRowSelectable={() => false}
               disableColumnMenu
               rows={tableData.result}

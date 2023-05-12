@@ -5,6 +5,7 @@ import {
   useMemberVPosAddWithSettings,
   useGetAllMerchantList,
   useGetAcquirerBankList,
+  useAuthorization,
 } from "../../../hooks";
 import {
   Box,
@@ -19,12 +20,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Button, Loading } from "../../atoms";
 import {
   InputControl,
-  PhoneControl,
   SelectControl,
   FormatInputControl,
 } from "../../molecules";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -36,19 +36,17 @@ import {
 export const BankAddForm = () => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const navigate = useNavigate();
+  const {showCreate} = useAuthorization();
   const setSnackbar = useSetSnackBar();
   const memberVPos = useLocation().state as unknown as IMemberVPos | undefined;
-  const {
-    control,
-    reset,
-    watch,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<BankAddFormValuesType>({
-    resolver: zodResolver(addBankFormSchema),
-    defaultValues: initialState,
-  });
+  console.log("memberVPos");
+  console.log(memberVPos);
+  const { control, reset, watch, handleSubmit, setValue } =
+    useForm<BankAddFormValuesType>({
+      resolver: zodResolver(addBankFormSchema),
+      defaultValues: initialState,
+    });
   const bankCode = watch("bankCode");
   const selectedMerchantId = watch("merchantID");
   const { data: rawAcquirerBankList } = useGetAcquirerBankList();
@@ -62,9 +60,10 @@ export const BankAddForm = () => {
     name: "parameters",
   });
   const [, setSelectedMerchant] = useState({} as any);
+  const handleBack = () => navigate("/dashboard");
 
   useEffect(() => {
-    if (!!memberVPos) {
+    if (!!memberVPos && JSON.stringify(memberVPos) !== "{}") {
       reset({
         fullName: memberVPos?.fullName,
         mail: memberVPos?.mail,
@@ -338,12 +337,12 @@ export const BankAddForm = () => {
           direction="row"
           justifyContent="flex-end"
         >
-          <Button
+          {!!showCreate && (<Button
             onClick={handleSubmit(onSubmit)}
             variant="contained"
-            text={memberVPos ? "Güncelle" : "Kaydet"}
-          />
-          <Button sx={{ mx: 2 }} text={"Iptal"} />
+            text={!!memberVPos?.id ? "Güncelle" : "Kaydet"}
+          />)}
+          <Button onClick={handleBack} sx={{ mx: 2 }} text={"Iptal"} />
         </Stack>
       </Stack>
     </>

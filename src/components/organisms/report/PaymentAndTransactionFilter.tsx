@@ -15,6 +15,7 @@ import {
   useGetTrxStatusSettingsList,
   BasePagingResponse,
   PagingResponse,
+  useAuthorization,
 } from "../../../hooks";
 import {
   GridColDef,
@@ -42,6 +43,7 @@ import { downloadExcel } from "../../../util/downloadExcel";
 
 export const PaymentAndTransactionFilter = () => {
   const theme = useTheme();
+  const { showDelete, showUpdate } = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const { control, handleSubmit, setValue, getValues } =
     useForm<PaymentAndTransactionValuesType>({
@@ -280,11 +282,15 @@ export const PaymentAndTransactionFilter = () => {
         type: "actions",
         width: 80,
         getActions: (params) => [
-          <GridActionsCellItem
-            label="Sil"
-            onClick={deleteRow(params.row)}
-            icon={RenderActionButton(params.row)}
-          />,
+          !!showDelete ? (
+            <GridActionsCellItem
+              label="Sil"
+              onClick={deleteRow(params.row)}
+              icon={RenderActionButton(params.row)}
+            />
+          ) : (
+            <></>
+          ),
         ],
       },
       { field: "txnType", headerName: "İşlem Tipi", width: 150 },
@@ -388,7 +394,7 @@ export const PaymentAndTransactionFilter = () => {
       { field: "paymentModel", headerName: "Ödeme Modeli", width: 200 },
       { field: "endOfDayFlag", headerName: "Gün Sonu", width: 200 },
     ];
-  }, [deleteRow]);
+  }, [deleteRow, showDelete]);
 
   const handleChangePagination = (model: GridPaginationModel) => {
     setPaginationModel(model);

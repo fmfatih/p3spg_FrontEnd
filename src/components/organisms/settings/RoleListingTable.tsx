@@ -7,7 +7,7 @@ import {
   GridRowId,
 } from "@mui/x-data-grid";
 import { DeleteConfirmModal, Table } from "../../molecules";
-import { IRole, useGetRoleList } from "../../../hooks";
+import { IRole, useAuthorization, useGetRoleList } from "../../../hooks";
 import { Loading } from "../../atoms";
 import { DeleteRoleRequest, useDeleteRole } from "../../../hooks";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
@@ -23,6 +23,7 @@ export const RoleListingTable = ({
   isModalClosed,
 }: RoleListingTableProps) => {
   const theme = useTheme();
+  const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
@@ -166,24 +167,24 @@ export const RoleListingTable = ({
   };
   const columns: GridColDef[] = useMemo(() => {
     return [
-      { field: "id", headerName: "Rol ID", flex: 1 },
-      { field: "code", headerName: "Rol Kodu", flex: 1 },
-      { field: "name", headerName: "Rol Adı", flex: 1 },
-      { field: "description", headerName: "Açıklama", flex: 1 },
       {
         field: "actions",
         type: "actions",
         width: 80,
         getActions: (params) => [
-          <GridActionsCellItem
+          !!showDelete ? <GridActionsCellItem
             label="Sil"
             onClick={deleteRow(params.row)}
             showInMenu
-          />,
+          /> : <></>,
         ],
       },
+      { field: "id", headerName: "Rol ID", flex: 1 },
+      { field: "code", headerName: "Rol Kodu", flex: 1 },
+      { field: "name", headerName: "Rol Adı", flex: 1 },
+      { field: "description", headerName: "Açıklama", flex: 1 },
     ];
-  }, [deleteRow]);
+  }, [deleteRow, showDelete]);
 
   const onSave = () => {
     getRoleList(
@@ -231,7 +232,7 @@ export const RoleListingTable = ({
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               isRowSelectable={() => false}
               disableColumnMenu
-              onRowClick={onRowClick}
+              onRowClick={!!showUpdate ? onRowClick : () => null}
               rows={tableData.result}
               columns={columns}
               exportFileName="Rol Listesi"

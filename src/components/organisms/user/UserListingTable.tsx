@@ -15,6 +15,7 @@ import {
   useDeleteUser,
   DeleteUserRequest,
   useForgotPassword,
+  useAuthorization,
 } from "../../../hooks";
 import { useNavigate } from "react-router-dom";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
@@ -28,6 +29,7 @@ function RenderStatus(props: GridRenderCellParams<any, string>) {
 
 export const UserListingTable = () => {
   const theme = useTheme();
+  const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const { mutate: forgotPassword } = useForgotPassword();
   const [tableData, setTableData] = useState<PagingResponse<Array<IUser>>>();
@@ -180,6 +182,32 @@ export const UserListingTable = () => {
 
   const columns: GridColDef<IUser, any, any>[] = useMemo(() => {
     return [
+      {
+        field: "actions",
+        type: "actions",
+        width: 80,
+        getActions: (params) => {
+          return(
+            [
+              !!showUpdate ? <GridActionsCellItem
+                label="Düzenle"
+                onClick={editRow(params.row)}
+                showInMenu
+              /> : <></>,
+              !!showDelete ? <GridActionsCellItem
+                label="Sil"
+                onClick={deleteRow(params.row)}
+                showInMenu
+              /> : <></>,
+              <GridActionsCellItem
+                label="Parolayı Sıfırla"
+                onClick={handleResetPassword(params.row)}
+                showInMenu
+              />,
+            ]
+          )
+        },
+      },
       { field: "fullName", headerName: "Adı Soyadı", width: 350 },
       {
         renderCell: RenderStatus,
@@ -190,30 +218,8 @@ export const UserListingTable = () => {
       { field: "email", headerName: "E Posta", width: 300 },
       { field: "phoneNumber", headerName: "Telefon", width: 180 },
       { field: "merchantName", headerName: "Üye İşyeri Adı", width: 400 },
-      {
-        field: "actions",
-        type: "actions",
-        width: 80,
-        getActions: (params) => [
-          <GridActionsCellItem
-            label="Düzenle"
-            onClick={editRow(params.row)}
-            showInMenu
-          />,
-          <GridActionsCellItem
-            label="Sil"
-            onClick={deleteRow(params.row)}
-            showInMenu
-          />,
-          <GridActionsCellItem
-            label="Parolayı Sıfırla"
-            onClick={handleResetPassword(params.row)}
-            showInMenu
-          />,
-        ],
-      },
     ];
-  }, [deleteRow, editRow, handleResetPassword]);
+  }, [deleteRow, editRow, handleResetPassword, showDelete, showUpdate]);
 
   const onSave = () => {
     getUserList(

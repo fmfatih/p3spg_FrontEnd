@@ -8,6 +8,7 @@ import {
   useGetAcquirerBankList,
   useGetPayment3DTrxSettingsList,
   useUpdateCommissionParameter,
+  useAuthorization,
 } from "../../../hooks";
 import {
   Box,
@@ -43,12 +44,11 @@ export const BankAddCommissionForm = () => {
     reset,
     handleSubmit,
     setValue,
-    getValues,
-    formState: { errors },
   } = useForm<BankAddFormSchemaFormValuesType>({
     resolver: zodResolver(bankAddFormSchema),
     defaultValues: bankAddInitialValues,
   });
+  const {showCreate} = useAuthorization();
   const { data: rawCommissionProfileList } = useGetCommissionProfileList({});
   const { data: rawMerchantList } = useGetAllMerchantList();
   const { data: rawCardTypeList } = useGetCardTypeList({});
@@ -60,8 +60,7 @@ export const BankAddCommissionForm = () => {
     useGetInstallmentCountSettingsList({});
   const { mutate: addCommisionParameter, isLoading } =
     useAddCommissionParameter();
-  const { mutate: updateCommisionParameter, isUpdateLoading } =
-    useUpdateCommissionParameter();
+  const { mutate: updateCommisionParameter } = useUpdateCommissionParameter();
   const navigate = useNavigate();
   const bankBlockedValue = watch("bankblocked");
   const merchantBlockedValue = watch("merchantblocked");
@@ -291,6 +290,9 @@ export const BankAddCommissionForm = () => {
       });
     }
   }, [commissionParameter, reset]);
+
+
+  const handleBack = () => navigate("/dashboard");
 
   return (
     <>
@@ -606,15 +608,18 @@ export const BankAddCommissionForm = () => {
           direction="row"
           justifyContent="flex-end"
         >
-          <Button
-            onClick={handleSubmit(onSubmit)}
-            variant="contained"
-            text={
-              commissionParameter && Number(commissionParameter?.id) > 0
-                ? "Güncelle"
-                : "Kaydet"
-            }
-          />
+          {!!showCreate && (
+            <Button
+              onClick={handleSubmit(onSubmit)}
+              variant="contained"
+              text={
+                commissionParameter && Number(commissionParameter?.id) > 0
+                  ? "Güncelle"
+                  : "Kaydet"
+              }
+            />
+          )}
+          <Button onClick={handleBack} sx={{ mx: 2 }} text={"Iptal"} />
         </Stack>
       </Stack>
     </>

@@ -13,6 +13,7 @@ import {
   DeleteMerchantRequest,
   IMerchant,
   PagingResponse,
+  useAuthorization,
   useGetMerchantList,
   useMerchantDelete,
 } from "../../../hooks";
@@ -34,6 +35,7 @@ export const MerchantListingTable = ({
   onRowClick,
 }: MerchantListingTableProps) => {
   const theme = useTheme();
+  const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [tableData, setTableData] = useState<PagingResponse<Array<any>>>();
   const [paginationModel, setPaginationModel] = React.useState({
@@ -178,6 +180,25 @@ export const MerchantListingTable = ({
   };
   const columns: GridColDef[] = useMemo(() => {
     return [
+      {
+        field: "actions",
+        type: "actions",
+        width: 80,
+        getActions: (params) => {
+          return [
+            !!showUpdate ? <GridActionsCellItem
+              label="Düzenle"
+              onClick={editRow(params.row)}
+              showInMenu
+            /> : <></>,
+            !!showDelete ? <GridActionsCellItem
+              label="Sil"
+              onClick={deleteRow(params.row)}
+              showInMenu
+            /> : <></>,
+          ];
+        },
+      },
       { field: "merchantId", headerName: "İşyeri No", width: 200 },
       { field: "merchantName", headerName: "İşyeri Adı", width: 400 },
       {
@@ -246,28 +267,8 @@ export const MerchantListingTable = ({
         headerName: "Ortak 2 Cep Telefonu",
         width: 200,
       },
-
-      {
-        field: "actions",
-        type: "actions",
-        width: 80,
-        getActions: (params) => {
-          return [
-            <GridActionsCellItem
-              label="Düzenle"
-              onClick={editRow(params.row)}
-              showInMenu
-            />,
-            <GridActionsCellItem
-              label="Sil"
-              onClick={deleteRow(params.row)}
-              showInMenu
-            />,
-          ];
-        },
-      },
     ];
-  }, [editRow]);
+  }, [deleteRow, editRow, showDelete, showUpdate]);
 
   const onSave = () => {
     getMerchantList(

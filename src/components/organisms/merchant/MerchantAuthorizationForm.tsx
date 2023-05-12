@@ -2,6 +2,7 @@ import {
   useAddMerchantVPos,
   useGetMemberVPosList,
   useGetAllMerchantList,
+  useAuthorization,
 } from "../../../hooks";
 import { Box, FormControl, Stack, useMediaQuery, useTheme } from "@mui/material";
 import { useMemo, useEffect } from "react";
@@ -19,6 +20,7 @@ import {
 
 export const MerchantAuthorizationForm = () => {
   const theme = useTheme();
+  const {showCreate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const { mutate: getMemberVPosList, data: rawMemberVPosList } =
     useGetMemberVPosList();
@@ -94,6 +96,8 @@ export const MerchantAuthorizationForm = () => {
     );
   };
 
+  const handleBack = () => navigate("/dashboard");
+
   return (
     <>
       {(isMerchantListLoading || isLoading) && <Loading />}
@@ -137,11 +141,14 @@ export const MerchantAuthorizationForm = () => {
           direction="row"
           justifyContent="flex-end"
         >
-          <Button
-            onClick={handleSubmit(onSubmit)}
-            variant="contained"
-            text={"Kaydet"}
-          />
+          {!!showCreate && (
+            <Button
+              onClick={handleSubmit(onSubmit)}
+              variant="contained"
+              text={"Kaydet"}
+            />
+          )}
+          <Button onClick={handleBack} sx={{ mx: 2 }} text={"Iptal"} />
         </Stack>
       </Stack>
     </>

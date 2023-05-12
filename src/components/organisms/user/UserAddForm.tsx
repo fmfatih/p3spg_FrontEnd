@@ -6,6 +6,7 @@ import {
   useUserAdd,
   useGetAllMerchantList,
   useGetAllRoleList,
+  useAuthorization,
 } from "../../../hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -25,7 +26,6 @@ import {
   RadioButtonsControl,
   CheckboxesControl,
   FormatInputControl,
-  PhoneControl,
 } from "../../molecules";
 import { addUserFormSchema, UserAddFormValuesType } from "../_formTypes";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -34,6 +34,7 @@ import { useUserInfo } from "../../../store/User.state";
 
 export const UserAddForm = () => {
   const theme = useTheme();
+  const {showCreate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const navigate = useNavigate();
   const [userInfo] = useUserInfo();
@@ -45,7 +46,7 @@ export const UserAddForm = () => {
   const { mutate: userAdd, isLoading: isUserAddLoading } = useUserAdd();
   const { mutate: userUpdate, isLoading: isUserUpdateLoading } =
     useUpdateUser();
-  const { handleSubmit, control, reset, setValue, getValues } =
+  const { handleSubmit, control, reset, setValue } =
     useForm<UserAddFormValuesType>({
       resolver: zodResolver(addUserFormSchema),
     });
@@ -80,7 +81,7 @@ export const UserAddForm = () => {
         }
       );
     }
-  }, [reset, user]);
+  }, [reset, setValue, user]);
 
   const merchantList = useMemo(() => {
     return rawMerchantList?.data?.map(
@@ -198,7 +199,9 @@ export const UserAddForm = () => {
       });
     }
   };
-  console.log(getValues());
+  
+  const handleBack = () => navigate("/dashboard");
+
   return (
     <>
       {(isUserAddLoading || isUserUpdateLoading) && <Loading />}
@@ -213,12 +216,14 @@ export const UserAddForm = () => {
               <InputControl
                 sx={{ flex: 1 }}
                 label="Adı Soyadı"
+                defaultValue=""
                 control={control}
                 id="fullName"
               />
               <InputControl
                 sx={{ flex: 1 }}
                 label="E Posta"
+                defaultValue=""
                 control={control}
                 id="email"
               />
@@ -308,12 +313,14 @@ export const UserAddForm = () => {
           direction="row"
           justifyContent="flex-end"
         >
-          <Button
-            onClick={handleSubmit(onSubmit)}
-            variant="contained"
-            text={!!user && Number(user?.id) > 0 ? "Güncelle" : "Kaydet"}
-          />
-          <Button sx={{ mx: 2 }} text={"Iptal"} />
+          {!!showCreate && (
+            <Button
+              onClick={handleSubmit(onSubmit)}
+              variant="contained"
+              text={!!user && Number(user?.id) > 0 ? "Güncelle" : "Kaydet"}
+            />
+          )}
+          <Button onClick={handleBack} sx={{ mx: 2 }} text={"Iptal"} />
         </Stack>
       </Stack>
     </>

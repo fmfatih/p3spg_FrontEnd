@@ -1,4 +1,4 @@
-import { useAddCommissionProfile } from "../../../hooks";
+import { useAddCommissionProfile, useAuthorization } from "../../../hooks";
 import { FormControl, useMediaQuery, useTheme } from "@mui/material";
 import { Stack } from "@mui/system";
 import { Button, Loading } from "../../atoms";
@@ -10,8 +10,11 @@ import {
   BankAddProfileFormSchemaFormValuesType,
 } from "./_formTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router-dom";
 
 export const BankAddCommissionProfileForm = () => {
+  const navigate = useNavigate();
+  const {showCreate} = useAuthorization();
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const { control, reset, handleSubmit } =
@@ -62,6 +65,8 @@ export const BankAddCommissionProfileForm = () => {
       },
     });
   };
+
+  const handleBack = () => navigate("/dashboard");
 
   return (
     <>
@@ -115,11 +120,14 @@ export const BankAddCommissionProfileForm = () => {
           direction="row"
           justifyContent="flex-end"
         >
-          <Button
-            onClick={handleSubmit(onSubmit)}
-            variant="contained"
-            text={"Kaydet"}
-          />
+          {!!showCreate && (
+            <Button
+              onClick={handleSubmit(onSubmit)}
+              variant="contained"
+              text={"Kaydet"}
+            />
+          )}
+          <Button onClick={handleBack} sx={{ mx: 2 }} text={"Iptal"} />
         </Stack>
       </Stack>
     </>

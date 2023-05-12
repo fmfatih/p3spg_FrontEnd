@@ -8,11 +8,10 @@ import {
 } from "@mui/x-data-grid";
 import { DeleteConfirmModal, Table } from "../../molecules";
 import {
-  INonsecure,
   useGetNonsecureList,
   DeleteNonsecureRequest,
   useDeleteNonsecure,
-  PagingResponse,
+  useAuthorization,
 } from "../../../hooks";
 import { Loading } from "../../atoms";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
@@ -29,6 +28,7 @@ export const NonsecureListingTable = ({
 }: NonsecureListingTableProps) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const {showDelete, showUpdate} = useAuthorization();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
@@ -172,6 +172,18 @@ export const NonsecureListingTable = ({
   };
   const columns: GridColDef[] = useMemo(() => {
     return [
+      {
+        field: "actions",
+        type: "actions",
+        width: 80,
+        getActions: (params) => [
+          !!showDelete ? <GridActionsCellItem
+            label="Sil"
+            onClick={deleteRow(params.row)}
+            showInMenu
+          /> : null,
+        ],
+      },
       { field: "merchantId", headerName: "Üye İşyeri Kodu", width: 170 },
       { field: "merchantName", headerName: "Üye İşyeri Adı", width: 350 },
       { field: "bankCode", headerName: "Banka Kodu", width: 170 },
@@ -182,20 +194,8 @@ export const NonsecureListingTable = ({
         width: 170,
       },
       { field: "maxAmount", headerName: "Maksimum Tutar", width: 170 },
-      {
-        field: "actions",
-        type: "actions",
-        width: 80,
-        getActions: (params) => [
-          <GridActionsCellItem
-            label="Sil"
-            onClick={deleteRow(params.row)}
-            showInMenu
-          />,
-        ],
-      },
     ];
-  }, [deleteRow]);
+  }, [deleteRow, showDelete]);
 
   const onSave = () => {
     getParameterList(
@@ -243,7 +243,7 @@ export const NonsecureListingTable = ({
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               isRowSelectable={() => false}
               disableColumnMenu
-              onRowClick={onRowClick}
+              onRowClick={!!showUpdate ? onRowClick : () => null}
               rows={tableData.result}
               columns={columns}
               exportFileName="Non Secure Listesi"

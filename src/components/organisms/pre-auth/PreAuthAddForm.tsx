@@ -14,6 +14,7 @@ import {
   useGetPaymentModelSettingsList,
   usePaymentPreAuth,
   IPaymentPreAuthRequest,
+  useAuthorization,
 } from "../../../hooks";
 import { useMemo, useState } from "react";
 import {
@@ -35,6 +36,7 @@ import { useSetSnackBar } from "../../../store/Snackbar.state";
 export const PreAuthAddForm = () => {
   const [html, setHtml] = useState();
   const [isHtmlOpen, setIsHtmlOpen] = useState(false);
+  const {showCreate} = useAuthorization();
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const { control, handleSubmit } =
@@ -292,12 +294,14 @@ export const PreAuthAddForm = () => {
               </FormControl>
             </Stack>
             <Stack direction={isDesktop ? "row" : "column"} justifyContent="flex-end" width={isDesktop ? 800 : 'auto'}>
-              <Button
-                sx={{ width: 100 }}
-                onClick={handleSubmit(onSubmit)}
-                variant="contained"
-                text={"Öde"}
-              />
+              {!!showCreate && (
+                <Button
+                  sx={{ width: 100 }}
+                  onClick={handleSubmit(onSubmit)}
+                  variant="contained"
+                  text={"Öde"}
+                />
+              )}
             </Stack>
           </Stack>
         </Stack>

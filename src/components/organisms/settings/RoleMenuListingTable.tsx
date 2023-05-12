@@ -11,6 +11,7 @@ import {
   useGetRoleMenuList,
   useDeleteRoleMenu,
   DeleteRoleMenuRequest,
+  useAuthorization,
 } from "../../../hooks";
 import { Loading } from "../../atoms";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
@@ -35,6 +36,7 @@ export const RoleMenuListingTable = ({
   });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState(0);
+  const {showDelete, showUpdate} = useAuthorization();
   const setSnackbar = useSetSnackBar();
   const { mutate: roleMenuDelete, isLoading: isDeleteLoading } =
     useDeleteRoleMenu();
@@ -166,22 +168,22 @@ export const RoleMenuListingTable = ({
 
   const columns: GridColDef[] = useMemo(() => {
     return [
-      { field: "roleName", headerName: "Rol Adı", flex: 1 },
-      { field: "menuName", headerName: "Menü Adı", flex: 1 },
       {
         field: "actions",
         type: "actions",
         width: 80,
         getActions: (params) => [
-          <GridActionsCellItem
+          !!showDelete ?<GridActionsCellItem
             label="Sil"
             onClick={deleteRow(params.row)}
             showInMenu
-          />,
+          /> : <></>,
         ],
       },
+      { field: "roleName", headerName: "Rol Adı", flex: 1 },
+      { field: "menuName", headerName: "Menü Adı", flex: 1 },
     ];
-  }, [deleteRow]);
+  }, [deleteRow, showDelete]);
 
   const onSave = () => {
     getRoleMenu(
@@ -229,7 +231,7 @@ export const RoleMenuListingTable = ({
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               isRowSelectable={() => false}
               disableColumnMenu
-              onRowClick={onRowClick}
+              onRowClick={!!showUpdate ? onRowClick : () => null}
               rows={tableData.result}
               columns={columns}
               exportFileName="Rol Menü Listesi"
