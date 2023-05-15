@@ -110,6 +110,8 @@ export const PreAuthSalesForm = () => {
       currency: formValues.currency,
       orderId: formValues.orderId,
       use3D: formValues.use3D === "3D" ? true : false,
+      okUrl: `${window.location.href}?success=true`,
+      failUrl: `${window.location.href}?success=false`,
     };
 
     paymentSales(request, {
@@ -122,11 +124,18 @@ export const PreAuthSalesForm = () => {
             form && form.submit();
           }, 1000);
         };
+
         if (data.isSuccess) {
           setSnackbar({
             severity: "success",
             isOpen: true,
             description: data.message,
+          });
+        } else {
+          setSnackbar({
+            severity: "error",
+            description: data.message,
+            isOpen: true,
           });
         }
       },

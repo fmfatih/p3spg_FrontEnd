@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { SVGProps } from 'react';
+import React, { SVGProps, useState } from 'react';
 import { Link, Stack, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useLocation, Link as LinkRouter, useNavigate } from 'react-router-dom';
@@ -29,6 +29,15 @@ export const NavigationItem = ({ navItems, title, url, Icon }: NavigationItemPro
 
   const isExpanded = location.pathname.includes(url);
 
+  const [isHover, setIsHover] = useState(false);
+
+   const handleMouseEnter = () => {
+      setIsHover(true);
+   };
+   const handleMouseLeave = () => {
+      setIsHover(false);
+   };
+
   return (
     <>
       {navItems?.length ? (
@@ -57,9 +66,9 @@ export const NavigationItem = ({ navItems, title, url, Icon }: NavigationItemPro
               }
 
               return (
-                <a onClick={handleClick}>
-                  <Stack my={1} spacing={2} alignItems="center" direction="row">
-                    <Typography color={isActive ? 'primary' : 'text.subtle'} variant='body2'>{navItem.text}</Typography>
+                <a onClick={handleClick} style={{ cursor: 'pointer'   }}>
+                  <Stack my={1} spacing={2} alignItems="center" direction="row" >
+                    <Typography color={isActive ? 'primary' : 'text.subtle'}  variant='body2'>{navItem.text}</Typography>
                   </Stack>
                 </a>
               )
@@ -68,7 +77,7 @@ export const NavigationItem = ({ navItems, title, url, Icon }: NavigationItemPro
         </Accordion>
       ) : (
         <Link href={`/${url}`} underline="none">
-          <Stack my={2} spacing={2} alignItems="center" direction="row">
+          <Stack my={2} spacing={2} alignItems="center" direction="row" >
             <Icon colors= {location.pathname === url ? {
                 dark: '#0c9fdc',
                 main: '#85cfed'
@@ -76,7 +85,7 @@ export const NavigationItem = ({ navItems, title, url, Icon }: NavigationItemPro
                 dark: '#41414d',
                 main: '#c0c0c7'
               }}/>
-            <Typography color={location.pathname === url ? 'primary' : 'text.subtle'} variant='body2'>{title}</Typography>
+            <Typography color={location.pathname === url ? 'primary' : 'text.subtle'} variant='body2' >{title}</Typography>
           </Stack>
         </Link>
       )}

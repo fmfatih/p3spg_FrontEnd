@@ -16,6 +16,8 @@ export interface IPaymentPreAuthRequest {
   currency: string;
   orderId: string;
   use3D: boolean;
+  okUrl:string;
+  failUrl:string
 }
 
 async function paymentPreAuth(data: IPaymentPreAuthRequest): Promise<any> {

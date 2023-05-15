@@ -19,7 +19,7 @@ export const addUserFormSchema = zod.object({
   ),
   status: zod.any(),
   merchant: zod.any(),
-  userType: zod.string(),
+  userType: zod.string().min(1, { message: "Please enter your user type" }),
   roleIds: zod.any(),
 });
 

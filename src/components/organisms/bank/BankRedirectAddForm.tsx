@@ -287,7 +287,7 @@ export const BankRedirectAddForm = () => {
                               value: number;
                             }) => option.label}
                             renderInput={(params) => (
-                              <TextField {...params} label="Üye İşyeri" />
+                              <TextField {...params} label="Üye İşyeri" required={true} />
                             )}
                           />
                         </>

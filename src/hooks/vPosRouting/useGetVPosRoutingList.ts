@@ -8,6 +8,7 @@ export type GetVPosRoutingListRequest = {
   size?: number;
   orderByDesc?: boolean;
   orderBy?: string;
+  searchText?: string;
 };
 
 export type IVPosRouting = {
@@ -39,12 +40,14 @@ async function getVPosRoutingList({
   size = 15,
   orderByDesc = true,
   orderBy = "CreateDate",
+  searchText = '',
 }: GetVPosRoutingListRequest): Promise<GetVPosRoutingListResponse> {
   const data = {
     page,
     size,
     orderByDesc,
     orderBy,
+    searchText
   };
   try {
     return (await axiosInstance.post("/VPosRouting/List", data)).data;

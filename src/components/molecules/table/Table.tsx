@@ -9,7 +9,12 @@ import {
   GridToolbarFilterButton,
   useGridApiRef,
   gridExpandedSortedRowIdsSelector,
+  GridColumnHeaderFilterIconButton,
+  GridToolbarColumnsButton,
+  GridToolbarQuickFilter,
+  SearchBar,
 } from "@mui/x-data-grid";
+import InputLabel from "@mui/material/InputLabel";
 import "./index.css";
 import { downloadExcel } from "../../../util/downloadExcel";
 import { Button } from "@mui/material";
@@ -30,6 +35,8 @@ interface IColumn {
 function CustomToolbar({ onDownload }: { onDownload: any }) {
   return (
     <GridToolbarContainer sx={{ justifyContent: "flex-end" }}>
+      {/* <GridToolbarQuickFilter></GridToolbarQuickFilter> */}
+      <GridToolbarColumnsButton></GridToolbarColumnsButton>
       <GridToolbarFilterButton></GridToolbarFilterButton>
       <Button onClick={onDownload}>
         <FileDownloadOutlined color="primary " />
@@ -39,7 +46,7 @@ function CustomToolbar({ onDownload }: { onDownload: any }) {
   );
 }
 
-export const Table = ({ ...props }: TableProps) => {
+export const Table = ({...props }: TableProps) => {
   const apiRef = useGridApiRef();
   const handleDownload = () => {
     const filteredGridIds = gridExpandedSortedRowIdsSelector(apiRef);
@@ -70,9 +77,14 @@ export const Table = ({ ...props }: TableProps) => {
       {...props}
       apiRef={apiRef}
       slots={{
-        toolbar: () => CustomToolbar({ onDownload: props.onSave }),
+        toolbar: () => CustomToolbar({onDownload: props.onSave }),
       }}
       localeText={{
+        toolbarColumns: "Kolonlar",
+        columnsPanelShowAllButton: "Tümünü Göster",
+        columnsPanelHideAllButton: "Gizle",
+        columnsPanelTextFieldLabel: "Kolon Ara",
+        columnsPanelTextFieldPlaceholder: "Kolon Başlığı",
         toolbarExport: "İndir",
         toolbarExportCSV: "Excel olarak indir",
         toolbarExportPrint: "Yazdır",

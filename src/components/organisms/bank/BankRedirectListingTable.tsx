@@ -1,12 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Stack, useMediaQuery, useTheme } from "@mui/material";
-import {
-  GridColDef,
-  GridActionsCellItem,
-  GridPaginationModel,
-} from "@mui/x-data-grid";
-import { DeleteConfirmModal, Table } from "../../molecules";
-import { Loading } from "../../atoms";
+import React, { useEffect, useMemo, useState } from 'react';
+import { Stack, useMediaQuery, useTheme } from '@mui/material';
+import { GridColDef, GridActionsCellItem, GridPaginationModel } from '@mui/x-data-grid';
+import { DeleteConfirmModal, Table } from '../../molecules';
+import { Loading } from '../../atoms';
 import {
   DeleteMerchantRequest,
   IMerchant,
@@ -14,27 +10,30 @@ import {
   useAuthorization,
   useDeleteVPosRouting,
   useGetVPosRoutingList,
-} from "../../../hooks";
-import { useNavigate } from "react-router-dom";
-import { useSetSnackBar } from "../../../store/Snackbar.state";
-import { PagingResponse } from "../../../hooks/_types";
-import { downloadExcel } from "../../../util/downloadExcel";
+} from '../../../hooks';
+import { useNavigate } from 'react-router-dom';
+import { useSetSnackBar } from '../../../store/Snackbar.state';
+import { PagingResponse } from '../../../hooks/_types';
+import { downloadExcel } from '../../../util/downloadExcel';
+import SearchTable from '../../../components/atoms/SearchTable';
 
 export const BankRedirectListingTable = () => {
+  const [text, setText] = useState('');
   const theme = useTheme();
-  const {showDelete, showUpdate} = useAuthorization();
-  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const { showDelete, showUpdate } = useAuthorization();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const navigate = useNavigate();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
+    searchText: null,
   });
   const { data: vposRoutingListResponse, mutate: getVPosRoutingList, isLoading } = useGetVPosRoutingList();
-  const tableData = vposRoutingListResponse?.data
+  const tableData = vposRoutingListResponse?.data;
 
   const editRow = React.useCallback(
     (vPosRouting: IVPosRouting) => () => {
-      navigate("/vpos-management/vpos-bankrouting", { state: vPosRouting });
+      navigate('/vpos-management/vpos-bankrouting', { state: vPosRouting });
     },
     [navigate]
   );
@@ -42,8 +41,7 @@ export const BankRedirectListingTable = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState(0);
   const setSnackbar = useSetSnackBar();
-  const { mutate: vPosRoutingDelete, isLoading: isDeleteLoading } =
-    useDeleteVPosRouting();
+  const { mutate: vPosRoutingDelete, isLoading: isDeleteLoading } = useDeleteVPosRouting();
 
   const deleteRow = React.useCallback(
     (merchant: IMerchant) => () => {
@@ -62,14 +60,15 @@ export const BankRedirectListingTable = () => {
       {
         size: paginationModel.pageSize,
         page: paginationModel.page,
-        orderBy: "CreateDate",
+        orderBy: 'CreateDate',
         orderByDesc: true,
+        searchText: text,
       },
       {
         onSuccess: (data) => {
           if (!data.isSuccess) {
             setSnackbar({
-              severity: "error",
+              severity: 'error',
               description: data.message,
               isOpen: true,
             });
@@ -77,19 +76,14 @@ export const BankRedirectListingTable = () => {
         },
         onError: () => {
           setSnackbar({
-            severity: "error",
-            description: "İşlem sırasında bir hata oluştu",
+            severity: 'error',
+            description: 'İşlem sırasında bir hata oluştu',
             isOpen: true,
           });
         },
       }
     );
-  }, [
-    getVPosRoutingList,
-    paginationModel.page,
-    paginationModel.pageSize,
-    setSnackbar,
-  ]);
+  }, [getVPosRoutingList, paginationModel.page, paginationModel.pageSize, setSnackbar, text]);
 
   const handleChangePagination = (model: GridPaginationModel) => {
     setPaginationModel(model);
@@ -98,14 +92,15 @@ export const BankRedirectListingTable = () => {
       {
         size: paginationModel.pageSize,
         page: paginationModel.page,
-        orderBy: "CreateDate",
+        orderBy: 'CreateDate',
         orderByDesc: true,
+        searchText: text,
       },
       {
         onSuccess: (data) => {
           if (!data.isSuccess) {
             setSnackbar({
-              severity: "error",
+              severity: 'error',
               description: data.message,
               isOpen: true,
             });
@@ -113,8 +108,8 @@ export const BankRedirectListingTable = () => {
         },
         onError: () => {
           setSnackbar({
-            severity: "error",
-            description: "İşlem sırasında bir hata oluştu",
+            severity: 'error',
+            description: 'İşlem sırasında bir hata oluştu',
             isOpen: true,
           });
         },
@@ -131,17 +126,18 @@ export const BankRedirectListingTable = () => {
           getVPosRoutingList({
             size: paginationModel.pageSize,
             page: paginationModel.page,
-            orderBy: "CreateDate",
+            orderBy: 'CreateDate',
             orderByDesc: true,
+            searchText: text,
           });
           setSnackbar({
-            severity: "success",
+            severity: 'success',
             isOpen: true,
             description: data.message,
           });
         } else {
           setSnackbar({
-            severity: "error",
+            severity: 'error',
             description: data.message,
             isOpen: true,
           });
@@ -149,8 +145,8 @@ export const BankRedirectListingTable = () => {
       },
       onError: () => {
         setSnackbar({
-          severity: "error",
-          description: "İşlem sırasında bir hata oluştu",
+          severity: 'error',
+          description: 'İşlem sırasında bir hata oluştu',
           isOpen: true,
         });
       },
@@ -161,55 +157,47 @@ export const BankRedirectListingTable = () => {
   const columns: GridColDef[] = useMemo(() => {
     return [
       {
-        field: "actions",
-        type: "actions",
+        field: 'actions',
+        type: 'actions',
         width: 80,
         getActions: (params) => {
           return [
-            !!showUpdate ? <GridActionsCellItem
-              label="Düzenle"
-              onClick={editRow(params.row)}
-              showInMenu
-            /> : <></>,
-            !!showDelete ? <GridActionsCellItem
-              label="Sil"
-              onClick={deleteRow(params.row)}
-              showInMenu
-            /> : <></>,
+            !!showUpdate ? <GridActionsCellItem label="Düzenle" onClick={editRow(params.row)} showInMenu /> : <></>,
+            !!showDelete ? <GridActionsCellItem label="Sil" onClick={deleteRow(params.row)} showInMenu /> : <></>,
           ];
         },
       },
       {
-        field: "issuerCardBankName",
-        headerName: "Yönlendirelecek Kartın Bankası",
+        field: 'issuerCardBankName',
+        headerName: 'Yönlendirelecek Kartın Bankası',
         width: 350,
       },
       {
-        field: "merchantVposBankName",
-        headerName: "Yönlendirelecek Sanal Pos",
+        field: 'merchantVposBankName',
+        headerName: 'Yönlendirelecek Sanal Pos',
         width: 350,
       },
       {
-        field: "merchantId",
-        headerName: "Üye İşyeri Numarası",
+        field: 'merchantId',
+        headerName: 'Üye İşyeri Numarası',
         width: 200,
       },
       {
-        field: "merchantName",
-        headerName: "Üye İşyeri Adı",
+        field: 'merchantName',
+        headerName: 'Üye İşyeri Adı',
         width: 380,
       },
       {
-        field: "status",
-        headerName: "Statü",
+        field: 'status',
+        headerName: 'Statü',
         width: 100,
       },
       {
-        field: "createDate",
-        headerName: "Düzenlenme Tarihi",
+        field: 'createDate',
+        headerName: 'Düzenlenme Tarihi',
         width: 200,
       },
-      { field: "createUserName", headerName: "Düzenleyen", width: 200 },
+      { field: 'createUserName', headerName: 'Düzenleyen', width: 200 },
     ];
   }, [deleteRow, editRow, showDelete, showUpdate]);
 
@@ -218,16 +206,16 @@ export const BankRedirectListingTable = () => {
       {
         size: -1,
         page: 0,
-        orderBy: "CreateDate",
+        orderBy: 'CreateDate',
         orderByDesc: true,
       },
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            downloadExcel(data?.data?.result || [], "Sanal Pos Banka Listesi");
+            downloadExcel(data?.data?.result || [], 'Sanal Pos Banka Listesi');
           } else {
             setSnackbar({
-              severity: "error",
+              severity: 'error',
               description: data.message,
               isOpen: true,
             });
@@ -235,8 +223,8 @@ export const BankRedirectListingTable = () => {
         },
         onError: () => {
           setSnackbar({
-            severity: "error",
-            description: "İşlem sırasında bir hata oluştu",
+            severity: 'error',
+            description: 'İşlem sırasında bir hata oluştu',
             isOpen: true,
           });
         },
@@ -245,12 +233,21 @@ export const BankRedirectListingTable = () => {
   };
 
   const hasLoading = isLoading || isDeleteLoading;
+
+  const handleChange = (newText) => {
+    setText(newText);
+    // Burada, debounced giriş işlemi yapılabilir.
+  };
+
   return (
     <>
       {hasLoading && <Loading />}
       <Stack flex={1} p={2}>
         {tableData?.result && (
           <>
+            <div style={{ marginBottom: '10px' }}>
+              <SearchTable value={text} onChange={handleChange} delay={500} />
+            </div>
             <Table
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
@@ -267,8 +264,7 @@ export const BankRedirectListingTable = () => {
             <DeleteConfirmModal
               isOpen={isDeleteModalOpen}
               onClose={handleCloseDeleteModal}
-              onConfirm={() => handleDeleteConfirm()}
-            ></DeleteConfirmModal>
+              onConfirm={() => handleDeleteConfirm()}></DeleteConfirmModal>
           </>
         )}
       </Stack>

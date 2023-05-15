@@ -46,16 +46,18 @@ export const UserAddForm = () => {
   const { mutate: userAdd, isLoading: isUserAddLoading } = useUserAdd();
   const { mutate: userUpdate, isLoading: isUserUpdateLoading } =
     useUpdateUser();
-  const { handleSubmit, control, reset, setValue } =
+  const { handleSubmit, control, reset, setValue, watch } =
     useForm<UserAddFormValuesType>({
       resolver: zodResolver(addUserFormSchema),
     });
 
   const [selectedMerchant, setSelectedMerchant] = useState(
-    Number(userInfo.merchantId) !== 0
+    user ? (Number(userInfo.merchantId) !== 0
       ? { label: userInfo.merchantName, value: Number(userInfo.merchantId) }
-      : null
+      : null) : null
   );
+
+  let checkSelectedValue = watch('userType')
 
   useEffect(() => {
     if (!!user && JSON.stringify(user) !== "{}") {
@@ -286,7 +288,7 @@ export const UserAddForm = () => {
                     control={control}
                     id="userType"
                     items={userTypeList}
-                    defaultValue={userTypeList[0]?.value.toString()}
+                    defaultValue={null}
                   />
                 )}
               </Box>
@@ -294,7 +296,7 @@ export const UserAddForm = () => {
             <Stack width={isDesktop ? 800 : "auto"} direction="row">
               {isDesktop && <FormControl sx={{ width: "50%" }} />}
               <Box flex={1}>
-                {roleList && (
+                {roleList && checkSelectedValue && (
                   <CheckboxesControl
                     row={!isDesktop}
                     title="Kullanıcı Rolü"
