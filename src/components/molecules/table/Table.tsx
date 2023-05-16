@@ -37,7 +37,7 @@ function CustomToolbar({ onDownload }: { onDownload: any }) {
     <GridToolbarContainer sx={{ justifyContent: "flex-end" }}>
       {/* <GridToolbarQuickFilter></GridToolbarQuickFilter> */}
       <GridToolbarColumnsButton></GridToolbarColumnsButton>
-      <GridToolbarFilterButton></GridToolbarFilterButton>
+      {/* <GridToolbarFilterButton></GridToolbarFilterButton> */}
       <Button onClick={onDownload}>
         <FileDownloadOutlined color="primary " />
         İNDİR

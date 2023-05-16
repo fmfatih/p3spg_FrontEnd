@@ -150,7 +150,7 @@ export const BankListingActiveTable = ({
   const columns: GridColDef[] = useMemo(() => {
     return [
       {
-        field: "update",
+        field: "Aksiyonlar",
         type: "actions",
         width: 80,
         getActions: (params) => {

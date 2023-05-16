@@ -56,6 +56,14 @@ export const UserAddForm = () => {
       ? { label: userInfo.merchantName, value: Number(userInfo.merchantId) }
       : null) : null
   );
+  console.log(user);
+  console.log(userInfo);
+  console.log(selectedMerchant);
+  
+  
+  
+   
+  const userType = watch('userType');
 
   let checkSelectedValue = watch('userType')
 
@@ -265,13 +273,14 @@ export const UserAddForm = () => {
                             }}
                             id="merchant"
                             options={merchantList}
-                            defaultValue={selectedMerchant}
+                            defaultValue={user?.id?selectedMerchant:null}
                             getOptionLabel={(option: {
                               label: string;
                               value: number;
                             }) => option.label}
+                            disabled={userType === '1'}
                             renderInput={(params) => (
-                              <TextField {...params} label="Üye İşyeri" />
+                              <TextField {...params} label="Üye İşyeri"  />
                             )}
                           />
                         </>

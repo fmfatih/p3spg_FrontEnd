@@ -4,7 +4,7 @@ import { AdminTemplate, UserListingTable } from "../components";
 export const UserList = () => {
   const navigate = useNavigate();
   const handleAddButton = () =>
-    navigate("/user-management/user-identification");
+    navigate("/user-management/user-identification", { state: null });
 
   return (
     <AdminTemplate

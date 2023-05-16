@@ -183,7 +183,7 @@ export const UserListingTable = () => {
   const columns: GridColDef<IUser, any, any>[] = useMemo(() => {
     return [
       {
-        field: "actions",
+        field: "Aksiyonlar",
         type: "actions",
         width: 80,
         getActions: (params) => {

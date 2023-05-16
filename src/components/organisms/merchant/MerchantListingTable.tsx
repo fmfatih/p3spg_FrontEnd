@@ -181,7 +181,7 @@ export const MerchantListingTable = ({
   const columns: GridColDef[] = useMemo(() => {
     return [
       {
-        field: "actions",
+        field: "Aksiyonlar",
         type: "actions",
         width: 80,
         getActions: (params) => {

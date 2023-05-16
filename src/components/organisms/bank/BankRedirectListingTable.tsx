@@ -58,7 +58,7 @@ export const BankRedirectListingTable = () => {
   useEffect(() => {
     getVPosRoutingList(
       {
-        size: paginationModel.pageSize,
+        size: text ? -1 : paginationModel.pageSize,
         page: paginationModel.page,
         orderBy: 'CreateDate',
         orderByDesc: true,
@@ -90,7 +90,7 @@ export const BankRedirectListingTable = () => {
 
     getVPosRoutingList(
       {
-        size: paginationModel.pageSize,
+        size: text ? -1 : paginationModel.pageSize,
         page: paginationModel.page,
         orderBy: 'CreateDate',
         orderByDesc: true,
@@ -124,7 +124,7 @@ export const BankRedirectListingTable = () => {
       onSuccess: (data: any) => {
         if (data.isSuccess) {
           getVPosRoutingList({
-            size: paginationModel.pageSize,
+            size: text ? -1 : paginationModel.pageSize,
             page: paginationModel.page,
             orderBy: 'CreateDate',
             orderByDesc: true,
@@ -157,7 +157,7 @@ export const BankRedirectListingTable = () => {
   const columns: GridColDef[] = useMemo(() => {
     return [
       {
-        field: 'actions',
+        field: 'Aksiyonlar',
         type: 'actions',
         width: 80,
         getActions: (params) => {
