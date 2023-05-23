@@ -43,6 +43,7 @@ export function SelectControl<TFormFields>(
     items,
     size,
     defaultValue,
+    disabled = false,
     ...textFieldProps
   } = props;
 
@@ -65,6 +66,7 @@ export function SelectControl<TFormFields>(
               error={!!error}
               label={label}
               onChange={onChange}
+              disabled={disabled}
             >
               {items.map((item) => (
                 <MenuItem key={item.value} value={item.value}>

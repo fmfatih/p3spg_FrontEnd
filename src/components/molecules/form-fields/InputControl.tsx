@@ -8,11 +8,14 @@ import {
 } from "@mui/material";
 import { Theme } from "@mui/system";
 import { Control, Controller, ControllerProps } from "react-hook-form";
+import Tooltip from "@mui/material/Tooltip";
+import InfoIcon from "@mui/icons-material/Info";
 
 export type InpControlProps = {
   label: string;
   isDisabled?: boolean;
   numeric?: boolean;
+  showInfoIcon?: boolean
 } & TextFieldProps;
 
 export type InputControlProps<TFormFields> = {
@@ -40,6 +43,7 @@ export function InputControl<TFormFields>(
     label,
     adornmentText,
     rules,
+    tooltipText,
     numeric,
     size = "medium",
     sx,
@@ -73,11 +77,17 @@ export function InputControl<TFormFields>(
         };
 
         return (
+       
           <TextField
             InputProps={{
               endAdornment: (
                 <InputAdornment position="start">
                   {adornmentText}
+                  {props.showInfoIcon && ( 
+                    <Tooltip title={tooltipText} placement="top">
+                      <InfoIcon />
+                    </Tooltip>
+                  )}
                 </InputAdornment>
               ),
             }}
@@ -91,6 +101,7 @@ export function InputControl<TFormFields>(
             label={label}
             variant="outlined"
           />
+       
         );
       }}
       defaultValue={defaultValue}

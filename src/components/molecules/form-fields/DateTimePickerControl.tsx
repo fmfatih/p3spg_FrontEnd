@@ -6,6 +6,11 @@ import { DateTimePicker } from "@mui/x-date-pickers";
 import { Control, Controller, ControllerProps } from "react-hook-form";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import 'dayjs/locale/tr' // import Türkçe dil desteği
+import dayjs from 'dayjs'
+
+dayjs.locale('tr') // use Türkçe dil desteği global olarak
+
 
 export type DateTimeControlProps = {
   label: string;
@@ -50,7 +55,7 @@ export function DateTimePickerControl<TFormFields>(
       render={({ field: { onChange, name, value }, fieldState: { error } }) => {
         return (
           <>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} locale="tr">
               <DateTimePicker
                 sx={sx}
                 size={size}

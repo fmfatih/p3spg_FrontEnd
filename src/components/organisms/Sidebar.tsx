@@ -41,6 +41,8 @@ export const Sidebar = ({onCloseMenu}: SidebarProps) => {
     return "";
   };
 
+  console.log(userMenu);
+  
   return (
     <Box maxWidth={isDesktop ? 260 : undefined}>
       <Stack

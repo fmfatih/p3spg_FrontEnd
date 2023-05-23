@@ -1,3 +1,7 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable jsx-a11y/anchor-is-valid */
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { Stack, useMediaQuery, useTheme } from '@mui/material';
 import { GridColDef, GridActionsCellItem, GridPaginationModel } from '@mui/x-data-grid';
@@ -19,6 +23,8 @@ import SearchTable from '../../../components/atoms/SearchTable';
 
 export const BankRedirectListingTable = () => {
   const [text, setText] = useState('');
+  const [queryOptions, setQueryOptions] = React.useState({});
+
   const theme = useTheme();
   const { showDelete, showUpdate } = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
@@ -54,36 +60,41 @@ export const BankRedirectListingTable = () => {
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
   };
-
   useEffect(() => {
-    getVPosRoutingList(
-      {
-        size: text ? -1 : paginationModel.pageSize,
-        page: paginationModel.page,
-        orderBy: 'CreateDate',
-        orderByDesc: true,
-        searchText: text,
-      },
-      {
-        onSuccess: (data) => {
-          if (!data.isSuccess) {
-            setSnackbar({
-              severity: 'error',
-              description: data.message,
-              isOpen: true,
-            });
-          }
-        },
-        onError: () => {
+    const requestPayload = {
+      size: text ? -1 : paginationModel.pageSize,
+      page: paginationModel.page,
+      orderBy: 'CreateDate',
+      orderByDesc: true,
+      searchText: text,
+    };
+  
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+  
+    getVPosRoutingList(requestPayload, {
+      onSuccess: (data) => {
+        if (!data.isSuccess) {
           setSnackbar({
             severity: 'error',
-            description: 'İşlem sırasında bir hata oluştu',
+            description: data.message,
             isOpen: true,
           });
-        },
-      }
-    );
-  }, [getVPosRoutingList, paginationModel.page, paginationModel.pageSize, setSnackbar, text]);
+        }
+      },
+      onError: () => {
+        setSnackbar({
+          severity: 'error',
+          description: 'İşlem sırasında bir hata oluştu',
+          isOpen: true,
+        });
+      },
+    });
+  }, [getVPosRoutingList, paginationModel.page, paginationModel.pageSize, setSnackbar, queryOptions]);
+  
+
+  // , queryOptions 
 
   const handleChangePagination = (model: GridPaginationModel) => {
     setPaginationModel(model);
@@ -234,10 +245,36 @@ export const BankRedirectListingTable = () => {
 
   const hasLoading = isLoading || isDeleteLoading;
 
-  const handleChange = (newText) => {
-    setText(newText);
-    // Burada, debounced giriş işlemi yapılabilir.
+  // const handleChange = (newText) => {
+  //   setText(newText);
+  //   // Burada, debounced giriş işlemi yapılabilir.
+  // };
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, delay);
+    };
   };
+
+  const handleFilterChange = debounce((props) => {
+    if (props.value?.toString()?.length >= 1) {
+      setQueryOptions(props);
+    }
+  }, 500);
+
+  // const handleFilterChange = (props:any) => {
+  //   if(props.value?.toString()?.length > 3){
+  //     setQueryOptions(props)
+  //   }
+
+
+
+  // }
+
+console.log(queryOptions)
 
   return (
     <>
@@ -245,17 +282,18 @@ export const BankRedirectListingTable = () => {
       <Stack flex={1} p={2}>
         {tableData?.result && (
           <>
-            <div style={{ marginBottom: '10px' }}>
+            {/* <div style={{ marginBottom: '10px' }}>
               <SearchTable value={text} onChange={handleChange} delay={500} />
-            </div>
+            </div> */}
             <Table
+              handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
               rowCount={tableData.totalItems}
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               isRowSelectable={() => false}
-              disableColumnMenu
+              // disableColumnMenu
               rows={tableData.result}
               columns={columns}
               exportFileName="Sanal Pos Banka Listesi"

@@ -18,8 +18,21 @@ export const addUserFormSchema = zod.object({
     zod.string().min(10)
   ),
   status: zod.any(),
-  merchant: zod.any(),
-  userType: zod.string().min(1, { message: "Please enter your user type" }),
+  // merchant: zod.number().positive("Please select a merchant"),
+  userType: zod.number().positive("Please select a user type"),
+  merchant: zod.number().positive("Please select a merchant").or(
+    zod.object({
+      // burada istediğiniz diğer kontrolleri ekleyin
+      label: zod.string(),
+      value: zod.number().positive(),
+    }),
+  ),
+  // userType: zod.number().positive("Please select a user type").or(
+  //   zod.object({
+  //     label: zod.string(),
+  //     value: zod.number().positive(),
+  //   }),
+  // ),
   roleIds: zod.any(),
 });
 

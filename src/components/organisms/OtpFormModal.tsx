@@ -45,6 +45,11 @@ export const OtpFormModal = ({ isOpen }: OtpFormModalProps) => {
               if (userInfo.systemPassword) {
                 setIsChangePasswordModalOpen(true);
               } else {
+                setSnackbar({
+                  severity: "success",
+                  isOpen: true,
+                  description: data.message,
+                });
                 navigate("/dashboard");
               }
             } else {

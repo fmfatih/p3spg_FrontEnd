@@ -1,9 +1,11 @@
 import {
   IMemberVPos,
+  IMerchantVPos,
   useGetBankList,
   useGetDefaultVPosSettingsList,
   useMemberVPosAddWithSettings,
   useGetAllMerchantList,
+  useMerchantVPosAddWithSettings,
   useGetAcquirerBankList,
   useAuthorization,
 } from "../../../hooks";
@@ -37,12 +39,14 @@ export const BankAddForm = () => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const navigate = useNavigate();
-  const {showCreate} = useAuthorization();
+  const { showCreate } = useAuthorization();
   const setSnackbar = useSetSnackBar();
   const memberVPos = useLocation().state as unknown as IMemberVPos | undefined;
-  console.log("memberVPos");
-  console.log(memberVPos);
-  const { control, reset, watch, handleSubmit, setValue } =
+  const merchantVPos = useLocation().state as unknown as
+    | IMerchantVPos
+    | undefined;
+
+  const { control, reset, watch, handleSubmit, setValue, errors } =
     useForm<BankAddFormValuesType>({
       resolver: zodResolver(addBankFormSchema),
       defaultValues: initialState,
@@ -54,16 +58,20 @@ export const BankAddForm = () => {
     useGetDefaultVPosSettingsList();
   const { mutate: memberVPosAddWithSettings, isLoading } =
     useMemberVPosAddWithSettings();
+  const { mutate: merchantVPosAddWithSettings, isLoading: merchantLoading } =
+    useMerchantVPosAddWithSettings();
   const { data: rawMerchantList } = useGetAllMerchantList();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "parameters",
   });
+
   const [, setSelectedMerchant] = useState({} as any);
   const handleBack = () => navigate("/dashboard");
 
   useEffect(() => {
     if (!!memberVPos && JSON.stringify(memberVPos) !== "{}") {
+      console.log("memberVPos", memberVPos);
       reset({
         fullName: memberVPos?.fullName,
         mail: memberVPos?.mail,
@@ -74,7 +82,20 @@ export const BankAddForm = () => {
         bankCode: `${memberVPos.bankCode}`,
       });
     }
-  }, [reset, memberVPos, setValue]);
+  }, [reset, memberVPos, setValue,]);
+
+  // useEffect(() => {
+  //   if (!!merchantVPos && JSON.stringify(merchantVPos) !== "{}") {
+  //     reset({
+  //       fullName: merchantVPos?.fullName,
+  //       mail: merchantVPos?.mail,
+  //       phoneNumber: merchantVPos.phoneNumber,
+  //       officePhone: merchantVPos.officePhone,
+  //       description: merchantVPos.description,
+  //       bankCode: `${merchantVPos.bankCode}`,
+  //     });
+  //   }
+  // }, [reset, merchantVPos, setValue]);
 
   useEffect(() => {
     let req = {};
@@ -91,12 +112,14 @@ export const BankAddForm = () => {
 
     if (!!bankCode) {
       getDefaultVposSettingsList(req, {
-        onSuccess: (data: { data: Array<{ key: string; type: string }> }) => {
+        onSuccess: (data: {
+          data: Array<{ key: string; type: string; label: string }>;
+        }) => {
           remove();
           data?.data?.map((item) => {
             const tempOBJ: any = {
               key: item.key,
-              label: item.key,
+              label: item?.label,
               type: "string",
             };
             if (!!memberVPos) {
@@ -120,6 +143,7 @@ export const BankAddForm = () => {
     remove,
     selectedMerchantId,
   ]);
+  console.log(memberVPos)
 
   const acquirerBankList = useMemo(() => {
     return rawAcquirerBankList?.data?.map(
@@ -144,6 +168,7 @@ export const BankAddForm = () => {
   }, [rawMerchantList?.data]);
 
   const onSubmit = (data: BankAddFormValuesType) => {
+    console.log(data);
     const parameters = data?.parameters?.map((item) => {
       return {
         key: item.key,
@@ -152,42 +177,86 @@ export const BankAddForm = () => {
       };
     });
 
-    memberVPosAddWithSettings(
-      {
-        ...data,
-        parameters,
-        phoneNumber: data.phoneNumber ? `05${data.phoneNumber}` : "",
-        officePhone: data.officePhone ? `05${data.officePhone}` : "",
-        defaultBank: false,
-        memberId: 1,
-        merchantID: selectedMerchantId || 0,
-      },
-      {
-        onSuccess: (data) => {
-          if (data.isSuccess) {
-            setSnackbar({
-              severity: "success",
-              isOpen: true,
-              description: data.message,
-            });
-          } else {
+    if (memberVPos?.memberId && memberVPos?.memberName) {
+      memberVPosAddWithSettings(
+        {
+          ...data,
+          parameters,
+          phoneNumber: data.phoneNumber ? `05${data.phoneNumber}` : "",
+          officePhone: data.officePhone ? `05${data.officePhone}` : "",
+          defaultBank: false,
+          memberId: 1,
+          merchantID: selectedMerchantId || 0,
+        },
+        {
+          onSuccess: (data) => {
+            if (data.isSuccess) {
+              setSnackbar({
+                severity: "success",
+                isOpen: true,
+                description: data.message,
+              });
+            } else {
+              setSnackbar({
+                severity: "error",
+                description: data.message,
+                isOpen: true,
+              });
+            }
+          },
+          onError: () => {
             setSnackbar({
               severity: "error",
-              description: data.message,
+              description: "İşlem sırasında bir hata oluştu",
               isOpen: true,
             });
-          }
+          },
+        }
+      );
+    }
+
+    if (merchantVPos?.merchantId && merchantVPos?.merchantName) {
+      merchantVPosAddWithSettings(
+        {
+          ...data,
+          parameters,
+          phoneNumber: data.phoneNumber ? `05${data.phoneNumber}` : "",
+          officePhone: data.officePhone ? `05${data.officePhone}` : "",
+          defaultBank: false,
+          memberId: 1,
+          merchantID: selectedMerchantId || 0,
         },
-        onError: () => {
-          setSnackbar({
-            severity: "error",
-            description: "İşlem sırasında bir hata oluştu",
-            isOpen: true,
-          });
-        },
-      }
-    );
+        {
+          onSuccess: (data) => {
+            if (data.isSuccess) {
+              setSnackbar({
+                severity: "success",
+                isOpen: true,
+                description: data.message,
+              });
+            } else {
+              setSnackbar({
+                severity: "error",
+                description: data.message,
+                isOpen: true,
+              });
+            }
+          },
+          onError: () => {
+            setSnackbar({
+              severity: "error",
+              description: "İşlem sırasında bir hata oluştu",
+              isOpen: true,
+            });
+          },
+        }
+      );
+    }
   };
+
+  console.log(selectedMerchantId);
+  console.log(merchantVPos);
+  console.log(merchantList);
 
   return (
     <>
@@ -205,6 +274,12 @@ export const BankAddForm = () => {
                       return (
                         <>
                           <Autocomplete
+                            defaultValue={
+                              merchantVPos?.merchantName && {
+                                label: merchantVPos?.merchantName,
+                                value: merchantVPos?.merchantId,
+                              }
+                            }
                             sx={{ mr: isDesktop ? 2 : 0 }}
                             onChange={(event, selectedValue) => {
                               setSelectedMerchant(selectedValue);
@@ -228,7 +303,7 @@ export const BankAddForm = () => {
                 )}
               </FormControl>
             </Stack>
-            {!selectedMerchantId && (
+            {!selectedMerchantId && !merchantVPos?.merchantName && (
               <>
                 <Stack
                   width={isDesktop ? 800 : "auto"}
@@ -284,7 +359,7 @@ export const BankAddForm = () => {
                     id="description"
                   />
                 </Stack>
-                <Stack
+                {/* <Stack
                   width={isDesktop ? 800 : "auto"}
                   spacing={3}
                   direction="row"
@@ -295,7 +370,7 @@ export const BankAddForm = () => {
                     control={control}
                     id="webAddress"
                   />
-                </Stack>
+                </Stack> */}
               </>
             )}
           </Stack>
@@ -323,8 +398,10 @@ export const BankAddForm = () => {
                     defaultValue=""
                     sx={{ width: "100%" }}
                     id={`parameters.${index}.value`}
-                    label={field.label}
+                    label={field.key}
                     control={control}
+                    tooltipText={field.label}
+                    showInfoIcon={true}
                   />
                 </Box>
               ))}
@@ -337,11 +414,13 @@ export const BankAddForm = () => {
           direction="row"
           justifyContent="flex-end"
         >
-          {!!showCreate && (<Button
-            onClick={handleSubmit(onSubmit)}
-            variant="contained"
-            text={!!memberVPos?.id ? "Güncelle" : "Kaydet"}
-          />)}
+          {!!showCreate && (
+            <Button
+              onClick={handleSubmit(onSubmit)}
+              variant="contained"
+              text={!!memberVPos?.id ? "Güncelle" : "Kaydet"}
+            />
+          )}
           <Button onClick={handleBack} sx={{ mx: 2 }} text={"Iptal"} />
         </Stack>
       </Stack>

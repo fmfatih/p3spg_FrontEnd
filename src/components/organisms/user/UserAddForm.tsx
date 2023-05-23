@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import {
   IUser,
   IUserAddRequest,
@@ -34,7 +37,7 @@ import { useUserInfo } from "../../../store/User.state";
 
 export const UserAddForm = () => {
   const theme = useTheme();
-  const {showCreate} = useAuthorization();
+  const { showCreate } = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const navigate = useNavigate();
   const [userInfo] = useUserInfo();
@@ -44,6 +47,7 @@ export const UserAddForm = () => {
   const { data: rawMerchantList } = useGetAllMerchantList();
   const { data: userTypes } = useGetUserTypeList({});
   const { mutate: userAdd, isLoading: isUserAddLoading } = useUserAdd();
+
   const { mutate: userUpdate, isLoading: isUserUpdateLoading } =
     useUpdateUser();
   const { handleSubmit, control, reset, setValue, watch } =
@@ -52,20 +56,19 @@ export const UserAddForm = () => {
     });
 
   const [selectedMerchant, setSelectedMerchant] = useState(
-    user ? (Number(userInfo.merchantId) !== 0
-      ? { label: userInfo.merchantName, value: Number(userInfo.merchantId) }
-      : null) : null
+    user
+      ? Number(userInfo.merchantId) !== 0
+        ? { label: userInfo.merchantName, value: Number(userInfo.merchantId) }
+        : null
+      : null
   );
-  console.log(user);
-  console.log(userInfo);
-  console.log(selectedMerchant);
-  
-  
-  
-   
-  const userType = watch('userType');
+  // console.log(user);
+  // console.log(userInfo);
+  // console.log(selectedMerchant);
 
-  let checkSelectedValue = watch('userType')
+  const userType = watch("userType");
+
+  console.log(rawRoles);
 
   useEffect(() => {
     if (!!user && JSON.stringify(user) !== "{}") {
@@ -83,7 +86,8 @@ export const UserAddForm = () => {
           email: user?.email,
           phoneNumber: user.phoneNumber,
           merchant: { label: user?.merchantName, value: user?.merchantId },
-          userType: `${user.userType}`,
+          // userType: `${user.userType}`,
+          userType: user ? Number(user.userType) : 0,
           roleIds: tempRoleIds,
         },
         {
@@ -105,13 +109,16 @@ export const UserAddForm = () => {
   }, [rawMerchantList?.data]);
 
   const roleList = useMemo(() => {
-    return rawRoles?.data?.map((rawRole: { name: string; id: number }) => {
-      return {
-        label: rawRole.name,
-        value: `${rawRole.id}`,
-      };
-    });
-  }, [rawRoles?.data]);
+    return rawRoles?.data
+      ?.filter((rawRole) => rawRole.userType === userType)
+      .map((rawRole: { name: string; id: number; userType: number }) => {
+        return {
+          label: rawRole.name,
+          value: `${rawRole.id}`,
+          userType: rawRole?.userType,
+        };
+      });
+  }, [rawRoles?.data, userType]);
 
   const userTypeList = useMemo(() => {
     return userTypes?.data?.map((userType: { key: string; value: string }) => {
@@ -209,7 +216,7 @@ export const UserAddForm = () => {
       });
     }
   };
-  
+
   const handleBack = () => navigate("/dashboard");
 
   return (
@@ -262,7 +269,7 @@ export const UserAddForm = () => {
                   <Controller
                     control={control}
                     name="merchant"
-                    render={() => {
+                    render={({ field, fieldState }) => {
                       return (
                         <>
                           <Autocomplete
@@ -270,17 +277,23 @@ export const UserAddForm = () => {
                             onChange={(event, selectedValue) => {
                               setSelectedMerchant(selectedValue);
                               setValue("merchant", selectedValue?.value || 0);
+                              field.onChange(selectedValue?.value || 0);
+                              console.log(setSelectedMerchant);
                             }}
                             id="merchant"
                             options={merchantList}
-                            defaultValue={user?.id?selectedMerchant:null}
+                            defaultValue={user?.id ? selectedMerchant : null}
                             getOptionLabel={(option: {
                               label: string;
                               value: number;
                             }) => option.label}
-                            disabled={userType === '1'}
+                            disabled={Number(userType) === 1}
                             renderInput={(params) => (
-                              <TextField {...params} label="Üye İşyeri"  />
+                              <TextField
+                                {...params}
+                                label="Üye İşyeri"
+                                error={fieldState.invalid}
+                              />
                             )}
                           />
                         </>
@@ -289,23 +302,45 @@ export const UserAddForm = () => {
                   />
                 )}
               </FormControl>
-              <Box flex={1}>
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 {userTypeList && (
-                  <RadioButtonsControl
-                    row
-                    title="Kullanıcı Tipi"
+                  <Controller
                     control={control}
-                    id="userType"
-                    items={userTypeList}
-                    defaultValue={null}
+                    name="userType"
+                    render={({ field, fieldState }) => {
+                      const selectedUserType = user
+                        ? userTypeList.find(
+                            (option) => option.value === user.userType
+                          )
+                        : null;
+
+                      return (
+                        <Autocomplete
+                          id="userType"
+                          options={userTypeList}
+                          // getOptionLabel={(option: { label: string; value: number }) => option.label}
+                          onChange={(event, newValue) => {
+                            field.onChange(Number(newValue?.value));
+                          }}
+                          value={selectedUserType}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              error={fieldState.invalid}
+                              label="Kullanıcı Tipi"
+                            />
+                          )}
+                        />
+                      );
+                    }}
                   />
                 )}
-              </Box>
+              </FormControl>
             </Stack>
             <Stack width={isDesktop ? 800 : "auto"} direction="row">
               {isDesktop && <FormControl sx={{ width: "50%" }} />}
               <Box flex={1}>
-                {roleList && checkSelectedValue && (
+                {userType ? (
                   <CheckboxesControl
                     row={!isDesktop}
                     title="Kullanıcı Rolü"
@@ -313,7 +348,7 @@ export const UserAddForm = () => {
                     id="roleIds"
                     items={roleList}
                   />
-                )}
+                ) : null}
               </Box>
             </Stack>
           </Stack>

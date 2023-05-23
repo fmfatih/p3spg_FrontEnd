@@ -13,12 +13,16 @@ import {
   GridToolbarColumnsButton,
   GridToolbarQuickFilter,
   SearchBar,
+  GridLogicOperator,
+  GridFilterPanel,
+  GridColumnMenuFilterItem,
 } from "@mui/x-data-grid";
 import InputLabel from "@mui/material/InputLabel";
 import "./index.css";
 import { downloadExcel } from "../../../util/downloadExcel";
 import { Button } from "@mui/material";
-import { FileDownloadOutlined } from "@mui/icons-material";
+import { FileDownloadOutlined, Filter } from "@mui/icons-material";
+import React from "react";
 
 export type TableProps = DataGridProps & {
   components?: GridSlotsComponentsProps;
@@ -46,7 +50,7 @@ function CustomToolbar({ onDownload }: { onDownload: any }) {
   );
 }
 
-export const Table = ({...props }: TableProps) => {
+export const Table = ({ handleFilterChange, ...props }: TableProps) => {
   const apiRef = useGridApiRef();
   const handleDownload = () => {
     const filteredGridIds = gridExpandedSortedRowIdsSelector(apiRef);
@@ -61,6 +65,7 @@ export const Table = ({...props }: TableProps) => {
       .map((item) => {
         const filteredItem = {};
         fieldHeaderNameTuple.map((fieldHeader) => {
+          console.log(fieldHeader);
           if (fieldHeader) {
             filteredItem[fieldHeader[1]] = item[fieldHeader[0]];
           }
@@ -72,12 +77,55 @@ export const Table = ({...props }: TableProps) => {
     downloadExcel(array, props?.exportFileName);
   };
 
+  const onFilterChange = React.useCallback((filterModel: GridFilterModel) => {
+    // Here you save the data you need from the filter model
+    let request;
+    const value = filterModel?.items[0]?.value;
+    request = value
+      ? {
+          field: filterModel?.items[0]?.field,
+          value: filterModel?.items[0]?.value,
+        }
+      : {};
+
+    handleFilterChange(request);
+  }, []);
+
+  const [model, setModel] = React.useState();
+
+  React.useEffect(() => {
+    const storedFilters = localStorage.getItem('filters');
+    if (storedFilters) {
+      const filtersObject = JSON.parse(storedFilters);
+      setModel(currentModel => ({
+        ...currentModel,
+        ...filtersObject,
+      }));
+    }
+  }, []); 
+
+  const handleColumnVisibilityChange = (newProps) => {
+    setModel(currentModel => {
+      const updatedModel = {
+        ...currentModel,
+        ...newProps
+      };
+      localStorage.setItem('filters', JSON.stringify(updatedModel));
+      return updatedModel;
+    });
+  };
+
+
+
   return (
     <DataGrid
       {...props}
       apiRef={apiRef}
+      // disableDensitySelector
+      filterMode="server"
+      onFilterModelChange={onFilterChange}
       slots={{
-        toolbar: () => CustomToolbar({onDownload: props.onSave }),
+        toolbar: () => CustomToolbar({ onDownload: props.onSave }),
       }}
       localeText={{
         toolbarColumns: "Kolonlar",
@@ -93,6 +141,8 @@ export const Table = ({...props }: TableProps) => {
           labelRowsPerPage: "Sayfa Başına Satır",
         },
       }}
+      columnVisibilityModel={model}
+      onColumnVisibilityModelChange={handleColumnVisibilityChange}
     ></DataGrid>
   );
 };

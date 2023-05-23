@@ -27,7 +27,9 @@ import {
   SettingsNonsecure,
   PaymentWithLinked,
   PaymentWithLinkedList,
+  BusinessBankListing
 } from "../pages";
+
 
 export const router = createBrowserRouter([
   {
@@ -77,6 +79,10 @@ export const router = createBrowserRouter([
   {
     path: "/commission-management/commission-listing",
     element: <BankCommissionList />,
+  },
+  {
+    path: "/vpos-management/vpos-merchantbanklisting",
+    element: <BusinessBankListing />,
   },
   {
     path: "/commission-management/commission-definition",

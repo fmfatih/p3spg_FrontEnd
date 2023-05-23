@@ -40,11 +40,6 @@ export const LoginTemplate = () => {
           if (data.isSuccess) {
             setIsModalOpen(true);
             setUserInfo(data.data);
-            setSnackbar({
-              severity: "success",
-              isOpen: true,
-              description: data.message,
-            });
             localStorage.setItem(StorageKeys.bearerToken, data.data.token);
             localStorage.setItem(StorageKeys.userName, data.data.fullName);
             localStorage.setItem(StorageKeys.expireDate, data.data.expireDate);

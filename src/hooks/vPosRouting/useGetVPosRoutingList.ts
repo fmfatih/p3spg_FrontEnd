@@ -9,6 +9,7 @@ export type GetVPosRoutingListRequest = {
   orderByDesc?: boolean;
   orderBy?: string;
   searchText?: string;
+  [key: string]: string | number | boolean | undefined;
 };
 
 export type IVPosRouting = {
@@ -34,23 +35,11 @@ export type IVPosRouting = {
 export type GetVPosRoutingListResponse = BasePagingResponse<
   Array<IVPosRouting>
 >;
-
-async function getVPosRoutingList({
-  page = 0,
-  size = 15,
-  orderByDesc = true,
-  orderBy = "CreateDate",
-  searchText = '',
-}: GetVPosRoutingListRequest): Promise<GetVPosRoutingListResponse> {
-  const data = {
-    page,
-    size,
-    orderByDesc,
-    orderBy,
-    searchText
-  };
+async function getVPosRoutingList(
+  variables: GetVPosRoutingListRequest
+): Promise<GetVPosRoutingListResponse> {
   try {
-    return (await axiosInstance.post("/VPosRouting/List", data)).data;
+    return (await axiosInstance.post("/VPosRouting/List", variables)).data;
   } catch (ex) {
     throw ((ex as AxiosError).response?.data as any).error;
   }

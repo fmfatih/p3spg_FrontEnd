@@ -92,7 +92,6 @@ export const initialState: BankAddFormValuesType = {
   fullName: "",
   phoneNumber: "",
   bankCode: "",
-  webAddress: "",
   description: "",
   parameters: [],
   merchantID: null,

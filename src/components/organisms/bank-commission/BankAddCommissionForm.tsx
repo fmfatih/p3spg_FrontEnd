@@ -165,7 +165,7 @@ export const BankAddCommissionForm = () => {
       onus: !!onus,
       international: !!international,
       amex: !!amex,
-      cardType: cardType,
+      cardType: international ?  "" : cardType,
       installment: Number(installment),
       bankcode,
       bankblocked: !!bankblocked,
@@ -293,6 +293,8 @@ export const BankAddCommissionForm = () => {
 
 
   const handleBack = () => navigate("/dashboard");
+  let internationalState = watch('international')
+
 
   return (
     <>
@@ -425,6 +427,7 @@ export const BankAddCommissionForm = () => {
                     control={control}
                     label="Kart Tipi"
                     items={cardTypeList}
+                    disabled={internationalState}
                   />
                 )}
               </FormControl>
