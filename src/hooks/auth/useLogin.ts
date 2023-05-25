@@ -18,6 +18,7 @@ export type ILoginResponse = BaseResponse<{
   merchantId: string;
   merchantName: string;
   systemPassword?: boolean;
+  order: number;
 }>;
 
 async function login(data: ILoginRequest): Promise<ILoginResponse> {

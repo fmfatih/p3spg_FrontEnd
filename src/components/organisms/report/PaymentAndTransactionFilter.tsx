@@ -28,9 +28,17 @@ import {
 } from "@mui/x-data-grid";
 import { default as dayjs } from "dayjs";
 import React, { useEffect, useMemo, useState } from "react";
-import { useForm,Controller  } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { Stack } from "@mui/system";
-import { FormControl, Link, Box, useTheme, useMediaQuery, Autocomplete, TextField } from "@mui/material";
+import {
+  FormControl,
+  Link,
+  Box,
+  useTheme,
+  useMediaQuery,
+  Autocomplete,
+  TextField,
+} from "@mui/material";
 import { Button, Loading } from "../../atoms";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -138,6 +146,7 @@ export const PaymentAndTransactionFilter = () => {
       page: paginationModel.page,
       orderBy: "CreateDate",
     };
+    console.log(transactionType);
 
     GetPaymentAndTransaction(req, {
       onSuccess: (data) => {
@@ -167,14 +176,14 @@ export const PaymentAndTransactionFilter = () => {
   };
 
   function RenderActionButton(transaction: any) {
+    let buttonLabel = "";
+    let buttonColor = "";
 
+    if (transaction.status === "SUCCESS" && transaction.txnType !== "REFUND") {
+      buttonLabel = transaction.endOfDayFlag ? "İade" : "İptal";
+      buttonColor = transaction.endOfDayFlag ? "#EEAB00" : "#F5004A";
+    }
 
-    const isRefund = transaction.endOfDayFlag;
-    const buttonLabel = isRefund ? "İade" : "İptal";
-    const buttonColor = isRefund ? "#EEAB00" : "#F5004A";
-    // if (transaction.status !== "SUCCESS") {
-    //   return <Box>{buttonLabel}</Box>;
-    // }
     return (
       <>
         <Link
@@ -296,8 +305,9 @@ export const PaymentAndTransactionFilter = () => {
           ),
         ],
       },
-      { field: "txnType", headerName: "İşlem Tipi", width: 150 },
-      { field: "status", headerName: "İşlem Durumu", width: 200 },
+
+      { field: "txnTypeDesc", headerName: "İşlem Tipi", width: 150 },
+      { field: "statusDesc", headerName: "İşlem Durumu", width: 200 },
       { field: "maskedPan", headerName: "Kart Numarası", width: 200 },
       { field: "cardBankCode", headerName: "Kartın Banka Kodu", width: 200 },
       { field: "cardBankName", headerName: "Kartın Bankası", width: 200 },
@@ -513,35 +523,37 @@ export const PaymentAndTransactionFilter = () => {
                 />
               </FormControl>
               <FormControl sx={{ flex: isDesktop ? 1 : "auto" }}>
-  {transactionStatusList && (
-    <Controller
-      name="status"
-      control={control}
-      defaultValue=""
-      render={({ field: { onChange, value } }) => {
-        const selectedStatus = transactionStatusList.find(
-          (option) => option.value === value
-        );
+                {transactionStatusList && (
+                  <Controller
+                    name="status"
+                    control={control}
+                    defaultValue=""
+                    render={({ field: { onChange, value } }) => {
+                      const selectedStatus = transactionStatusList.find(
+                        (option) => option.value === value
+                      );
 
-        return (
-          <Autocomplete
-            id="status"
-            options={transactionStatusList}
-            getOptionSelected={(option, value) => option.value === value}
-            getOptionLabel={(option) => option.label}
-            value={selectedStatus || null}
-            onChange={(_, newValue) => {
-              onChange(newValue ? newValue.value : "");
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="İşlem Durumu"/>
-            )}
-          />
-        );
-      }}
-    />
-  )}
-</FormControl>
+                      return (
+                        <Autocomplete
+                          id="status"
+                          options={transactionStatusList}
+                          getOptionSelected={(option, value) =>
+                            option.value === value
+                          }
+                          getOptionLabel={(option) => option.label}
+                          value={selectedStatus || null}
+                          onChange={(_, newValue) => {
+                            onChange(newValue ? newValue.value : "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField {...params} label="İşlem Durumu" />
+                          )}
+                        />
+                      );
+                    }}
+                  />
+                )}
+              </FormControl>
 
               <FormControl sx={{ flex: isDesktop ? 1 : "auto" }}>
                 <InputControl
@@ -571,67 +583,71 @@ export const PaymentAndTransactionFilter = () => {
                 />
               </FormControl>
               <FormControl sx={{ flex: 1 }}>
-  {payment3DTrxSettingsList && (
-    <Controller
-      name="transactionType"
-      control={control}
-      defaultValue=""
-      render={({ field: { onChange, value } }) => {
-        const selectedTransactionType = payment3DTrxSettingsList.find(
-          (option) => option.value === value
-        );
+                {payment3DTrxSettingsList && (
+                  <Controller
+                    name="transactionType"
+                    control={control}
+                    defaultValue=""
+                    render={({ field: { onChange, value } }) => {
+                      const selectedTransactionType =
+                        payment3DTrxSettingsList.find(
+                          (option) => option.value === value
+                        );
 
-        return (
-          <Autocomplete
-            id="transactionType"
-            options={payment3DTrxSettingsList}
-            getOptionSelected={(option, value) => option.value === value}
-            getOptionLabel={(option) => option.label}
-            value={selectedTransactionType || null}
-            onChange={(_, newValue) => {
-              onChange(newValue ? newValue.value : "");
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="İşlem Tipi"/>
-            )}
-          />
-        );
-      }}
-    />
-  )}
-</FormControl>
+                      return (
+                        <Autocomplete
+                          id="transactionType"
+                          options={payment3DTrxSettingsList}
+                          getOptionSelected={(option, value) =>
+                            option.value === value
+                          }
+                          getOptionLabel={(option) => option.label}
+                          value={selectedTransactionType || null}
+                          onChange={(_, newValue) => {
+                            onChange(newValue ? newValue.value : "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField {...params} label="İşlem Tipi" />
+                          )}
+                        />
+                      );
+                    }}
+                  />
+                )}
+              </FormControl>
 
-<FormControl sx={{ flex: 1 }}>
-  {acquirerBankList && (
-    <Controller
-      name="bankCode"
-      control={control}
-      defaultValue=""
-      render={({ field: { onChange, value } }) => {
-        const selectedBank = acquirerBankList.find(
-          (option) => option.value === value
-        );
+              <FormControl sx={{ flex: 1 }}>
+                {acquirerBankList && (
+                  <Controller
+                    name="bankCode"
+                    control={control}
+                    defaultValue=""
+                    render={({ field: { onChange, value } }) => {
+                      const selectedBank = acquirerBankList.find(
+                        (option) => option.value === value
+                      );
 
-        return (
-          <Autocomplete
-            id="bankCode"
-            options={acquirerBankList}
-            getOptionSelected={(option, value) => option.value === value}
-            getOptionLabel={(option) => option.label}
-            value={selectedBank || null}
-            onChange={(_, newValue) => {
-              onChange(newValue ? newValue.value : "");
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="POS Bankası"/>
-            )}
-          />
-        );
-      }}
-    />
-  )}
-</FormControl>
-
+                      return (
+                        <Autocomplete
+                          id="bankCode"
+                          options={acquirerBankList}
+                          getOptionSelected={(option, value) =>
+                            option.value === value
+                          }
+                          getOptionLabel={(option) => option.label}
+                          value={selectedBank || null}
+                          onChange={(_, newValue) => {
+                            onChange(newValue ? newValue.value : "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField {...params} label="POS Bankası" />
+                          )}
+                        />
+                      );
+                    }}
+                  />
+                )}
+              </FormControl>
             </Stack>
             <Stack
               direction="row"

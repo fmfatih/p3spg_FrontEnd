@@ -17,6 +17,7 @@ export type GetPaymentAndTransactionRequest = {
   status?: string;
   transactionType?: string;
   bankCode?: string;
+  txnType?: string;
 };
 
 export type GetPaymentAndTransactionResponse = BasePagingResponse<Array<any>>;

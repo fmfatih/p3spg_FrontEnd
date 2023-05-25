@@ -42,6 +42,7 @@ export const LoginTemplate = () => {
             setUserInfo(data.data);
             localStorage.setItem(StorageKeys.bearerToken, data.data.token);
             localStorage.setItem(StorageKeys.userName, data.data.fullName);
+            localStorage.setItem(StorageKeys.order, data.data.order);
             localStorage.setItem(StorageKeys.expireDate, data.data.expireDate);
             localStorage.setItem(StorageKeys.merchantId, data.data.merchantId);
             localStorage.setItem(

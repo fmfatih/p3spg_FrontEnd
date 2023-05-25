@@ -5,4 +5,5 @@ export enum StorageKeys {
   merchantId = "merchantId",
   merchantName = "merchantName",
   systemPassword = "systemPassword",
+  order = "userOrder"
 }

@@ -62,6 +62,8 @@ export const userRoleAddFormSchema = zod.object({
   description: zod
     .string()
     .min(1, { message: "Please enter your phone number" }),
+    order: zod.string().regex(/^\d+$/, 'Must be a number').transform(Number),
+    userType: zod.number().nonnegative(),
 });
 
 export type UserRoleAddFormSchemaFormValuesType = zod.infer<
@@ -72,6 +74,9 @@ export const userRoleAddInitialValues: UserRoleAddFormSchemaFormValuesType = {
   name: "",
   description: "",
   code: "",
+  order: 0,  
+  userType: 0,  
+
 };
 
 export const roleMenuAddFormSchema = zod.object({

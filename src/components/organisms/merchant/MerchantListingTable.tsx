@@ -230,6 +230,9 @@ export const MerchantListingTable = ({
         width: 200,
       },
       { field: "webSite", headerName: "Web Sitesi", width: 300 },
+      { field: "try", headerName: "TRY", width: 200 },
+      { field: "usd", headerName: "USD", width: 200 },
+      { field: "eur", headerName: "EUR", width: 200 },
       { field: "iban", headerName: "IBAN", width: 300 },
       {
         renderCell: RenderStatus,

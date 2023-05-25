@@ -70,14 +70,9 @@ export const UserAddForm = () => {
       : null
   );
   const [userStatus, setUserStatus] = useState("");
-  // console.log(user);
-  // console.log(userInfo);
-  // console.log(selectedMerchant);
-
 
   const userType = watch("userType");
-
-  console.log(rawRoles);
+  const fullName=watch("fullName")
 
   useEffect(() => {
     if (!!user && JSON.stringify(user) !== "{}") {
@@ -127,6 +122,7 @@ export const UserAddForm = () => {
   const roleList = useMemo(() => {
     return rawRoles?.data
       ?.filter((rawRole) => rawRole.userType === userType)
+      .filter(item => (item.userType === 2 && item.order >= userInfo?.order) || item.userType !== 2)
       .map((rawRole: { name: string; id: number; userType: number }) => {
         return {
           label: rawRole.name,
@@ -278,11 +274,11 @@ export const UserAddForm = () => {
      
 
 <Box flex={1}>
-  {userType? (
+  {user?.merchantId? (
     <Controller
     name="status"
     control={control}
-    defaultValue={user?.status || "BLOCKED"}
+    defaultValue={user?.status || "ACTIVE"}
     render={({ field: { onChange, value } }) => (
       <FormControl component="fieldset">
         <FormLabel component="legend">Kullanıcı Durumu</FormLabel>

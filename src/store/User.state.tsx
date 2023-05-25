@@ -12,6 +12,7 @@ export const initialUserInfoState = {
   sessionId: "",
   token: "",
   tokenType: "",
+  order: localStorage.getItem(StorageKeys.order) || 0,
   merchantId: localStorage.getItem(StorageKeys.merchantId) || 0,
   merchantName: localStorage.getItem(StorageKeys.merchantName) || "",
 };

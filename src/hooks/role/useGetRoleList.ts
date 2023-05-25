@@ -23,6 +23,8 @@ export type IRole ={
   updateUserId: number;
   deleteDate: string;
   deleteUserId: number;
+  order: number; 
+  userType: number; 
 }
 
 export type GetRoleListResponse = BasePagingResponse<Array<IRole>>;

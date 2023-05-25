@@ -182,6 +182,8 @@ export const RoleListingTable = ({
       { field: "id", headerName: "Rol ID", flex: 1 },
       { field: "code", headerName: "Rol Kodu", flex: 1 },
       { field: "name", headerName: "Rol Adı", flex: 1 },
+      { field: "order", headerName: "Order", flex: 1 },
+      { field: "userType", headerName: "Kullanıcı Tipi", flex: 1 },
       { field: "description", headerName: "Açıklama", flex: 1 },
     ];
   }, [deleteRow, showDelete]);
