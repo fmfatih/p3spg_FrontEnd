@@ -174,16 +174,37 @@ export const CampaignAddForm = () => {
             </FormControl>
           </Stack>
           <Stack spacing={3} direction={isDesktop ? "row" : 'column'} width={isDesktop ? 800 : 'auto'}>
-            <FormControl sx={{ flex: 1, width: isDesktop ? "50%" : '100%' }}>
-              {acquirerBankList && (
-                <SelectControl
-                  label="Banka"
-                  control={control}
-                  id="bankCode"
-                  items={acquirerBankList}
-                />
-              )}
-            </FormControl>
+          <FormControl sx={{ flex: 1, width: isDesktop ? "50%" : "100%" }}>
+  {acquirerBankList && (
+    <Controller
+      name="bankCode"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedBank = acquirerBankList.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="bankCode"
+            options={acquirerBankList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedBank || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Banka" />
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
             <FormControl sx={{ flex: 1, width: isDesktop ? "50%" : '100%' }}>
               {cardBinList && (
                 <Controller
@@ -230,16 +251,37 @@ export const CampaignAddForm = () => {
             </FormControl>
           </Stack>
           <Stack spacing={3} direction={isDesktop ? "row" : 'column'} width={isDesktop ? 800 : 'auto'}>
-            <FormControl sx={{ flex: 1, width: isDesktop ? "50%" : '100%' }}>
-              {cardTypeList ? (
-                <SelectControl
-                  id="cardType"
-                  control={control}
-                  label="Kart Tipi"
-                  items={cardTypeList}
-                />
-              ) : null}
-            </FormControl>
+          <FormControl sx={{ flex: 1, width: isDesktop ? "50%" : "100%" }}>
+  {cardTypeList && (
+    <Controller
+      name="cardType"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedCardType = cardTypeList.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="cardType"
+            options={cardTypeList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedCardType || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Kart Tipi" />
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
             <FormControl sx={{ flex: 1 }}>
               <InputControl
                 sx={{ flex: 1 }}

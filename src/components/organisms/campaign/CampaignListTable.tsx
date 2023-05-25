@@ -360,16 +360,37 @@ export const CampaignListTable = () => {
               direction="row"
               width={isDesktop ? 1308 : "auto"}
             >
-              <FormControl sx={{ flex: 1 }}>
-                {acquirerBankList && (
-                  <SelectControl
-                    label="Banka"
-                    control={control}
-                    id="bankCode"
-                    items={acquirerBankList}
-                  />
-                )}
-              </FormControl>
+       <FormControl sx={{ flex: 1 }}>
+  {acquirerBankList && (
+    <Controller
+      name="bankCode"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedBank = acquirerBankList.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="bankCode"
+            options={acquirerBankList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedBank || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Banka" />
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
               <FormControl sx={{ flex: 1 }}>
                 {cardBinList && (
                   <Controller

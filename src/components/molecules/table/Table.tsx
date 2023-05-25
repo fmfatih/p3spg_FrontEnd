@@ -16,14 +16,15 @@ import {
   GridLogicOperator,
   GridFilterPanel,
   GridColumnMenuFilterItem,
+  GridFilterModel,
 } from "@mui/x-data-grid";
 import InputLabel from "@mui/material/InputLabel";
 import "./index.css";
 import { downloadExcel } from "../../../util/downloadExcel";
 import { Button } from "@mui/material";
-import { FileDownloadOutlined, Filter } from "@mui/icons-material";
+import { FileDownloadOutlined, Clear } from "@mui/icons-material";
 import React from "react";
-
+import SearchIcon from "@mui/icons-material/Search";
 export type TableProps = DataGridProps & {
   components?: GridSlotsComponentsProps;
   onDownload?: () => void;
@@ -36,12 +37,26 @@ interface IColumn {
   field: string;
 }
 
-function CustomToolbar({ onDownload }: { onDownload: any }) {
+export function FilterMenuIcon() {
+  return <SearchIcon className="icon" />;
+}
+
+function CustomToolbar({
+  onDownload,
+  onClear,
+}: {
+  onDownload: any;
+  onClear: any;
+}) {
   return (
     <GridToolbarContainer sx={{ justifyContent: "flex-end" }}>
       {/* <GridToolbarQuickFilter></GridToolbarQuickFilter> */}
       <GridToolbarColumnsButton></GridToolbarColumnsButton>
       {/* <GridToolbarFilterButton></GridToolbarFilterButton> */}
+      <Button onClick={()=> onClear()}>
+        <Clear color="primary" />
+        TEMİZLE
+      </Button>
       <Button onClick={onDownload}>
         <FileDownloadOutlined color="primary " />
         İNDİR
@@ -52,6 +67,14 @@ function CustomToolbar({ onDownload }: { onDownload: any }) {
 
 export const Table = ({ handleFilterChange, ...props }: TableProps) => {
   const apiRef = useGridApiRef();
+  const [filterr, setFilter] = React.useState({});
+  const [model, setModel] = React.useState();
+
+  const handleClear = () => {
+    let props = "clearFilter"
+    handleFilterChange(props);
+  };
+
   const handleDownload = () => {
     const filteredGridIds = gridExpandedSortedRowIdsSelector(apiRef);
     const fieldHeaderNameTuple = props.columns.map((column: IColumn) => {
@@ -78,7 +101,8 @@ export const Table = ({ handleFilterChange, ...props }: TableProps) => {
   };
 
   const onFilterChange = React.useCallback((filterModel: GridFilterModel) => {
-    // Here you save the data you need from the filter model
+    localStorage.setItem("filterModel", filterModel);
+    console.info(filterModel);
     let request;
     const value = filterModel?.items[0]?.value;
     request = value
@@ -91,44 +115,62 @@ export const Table = ({ handleFilterChange, ...props }: TableProps) => {
     handleFilterChange(request);
   }, []);
 
-  const [model, setModel] = React.useState();
-
   React.useEffect(() => {
-    const storedFilters = localStorage.getItem('filters');
+    const storedFilters = localStorage.getItem("filters");
     if (storedFilters) {
       const filtersObject = JSON.parse(storedFilters);
-      setModel(currentModel => ({
+      setModel((currentModel) => ({
         ...currentModel,
         ...filtersObject,
       }));
     }
-  }, []); 
+  }, []);
 
   const handleColumnVisibilityChange = (newProps) => {
-    setModel(currentModel => {
+    setModel((currentModel) => {
       const updatedModel = {
         ...currentModel,
-        ...newProps
+        ...newProps,
       };
-      localStorage.setItem('filters', JSON.stringify(updatedModel));
+      localStorage.setItem("filters", JSON.stringify(updatedModel));
       return updatedModel;
     });
   };
 
+  // const filterModel = JSON.parse(localStorage.getItem('filterModel'));
 
+  // if(filterModel) {
+  //   setFilter(filterModel)
+  // }
+  const [key, setKey] = React.useState(Math.random());
 
   return (
     <DataGrid
       {...props}
+      key={key}
       apiRef={apiRef}
-      // disableDensitySelector
+      disableDensitySelector={true}
       filterMode="server"
+      // initialState={{
+      //   filter: {
+      //     filterModel: {
+      //       items: [{ field: 'issuerCardBankName',  value: 'test' }],
+      //     },
+      //   },
+      // }}
       onFilterModelChange={onFilterChange}
       slots={{
-        toolbar: () => CustomToolbar({ onDownload: props.onSave }),
+        toolbar: () =>
+          CustomToolbar({ onDownload: props.onSave, onClear: handleClear }),
+        columnMenuIcon: FilterMenuIcon,
       }}
       localeText={{
         toolbarColumns: "Kolonlar",
+        columnMenuFilter: "Filtre",
+        columnMenuHideColumn: "Gizle",
+        columnMenuManageColumns: "Kolonlar",
+        columnMenuSortAsc: "Artan Sırala",
+        columnMenuSortDesc: "Azalan Sırala",
         columnsPanelShowAllButton: "Tümünü Göster",
         columnsPanelHideAllButton: "Gizle",
         columnsPanelTextFieldLabel: "Kolon Ara",

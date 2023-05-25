@@ -39,8 +39,8 @@ import { default as dayjs } from "dayjs";
 
 export const PaymentWithLinkedForm = () => {
   const theme = useTheme();
-  const {showCreate} = useAuthorization();
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+  const { showCreate } = useAuthorization();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const { data: rawAcquirerBankList } = useGetAcquirerBankList();
   const { data: rawMerchantList } = useGetAllMerchantList();
   const { data: rawInstallmentSettingsList } =
@@ -112,8 +112,11 @@ export const PaymentWithLinkedForm = () => {
       currency: formValues.currency,
       userEmail: formValues.userEmail || "",
       userPhoneNumber: formValues.userPhoneNumber || "",
-      expireMinute: dayjs(formValues.endDate).diff(dayjs(formValues.startDate), 'minutes'),
-      memberId: 0
+      expireMinute: dayjs(formValues.endDate).diff(
+        dayjs(formValues.startDate),
+        "minutes"
+      ),
+      memberId: 0,
     };
 
     paymentWithLinked(request, {
@@ -161,18 +164,45 @@ export const PaymentWithLinkedForm = () => {
       <Stack flex={1} justifyContent="space-between">
         <Stack flex={1} p={2}>
           <Stack spacing={4}>
-            <Stack width={isDesktop ? 800 : 'auto'} spacing={3} direction={isDesktop ? "row" : 'column'}>
-              <FormControl sx={{ width: isDesktop ? "50%" : '100%' }}>
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 {acquirerBankList && (
-                  <SelectControl
-                    id="bankCode"
+                  <Controller
+                    name="bankCode"
                     control={control}
-                    label="Banka"
-                    items={acquirerBankList}
+                    defaultValue=""
+                    render={({ field: { onChange, value } }) => {
+                      const selectedBank = acquirerBankList.find(
+                        (option) => option.value === value
+                      );
+
+                      return (
+                        <Autocomplete
+                          id="bankCode"
+                          options={acquirerBankList}
+                          getOptionSelected={(option, value) =>
+                            option.value === value
+                          }
+                          getOptionLabel={(option) => option.label}
+                          value={selectedBank || null}
+                          onChange={(_, newValue) => {
+                            onChange(newValue ? newValue.value : "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField {...params} label="Banka" />
+                          )}
+                        />
+                      );
+                    }}
                   />
                 )}
               </FormControl>
-              <FormControl sx={{ width: isDesktop ? "50%" : '100%' }}>
+
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <InputControl
                   label="Sipariş Numarası"
                   control={control}
@@ -180,8 +210,12 @@ export const PaymentWithLinkedForm = () => {
                 />
               </FormControl>
             </Stack>
-            <Stack width={isDesktop ? 800 : 'auto'} spacing={3} direction={isDesktop ? "row" : 'column'}>
-              <FormControl sx={{ width: isDesktop ? "50%" : '100%' }}>
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 {merchantList && (
                   <Controller
                     control={control}
@@ -210,7 +244,7 @@ export const PaymentWithLinkedForm = () => {
                   />
                 )}
               </FormControl>
-              <FormControl sx={{ width: isDesktop ? "50%" : '100%' }}>
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <InputControl
                   label="Ürün Adı"
                   control={control}
@@ -218,8 +252,12 @@ export const PaymentWithLinkedForm = () => {
                 />
               </FormControl>
             </Stack>
-            <Stack width={isDesktop ? 800 : 'auto'} spacing={3} direction={isDesktop ? "row" : 'column'}>
-              <FormControl sx={{ width: isDesktop ? "50%" : '100%' }}>
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <DateTimePickerControl
                   sx={{ flex: 1 }}
                   id="startDate"
@@ -229,7 +267,7 @@ export const PaymentWithLinkedForm = () => {
                   defaultValue={dayjs()}
                 />
               </FormControl>
-              <FormControl sx={{ width: isDesktop ? "50%" : '100%' }}>
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <DateTimePickerControl
                   sx={{ flex: 1 }}
                   id="endDate"
@@ -239,18 +277,45 @@ export const PaymentWithLinkedForm = () => {
                 />
               </FormControl>
             </Stack>
-            <Stack width={isDesktop ? 800 : 'auto'} spacing={3} direction={isDesktop ? "row" : 'column'}>
-              <FormControl sx={{ width: isDesktop ? "50%" : '100%' }}>
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 {currencyCodeList && (
-                  <SelectControl
-                    id="currency"
+                  <Controller
+                    name="currency"
                     control={control}
-                    label="Para Birimi"
-                    items={currencyCodeList}
+                    defaultValue=""
+                    render={({ field: { onChange, value } }) => {
+                      const selectedCurrency = currencyCodeList.find(
+                        (option) => option.value === value
+                      );
+
+                      return (
+                        <Autocomplete
+                          id="currency"
+                          options={currencyCodeList}
+                          getOptionSelected={(option, value) =>
+                            option.value === value
+                          }
+                          getOptionLabel={(option) => option.label}
+                          value={selectedCurrency || null}
+                          onChange={(_, newValue) => {
+                            onChange(newValue ? newValue.value : "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField {...params} label="Para Birimi" />
+                          )}
+                        />
+                      );
+                    }}
                   />
                 )}
               </FormControl>
-              <FormControl sx={{ width: isDesktop ? "50%" : '100%' }}>
+
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <NumericFormatInputControl
                   sx={{ flex: 1 }}
                   label="Tutar"
@@ -264,22 +329,51 @@ export const PaymentWithLinkedForm = () => {
                 />
               </FormControl>
             </Stack>
-            <Stack width={isDesktop ? 800 : 'auto'} spacing={3} direction={isDesktop ? "row" : 'column'}>
-              <FormControl sx={{ width: isDesktop ? "50%" : '100%' }}>
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <FormControl sx={{ width: isDesktop ? "48.5%" : "100%" }}>
                 {installmentCounts && (
-                  <SelectControl
-                    sx={{ mr: isDesktop ? 1 : 0 }}
-                    id="installmentCount"
+                  <Controller
+                    name="installmentCount"
                     control={control}
-                    label="Taksit Sayısı"
-                    items={installmentCounts}
+                    defaultValue=""
+                    render={({ field: { onChange, value } }) => {
+                      const selectedInstallment = installmentCounts.find(
+                        (option) => option.value === value
+                      );
+
+                      return (
+                        <Autocomplete
+                          id="installmentCount"
+                          options={installmentCounts}
+                          getOptionSelected={(option, value) =>
+                            option.value === value
+                          }
+                          getOptionLabel={(option) => option.label}
+                          value={selectedInstallment || null}
+                          onChange={(_, newValue) => {
+                            onChange(newValue ? newValue.value : "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField {...params} label="Taksit Sayısı" />
+                          )}
+                        />
+                      );
+                    }}
                   />
                 )}
               </FormControl>
             </Stack>
 
-            <Stack width={isDesktop ? 800 : 'auto'} spacing={3} direction={isDesktop ? "row" : 'column'}>
-              <FormControl sx={{ width: isDesktop ? "50%" : '100%' }}>
+            <Stack
+              width={isDesktop ? 800 : "auto"}
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+            >
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <InputControl
                   defaultValue=""
                   id={"userEmail"}
@@ -287,7 +381,7 @@ export const PaymentWithLinkedForm = () => {
                   label="E-Posta"
                 />
               </FormControl>
-              <FormControl sx={{ width: isDesktop ? "50%" : '100%' }}>
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <FormatInputControl
                   defaultValue=""
                   label="Telefon Numarası"
@@ -299,7 +393,11 @@ export const PaymentWithLinkedForm = () => {
                 />
               </FormControl>
             </Stack>
-            <Stack direction="row" justifyContent="flex-end" width={isDesktop ? 800 : 'auto'}>
+            <Stack
+              direction="row"
+              justifyContent="flex-end"
+              width={isDesktop ? 800 : "auto"}
+            >
               {!!showCreate && (
                 <Button
                   onClick={handleSubmit(onSubmit)}
@@ -309,7 +407,11 @@ export const PaymentWithLinkedForm = () => {
               )}
             </Stack>
             {currentUrl && (
-              <Stack direction="row" justifyContent="center" width={isDesktop ? 800 : 'auto'}>
+              <Stack
+                direction="row"
+                justifyContent="center"
+                width={isDesktop ? 800 : "auto"}
+              >
                 <FormControl sx={{ width: "50%" }}>
                   <InputControl
                     value={currentUrl}

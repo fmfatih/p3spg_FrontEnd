@@ -218,8 +218,8 @@ export const MerchantAddFormAddressStep = ({
               label="Adres Satırı 2"
             />
           </FormControl>
-          <Stack width={isDesktop ? 800 : "auto"} spacing={4} direction="row">
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+          <Stack width={isDesktop ? 800 : "auto"} spacing={3} direction="row">
+            <FormControl sx={{ width: isDesktop ? "49%" : "100%" }}>
               {cityList && (
                 <Controller
                   control={control}
@@ -253,15 +253,35 @@ export const MerchantAddFormAddressStep = ({
                 />
               )}
             </FormControl>
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+            <FormControl sx={{ width: isDesktop ? "45%" : "100%" }}>
               {districtList ? (
-                <SelectControl
-                  sx={{ mr: isDesktop ? 3 : 0 }}
-                  id="districtId"
-                  defaultValue={selectedDistrict}
+                <Controller
+                  name="districtId"
                   control={control}
-                  label="İlçe"
-                  items={districtList}
+                  defaultValue={selectedDistrict}
+                  render={({ field: { onChange, value } }) => {
+                    const selectedDistrictItem = districtList.find(
+                      (option) => option.value === value
+                    );
+
+                    return (
+                      <Autocomplete
+                        id="districtId"
+                        options={districtList}
+                        getOptionSelected={(option, value) =>
+                          option.value === value
+                        }
+                        getOptionLabel={(option) => option.label}
+                        value={selectedDistrictItem || null}
+                        onChange={(_, newValue) => {
+                          onChange(newValue ? newValue.value : "");
+                        }}
+                        renderInput={(params) => (
+                          <TextField {...params} label="İlçe" />
+                        )}
+                      />
+                    );
+                  }}
                 />
               ) : (
                 <SelectControl

@@ -6,12 +6,14 @@ import { MerchantAddFormAddressStep } from "./MerchantAddFormAddressStep";
 import { MerchantAddFormBankStep } from "./MerchantAddFormBankStep";
 import { MerchantAddFormCompanyStep } from "./MerchantAddFormCompanyStep";
 import { MerchantAddFormPartnerStep } from "./MerchantAddFormPartnerStep";
+import { MerchantAddFormCurrencyStep } from "./MerchantAddFormCurrencyStep"
 
 const steps = [
   "Şirket Bilgileri",
   "Yetkili Kişi Bilgileri",
   "Adres Bilgileri",
   "Banka Bilgileri",
+  "Para Birimi Kısıtlama"
 ];
 
 export const MerchantAddForm = () => {
@@ -58,7 +60,10 @@ export const MerchantAddForm = () => {
       {activeStep === 2 && (
         <MerchantAddFormAddressStep merchant={merchant} onNext={handleNext} />
       )}
-      {activeStep === 3 && <MerchantAddFormBankStep merchant={merchant} />}
+         {activeStep === 3 && (
+      <MerchantAddFormBankStep merchant={merchant}   onNext={handleNext}/>
+      )}
+       {activeStep === 4 && <MerchantAddFormCurrencyStep merchant={merchant} />}
     </Stack>
   );
 };

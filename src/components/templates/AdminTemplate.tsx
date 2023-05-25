@@ -33,6 +33,8 @@ export const AdminTemplate = ({
     }
   })
 
+  
+
   console.log("CABER")
   console.log(pathName)
 
@@ -77,7 +79,7 @@ export const AdminTemplate = ({
     <Stack direction="row">
       {isDesktop && <Sidebar />}
       <Stack minHeight={isDesktop ? undefined : '100vh'} flex={1}>
-        <Header {...headerProps} headerTitle={pathName === 'dashboard' ? "Ana Ekran" : title} hideAddButton={pathName === "dashboard" || hideSaveButton}/>
+        <Header {...headerProps} headerTitle={pathName === 'dashboard' ? "Ana Ekran" : title} hideAddButton={pathName === "dashboard" || pathName === "payment-reporting" ||  hideSaveButton}/>
         <Stack
           borderRadius={3}
           m={isDesktop ? 2 : 1}

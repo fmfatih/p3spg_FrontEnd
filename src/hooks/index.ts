@@ -12,6 +12,7 @@ export * from "./role";
 export * from "./merchantAddress";
 export * from "./merchantCategoryCode";
 export * from "./merchantBank";
+export * from "./merchantRestriction";
 export * from "./user-login";
 export * from "./memberVPos";
 export * from "./merchantVPos";

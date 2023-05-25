@@ -4,11 +4,11 @@ import {
   useGetAllMerchantList,
   useAuthorization,
 } from "../../../hooks";
-import { Box, FormControl, Stack, useMediaQuery, useTheme } from "@mui/material";
+import { Autocomplete, Box, FormControl, Stack, TextField, useMediaQuery, useTheme } from "@mui/material";
 import { useMemo, useEffect } from "react";
 import { Button, Loading } from "../../atoms";
 import { SelectControl, SwitchControl } from "../../molecules";
-import { useForm } from "react-hook-form";
+import { useForm,Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -105,17 +105,37 @@ export const MerchantAuthorizationForm = () => {
         <Stack flex={1} p={2}>
           <Stack spacing={4}>
             <Stack width={isDesktop ? 800 : 'auto'} spacing={3} direction="row">
-              <FormControl sx={{ flex: 1 }}>
-                {merchantList && (
-                  <SelectControl
-                    sx={{ flex: 1 }}
-                    items={merchantList}
-                    label="İşyeri"
-                    control={control}
-                    id="merchantId"
-                  />
-                )}
-              </FormControl>
+            <FormControl sx={{ flex: 1 }}>
+  {merchantList && (
+    <Controller
+      name="merchantId"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedMerchant = merchantList.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="merchantId"
+            options={merchantList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedMerchant || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="İşyeri" />
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
               {isDesktop && <Box sx={{ flex: 1 }} />}
             </Stack>
             {rawMemberVPosList?.data?.length && (

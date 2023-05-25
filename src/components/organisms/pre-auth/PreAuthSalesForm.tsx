@@ -253,39 +253,101 @@ export const PreAuthSalesForm = () => {
               </FormControl>
             </Stack>
             <Stack width={isDesktop ? 800 : 'auto'} spacing={3} direction="row">
-              <FormControl sx={{ width: "50%" }}>
-                {installmentCounts && (
-                  <SelectControl
-                    id="installmentCount"
-                    control={control}
-                    label="Taksit Sayısı"
-                    items={installmentCounts}
-                  />
-                )}
-              </FormControl>
-              <FormControl sx={{ width: "50%" }}>
-                {currencyCodeList && (
-                  <SelectControl
-                    id="currency"
-                    control={control}
-                    label="Para Birimi"
-                    items={currencyCodeList}
-                  />
-                )}
-              </FormControl>
+            <FormControl sx={{ width: "50%" }}>
+  {installmentCounts && (
+    <Controller
+      name="installmentCount"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedInstallment = installmentCounts.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="installmentCount"
+            options={installmentCounts}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedInstallment || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Taksit Sayısı" />
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
+<FormControl sx={{ width: "50%" }}>
+  {currencyCodeList && (
+    <Controller
+      name="currency"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedCurrency = currencyCodeList.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="currency"
+            options={currencyCodeList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedCurrency || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Para Birimi" />
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
             </Stack>
             <Stack width={isDesktop ? 800 : 'auto'} spacing={3} direction="row">
-              <FormControl sx={{ width: "50%" }}>
-                {paymentModelList && (
-                  <SelectControl
-                    sx={{ mr: 1 }}
-                    id="use3D"
-                    control={control}
-                    label="Ödeme Modeli"
-                    items={paymentModelList}
-                  />
-                )}
-              </FormControl>
+            <FormControl sx={{ width: "50%" }}>
+  {paymentModelList && (
+    <Controller
+      name="use3D"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedPaymentModel = paymentModelList.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="use3D"
+            options={paymentModelList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedPaymentModel || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Ödeme Modeli" />
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
             </Stack>
             <Stack direction="row" justifyContent="flex-end" width={isDesktop ? 800 : 'auto'}>
               {!!showCreate && (

@@ -2,11 +2,15 @@
 // @ts-nocheck
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { Stack, useMediaQuery, useTheme } from '@mui/material';
-import { GridColDef, GridActionsCellItem, GridPaginationModel } from '@mui/x-data-grid';
-import { DeleteConfirmModal, Table } from '../../molecules';
-import { Loading } from '../../atoms';
+import React, { useEffect, useMemo, useState } from "react";
+import { Stack, useMediaQuery, useTheme } from "@mui/material";
+import {
+  GridColDef,
+  GridActionsCellItem,
+  GridPaginationModel,
+} from "@mui/x-data-grid";
+import { DeleteConfirmModal, Table } from "../../molecules";
+import { Loading } from "../../atoms";
 import {
   DeleteMerchantRequest,
   IMerchant,
@@ -14,32 +18,36 @@ import {
   useAuthorization,
   useDeleteVPosRouting,
   useGetVPosRoutingList,
-} from '../../../hooks';
-import { useNavigate } from 'react-router-dom';
-import { useSetSnackBar } from '../../../store/Snackbar.state';
-import { PagingResponse } from '../../../hooks/_types';
-import { downloadExcel } from '../../../util/downloadExcel';
-import SearchTable from '../../../components/atoms/SearchTable';
+} from "../../../hooks";
+import { useNavigate } from "react-router-dom";
+import { useSetSnackBar } from "../../../store/Snackbar.state";
+import { PagingResponse } from "../../../hooks/_types";
+import { downloadExcel } from "../../../util/downloadExcel";
+import SearchTable from "../../../components/atoms/SearchTable";
 
 export const BankRedirectListingTable = () => {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [queryOptions, setQueryOptions] = React.useState({});
 
   const theme = useTheme();
   const { showDelete, showUpdate } = useAuthorization();
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const navigate = useNavigate();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
     searchText: null,
   });
-  const { data: vposRoutingListResponse, mutate: getVPosRoutingList, isLoading } = useGetVPosRoutingList();
+  const {
+    data: vposRoutingListResponse,
+    mutate: getVPosRoutingList,
+    isLoading,
+  } = useGetVPosRoutingList();
   const tableData = vposRoutingListResponse?.data;
 
   const editRow = React.useCallback(
     (vPosRouting: IVPosRouting) => () => {
-      navigate('/vpos-management/vpos-bankrouting', { state: vPosRouting });
+      navigate("/vpos-management/vpos-bankrouting", { state: vPosRouting });
     },
     [navigate]
   );
@@ -47,7 +55,8 @@ export const BankRedirectListingTable = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState(0);
   const setSnackbar = useSetSnackBar();
-  const { mutate: vPosRoutingDelete, isLoading: isDeleteLoading } = useDeleteVPosRouting();
+  const { mutate: vPosRoutingDelete, isLoading: isDeleteLoading } =
+    useDeleteVPosRouting();
 
   const deleteRow = React.useCallback(
     (merchant: IMerchant) => () => {
@@ -64,20 +73,20 @@ export const BankRedirectListingTable = () => {
     const requestPayload = {
       size: text ? -1 : paginationModel.pageSize,
       page: paginationModel.page,
-      orderBy: 'CreateDate',
+      orderBy: "CreateDate",
       orderByDesc: true,
       searchText: text,
     };
-  
+
     if (queryOptions?.field && queryOptions?.value !== undefined) {
       requestPayload[queryOptions.field] = queryOptions.value;
     }
-  
+
     getVPosRoutingList(requestPayload, {
       onSuccess: (data) => {
         if (!data.isSuccess) {
           setSnackbar({
-            severity: 'error',
+            severity: "error",
             description: data.message,
             isOpen: true,
           });
@@ -85,16 +94,21 @@ export const BankRedirectListingTable = () => {
       },
       onError: () => {
         setSnackbar({
-          severity: 'error',
-          description: 'İşlem sırasında bir hata oluştu',
+          severity: "error",
+          description: "İşlem sırasında bir hata oluştu",
           isOpen: true,
         });
       },
     });
-  }, [getVPosRoutingList, paginationModel.page, paginationModel.pageSize, setSnackbar, queryOptions]);
-  
+  }, [
+    getVPosRoutingList,
+    paginationModel.page,
+    paginationModel.pageSize,
+    setSnackbar,
+    queryOptions,
+  ]);
 
-  // , queryOptions 
+  // , queryOptions
 
   const handleChangePagination = (model: GridPaginationModel) => {
     setPaginationModel(model);
@@ -103,7 +117,7 @@ export const BankRedirectListingTable = () => {
       {
         size: text ? -1 : paginationModel.pageSize,
         page: paginationModel.page,
-        orderBy: 'CreateDate',
+        orderBy: "CreateDate",
         orderByDesc: true,
         searchText: text,
       },
@@ -111,7 +125,7 @@ export const BankRedirectListingTable = () => {
         onSuccess: (data) => {
           if (!data.isSuccess) {
             setSnackbar({
-              severity: 'error',
+              severity: "error",
               description: data.message,
               isOpen: true,
             });
@@ -119,8 +133,8 @@ export const BankRedirectListingTable = () => {
         },
         onError: () => {
           setSnackbar({
-            severity: 'error',
-            description: 'İşlem sırasında bir hata oluştu',
+            severity: "error",
+            description: "İşlem sırasında bir hata oluştu",
             isOpen: true,
           });
         },
@@ -137,18 +151,18 @@ export const BankRedirectListingTable = () => {
           getVPosRoutingList({
             size: text ? -1 : paginationModel.pageSize,
             page: paginationModel.page,
-            orderBy: 'CreateDate',
+            orderBy: "CreateDate",
             orderByDesc: true,
             searchText: text,
           });
           setSnackbar({
-            severity: 'success',
+            severity: "success",
             isOpen: true,
             description: data.message,
           });
         } else {
           setSnackbar({
-            severity: 'error',
+            severity: "error",
             description: data.message,
             isOpen: true,
           });
@@ -156,8 +170,8 @@ export const BankRedirectListingTable = () => {
       },
       onError: () => {
         setSnackbar({
-          severity: 'error',
-          description: 'İşlem sırasında bir hata oluştu',
+          severity: "error",
+          description: "İşlem sırasında bir hata oluştu",
           isOpen: true,
         });
       },
@@ -168,65 +182,86 @@ export const BankRedirectListingTable = () => {
   const columns: GridColDef[] = useMemo(() => {
     return [
       {
-        field: 'Aksiyonlar',
-        type: 'actions',
+        field: "Aksiyonlar",
+        type: "actions",
         width: 80,
         getActions: (params) => {
           return [
-            !!showUpdate ? <GridActionsCellItem label="Düzenle" onClick={editRow(params.row)} showInMenu /> : <></>,
-            !!showDelete ? <GridActionsCellItem label="Sil" onClick={deleteRow(params.row)} showInMenu /> : <></>,
+            !!showUpdate ? (
+              <GridActionsCellItem
+                label="Düzenle"
+                onClick={editRow(params.row)}
+                showInMenu
+              />
+            ) : (
+              <></>
+            ),
+            !!showDelete ? (
+              <GridActionsCellItem
+                label="Sil"
+                onClick={deleteRow(params.row)}
+                showInMenu
+              />
+            ) : (
+              <></>
+            ),
           ];
         },
       },
       {
-        field: 'issuerCardBankName',
-        headerName: 'Yönlendirelecek Kartın Bankası',
+        field: "issuerCardBankName",
+        headerName: "Yönlendirelecek Kartın Bankası",
         width: 350,
       },
       {
-        field: 'merchantVposBankName',
-        headerName: 'Yönlendirelecek Sanal Pos',
+        field: "merchantVposBankName",
+        headerName: "Yönlendirelecek Sanal Pos",
         width: 350,
       },
       {
-        field: 'merchantId',
-        headerName: 'Üye İşyeri Numarası',
+        field: "merchantId",
+        headerName: "Üye İşyeri Numarası",
         width: 200,
       },
       {
-        field: 'merchantName',
-        headerName: 'Üye İşyeri Adı',
+        field: "merchantName",
+        headerName: "Üye İşyeri Adı",
         width: 380,
       },
       {
-        field: 'status',
-        headerName: 'Statü',
+        field: "status",
+        headerName: "Statü",
         width: 100,
       },
       {
-        field: 'createDate',
-        headerName: 'Düzenlenme Tarihi',
+        field: "createDate",
+        headerName: "Düzenlenme Tarihi",
         width: 200,
       },
-      { field: 'createUserName', headerName: 'Düzenleyen', width: 200 },
+      { field: "createUserName", headerName: "Düzenleyen", width: 200 },
     ];
   }, [deleteRow, editRow, showDelete, showUpdate]);
 
   const onSave = () => {
-    getVPosRoutingList(
-      {
+    if (queryOptions?.field) {
+      const requestPayload = {
         size: -1,
         page: 0,
-        orderBy: 'CreateDate',
+        orderBy: "CreateDate",
         orderByDesc: true,
-      },
-      {
+      };
+
+      if (queryOptions?.field && queryOptions?.value !== undefined) {
+        requestPayload[queryOptions.field] = queryOptions.value;
+      }
+
+      return getVPosRoutingList(requestPayload, {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            downloadExcel(data?.data?.result || [], 'Sanal Pos Banka Listesi');
+            downloadExcel(data?.data?.result || [], "Sanal Pos Banka Listesi");
           } else {
             setSnackbar({
-              severity: 'error',
+              severity: "error",
               description: data.message,
               isOpen: true,
             });
@@ -234,8 +269,37 @@ export const BankRedirectListingTable = () => {
         },
         onError: () => {
           setSnackbar({
-            severity: 'error',
-            description: 'İşlem sırasında bir hata oluştu',
+            severity: "error",
+            description: "İşlem sırasında bir hata oluştu",
+            isOpen: true,
+          });
+        },
+      });
+    }
+
+    getVPosRoutingList(
+      {
+        size: -1,
+        page: 0,
+        orderBy: "CreateDate",
+        orderByDesc: true,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            downloadExcel(data?.data?.result || [], "Sanal Pos Banka Listesi");
+          } else {
+            setSnackbar({
+              severity: "error",
+              description: data.message,
+              isOpen: true,
+            });
+          }
+        },
+        onError: () => {
+          setSnackbar({
+            severity: "error",
+            description: "İşlem sırasında bir hata oluştu",
             isOpen: true,
           });
         },
@@ -260,6 +324,9 @@ export const BankRedirectListingTable = () => {
   };
 
   const handleFilterChange = debounce((props) => {
+    if (props === "clearFilter") {
+      return setQueryOptions({});
+    }
     if (props.value?.toString()?.length >= 1) {
       setQueryOptions(props);
     }
@@ -270,11 +337,9 @@ export const BankRedirectListingTable = () => {
   //     setQueryOptions(props)
   //   }
 
-
-
   // }
 
-console.log(queryOptions)
+  console.log(queryOptions);
 
   return (
     <>
@@ -302,7 +367,8 @@ console.log(queryOptions)
             <DeleteConfirmModal
               isOpen={isDeleteModalOpen}
               onClose={handleCloseDeleteModal}
-              onConfirm={() => handleDeleteConfirm()}></DeleteConfirmModal>
+              onConfirm={() => handleDeleteConfirm()}
+            ></DeleteConfirmModal>
           </>
         )}
       </Stack>

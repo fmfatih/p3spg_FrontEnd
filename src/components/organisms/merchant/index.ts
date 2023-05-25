@@ -5,3 +5,5 @@ export * from "./MerchantAddFormBankStep";
 export * from "./MerchantAuthorizationForm";
 export * from "./MerchantListingTable";
 export * from "./MerchantAddFormPartnerStep";
+export * from "./MerchantAddFormCurrencyStep";
+

@@ -1,6 +1,16 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import { InputControl, SelectControl } from "../../molecules";
-import { FormControl, Stack, useMediaQuery, useTheme } from "@mui/material";
-import { useForm } from "react-hook-form";
+import {
+  Autocomplete,
+  FormControl,
+  Stack,
+  TextField,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import { useForm, Controller } from "react-hook-form";
 import { Button, Loading } from "../../atoms";
 import {
   IMerchant,
@@ -21,11 +31,13 @@ import {
 } from "./_formTypes";
 
 type MerchantAddFormCompanyStepProps = {
+  onNext: () => void;
   merchant?: IMerchant;
 };
 
 export const MerchantAddFormBankStep = ({
   merchant,
+  onNext,
 }: MerchantAddFormCompanyStepProps) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -81,6 +93,7 @@ export const MerchantAddFormBankStep = ({
         { ...request, id: merchant?.id || 0 },
         {
           onSuccess(data) {
+            onNext();
             if (data.isSuccess) {
               //navigate("/merchant-management/merchant-listing");
               setSnackbar({
@@ -110,6 +123,7 @@ export const MerchantAddFormBankStep = ({
         onSuccess(data) {
           if (data.isSuccess) {
             //navigate("/merchant-management/merchant-listing");
+            onNext();
             setSnackbar({
               severity: "success",
               isOpen: true,
@@ -157,16 +171,37 @@ export const MerchantAddFormBankStep = ({
           >
             <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
               {currencyCodeList && (
-                <SelectControl
-                  sx={{ mr: isDesktop ? 3 : 0 }}
-                  id="currencyCode"
+                <Controller
+                  name="currencyCode"
                   control={control}
-                  label="Para Birimi"
-                  items={currencyCodeList}
-                  defaultValue="949"
+                  defaultValue=""
+                  render={({ field: { onChange, value } }) => {
+                    const selectedCurrency = currencyCodeList.find(
+                      (option) => option.value === value
+                    );
+
+                    return (
+                      <Autocomplete
+                        id="currencyCode"
+                        options={currencyCodeList}
+                        getOptionSelected={(option, value) =>
+                          option.value === value
+                        }
+                        getOptionLabel={(option) => option.label}
+                        value={selectedCurrency || null}
+                        onChange={(_, newValue) => {
+                          onChange(newValue ? newValue.value : "");
+                        }}
+                        renderInput={(params) => (
+                          <TextField {...params} label="Para Birimi" />
+                        )}
+                      />
+                    );
+                  }}
                 />
               )}
             </FormControl>
+
             <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
               <InputControl
                 sx={{ mr: isDesktop ? 3 : 0 }}
@@ -184,15 +219,37 @@ export const MerchantAddFormBankStep = ({
           >
             <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
               {bankList && (
-                <SelectControl
-                  sx={{ mr: isDesktop ? 3 : 0 }}
-                  id="bankCode"
+                <Controller
+                  name="bankCode"
                   control={control}
-                  label="Banka Adı"
-                  items={bankList}
+                  defaultValue=""
+                  render={({ field: { onChange, value } }) => {
+                    const selectedBank = bankList.find(
+                      (option) => option.value === value
+                    );
+
+                    return (
+                      <Autocomplete
+                        id="bankCode"
+                        options={bankList}
+                        getOptionSelected={(option, value) =>
+                          option.value === value
+                        }
+                        getOptionLabel={(option) => option.label}
+                        value={selectedBank || null}
+                        onChange={(_, newValue) => {
+                          onChange(newValue ? newValue.value : "");
+                        }}
+                        renderInput={(params) => (
+                          <TextField {...params} label="Banka Adı" />
+                        )}
+                      />
+                    );
+                  }}
                 />
               )}
             </FormControl>
+
             <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
               <InputControl
                 sx={{ mr: isDesktop ? 3 : 0 }}
@@ -212,7 +269,7 @@ export const MerchantAddFormBankStep = ({
         >
           <Button
             variant="contained"
-            text="Kaydet"
+            text="Devam"
             onClick={handleSubmit(onSubmit)}
           />
         </Stack>

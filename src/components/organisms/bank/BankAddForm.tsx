@@ -377,17 +377,37 @@ export const BankAddForm = () => {
           <Box sx={{ my: 5, borderBottom: "1px solid #E6E9ED" }} />
           <Stack mb={3} spacing={3}>
             <Stack width={isDesktop ? 800 : "auto"} direction="row">
-              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-                {acquirerBankList && (
-                  <SelectControl
-                    sx={{ mr: isDesktop ? 3 : 0 }}
-                    id="bankCode"
-                    control={control}
-                    label="Banka"
-                    items={acquirerBankList}
-                  />
-                )}
-              </FormControl>
+            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+  {acquirerBankList && (
+    <Controller
+      name="bankCode"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedBank = acquirerBankList.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="bankCode"
+            options={acquirerBankList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedBank || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Banka" sx={{ mr: isDesktop ? 3 : 0 }}/>
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
             </Stack>
           </Stack>
           {fields?.length ? (

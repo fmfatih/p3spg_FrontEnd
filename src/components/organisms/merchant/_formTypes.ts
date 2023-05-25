@@ -148,6 +148,23 @@ export const thirdStepInitialValues: ThirdStepFormValuesType = {
   accountOwner: "",
 };
 
+
+export const fourthStepFormSchema = zod.object({
+  try: zod.boolean(),
+  usd: zod.boolean(),
+  eur: zod.boolean(),
+});
+
+export type FourthStepFormValuesType = zod.infer<typeof fourthStepFormSchema>;
+
+export const fourthStepInitialValues: FourthStepFormValuesType = {
+  try: true,
+  usd: false,
+  eur: false,
+};
+
+
+
 export const partnerStepFormSchema = zod.object({
   partnerOneFullName: zod
     .string()

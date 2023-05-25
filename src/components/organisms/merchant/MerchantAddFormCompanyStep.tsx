@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import {
   CheckboxesControl,
   InputControl,
@@ -54,11 +57,11 @@ export const MerchantAddFormCompanyStep = ({
 }: MerchantAddFormCompanyStepProps) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
-  const {showCreate} = useAuthorization();
+  const { showCreate } = useAuthorization();
   const { mutate: addMerchant, isLoading } = useMerchantAdd();
   const { mutate: updateMerchant, isLoading: updateLoading } =
     useMerchantUpdate();
-  const [, setMerchantId] = useUserMerchantId();
+  const [test, setMerchantId] = useUserMerchantId();
   const [taxAdministrations, setTaxAdministrations] = useState([]);
   const { data: rawMerchantStatus, isLoading: isMerchantStatusLoading } =
     useGetMerchantStatusList({});
@@ -92,6 +95,7 @@ export const MerchantAddFormCompanyStep = ({
   const [selectedMerchant, setSelectedMerchant] = useState(null as any);
 
   const setSnackbar = useSetSnackBar();
+  
 
   useEffect(() => {
     selectedCity &&
@@ -354,6 +358,8 @@ export const MerchantAddFormCompanyStep = ({
         //foundationDate: dayjs(merchant.foundationDate),
       });
     }
+  
+    
   }, [
     cityList,
     merchant,
@@ -457,15 +463,36 @@ export const MerchantAddFormCompanyStep = ({
                 )}
               </FormControl>
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-                {merchantStatuses && (
-                  <SelectControl
-                    sx={{ mr: isDesktop ? 3 : 0 }}
-                    id="merchantStatusType"
+                {merchantStatuses ? (
+                  <Controller
+                    name="merchantStatusType"
                     control={control}
-                    label="İşyeri Durumu"
-                    items={merchantStatuses}
+                    defaultValue=""
+                    render={({ field: { onChange, value } }) => {
+                      const selectedMerchantStatus = merchantStatuses.find(
+                        (option) => option.value === value
+                      );
+
+                      return (
+                        <Autocomplete
+                          id="merchantStatusType"
+                          options={merchantStatuses}
+                          getOptionSelected={(option, value) =>
+                            option.value === value
+                          }
+                          getOptionLabel={(option) => option.label}
+                          value={selectedMerchantStatus || null}
+                          onChange={(_, newValue) => {
+                            onChange(newValue ? newValue.value : "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField {...params} label="İşyeri Durumu" />
+                          )}
+                        />
+                      );
+                    }}
                   />
-                )}
+                ) : null}
               </FormControl>
             </Stack>
             <Stack
@@ -505,15 +532,37 @@ export const MerchantAddFormCompanyStep = ({
                 />
               </FormControl>
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-                {commissionProfileList && (
-                  <SelectControl
-                    sx={{ mr: isDesktop ? 3 : 0 }}
-                    id="commissionProfileCode"
+                {commissionProfileList ? (
+                  <Controller
+                    name="commissionProfileCode"
                     control={control}
-                    label="Çalışma Koşulu"
-                    items={commissionProfileList}
+                    defaultValue=""
+                    render={({ field: { onChange, value } }) => {
+                      const selectedCommissionProfile =
+                        commissionProfileList.find(
+                          (option) => option.value === value
+                        );
+
+                      return (
+                        <Autocomplete
+                          id="commissionProfileCode"
+                          options={commissionProfileList}
+                          getOptionSelected={(option, value) =>
+                            option.value === value
+                          }
+                          getOptionLabel={(option) => option.label}
+                          value={selectedCommissionProfile || null}
+                          onChange={(_, newValue) => {
+                            onChange(newValue ? newValue.value : "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField {...params} label="Çalışma Koşulu" />
+                          )}
+                        />
+                      );
+                    }}
                   />
-                )}
+                ) : null}
               </FormControl>
             </Stack>
             <FormControl sx={{ width: isDesktop ? 800 : "auto" }}>
@@ -579,20 +628,40 @@ export const MerchantAddFormCompanyStep = ({
             </Stack>
             <Stack
               width={isDesktop ? 800 : "auto"}
-              spacing={3}
+              spacing={6}
               direction={isDesktop ? "row" : "column"}
             >
-              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-                {taxAdministrations && (
-                  <SelectControl
-                    sx={{ mr: isDesktop ? 3 : 0 }}
-                    id="taxOfficeCode"
-                    control={control}
-                    label="Vergi Dairesi"
-                    items={taxAdministrations}
-                  />
-                )}
-              </FormControl>
+          <FormControl sx={{ width: isDesktop ? "46%" : "100%" }} >
+  {taxAdministrations ? (
+    <Controller
+      name="taxOfficeCode"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedTaxAdministration = taxAdministrations.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="taxOfficeCode"
+            options={taxAdministrations}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedTaxAdministration || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Vergi Dairesi" />
+            )}
+          />
+        );
+      }}
+    />
+  ) : null}
+</FormControl>
+
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <InputControl
                   sx={{ mr: isDesktop ? 3 : 0 }}

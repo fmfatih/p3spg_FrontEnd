@@ -307,26 +307,68 @@ export const BankAddCommissionForm = () => {
               spacing={3}
               direction={isDesktop ? "row" : "column"}
             >
-              <FormControl sx={{ flex: 1 }}>
-                {commissionProfileList && (
-                  <SelectControl
-                    id="profileCode"
-                    control={control}
-                    label="Profil Kodu"
-                    items={commissionProfileList}
-                  />
-                )}
-              </FormControl>
-              <FormControl sx={{ flex: 1 }}>
-                {payment3DTrxSettingsList && (
-                  <SelectControl
-                    id="txnType"
-                    control={control}
-                    label="İşlem Tipi"
-                    items={payment3DTrxSettingsList}
-                  />
-                )}
-              </FormControl>
+         <FormControl sx={{ flex: 1 }}>
+  {commissionProfileList && (
+    <Controller
+      name="profileCode"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedProfile = commissionProfileList.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="profileCode"
+            options={commissionProfileList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedProfile || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Profil Kodu" />
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
+<FormControl sx={{ flex: 1 }}>
+  {payment3DTrxSettingsList && (
+    <Controller
+      name="txnType"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedTrxType = payment3DTrxSettingsList.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="txnType"
+            options={payment3DTrxSettingsList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedTrxType || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="İşlem Tipi" />
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
             </Stack>
             <Stack
               width={isDesktop ? 800 : "auto"}
@@ -421,16 +463,37 @@ export const BankAddCommissionForm = () => {
                 <SwitchControl label="Amex" control={control} id="amex" />
               </Box>
               <FormControl sx={{ flex: 1 }}>
-                {cardTypeList && (
-                  <SelectControl
-                    id="cardType"
-                    control={control}
-                    label="Kart Tipi"
-                    items={cardTypeList}
-                    disabled={internationalState}
-                  />
-                )}
-              </FormControl>
+  {cardTypeList && (
+    <Controller
+      name="cardType"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedCardType = cardTypeList.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="cardType"
+            options={cardTypeList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedCardType || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Kart Tipi" disabled={internationalState}/>
+            )}
+            disabled={internationalState}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
             </Stack>
             <Stack
               mb={3}
@@ -438,26 +501,67 @@ export const BankAddCommissionForm = () => {
               spacing={3}
               direction={isDesktop ? "row" : "column"}
             >
+             <FormControl sx={{ flex: 1 }}>
+  {installmentCounts && (
+    <Controller
+      name="installment"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedInstallment = installmentCounts.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="installment"
+            options={installmentCounts}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedInstallment || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Taksit Sayısı" />
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
               <FormControl sx={{ flex: 1 }}>
-                {installmentCounts && (
-                  <SelectControl
-                    id="installment"
-                    control={control}
-                    label="Taksit Sayısı"
-                    items={installmentCounts}
-                  />
-                )}
-              </FormControl>
-              <FormControl sx={{ flex: 1 }}>
-                {acquirerBankList && (
-                  <SelectControl
-                    id="bankcode"
-                    control={control}
-                    label="Banka"
-                    items={acquirerBankList}
-                  />
-                )}
-              </FormControl>
+  {acquirerBankList && (
+    <Controller
+      name="bankcode"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedBank = acquirerBankList.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="bankcode"
+            options={acquirerBankList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedBank || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Banka" />
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
             </Stack>
             <Stack mb={3} spacing={3}>
               <Stack

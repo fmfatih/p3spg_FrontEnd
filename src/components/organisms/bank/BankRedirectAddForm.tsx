@@ -302,28 +302,68 @@ export const BankRedirectAddForm = () => {
               spacing={3}
               direction={isDesktop ? "row" : "column"}
             >
-              <FormControl sx={{ flex: 1 }}>
-                {cardTypeList ? (
-                  <SelectControl
-                    sx={{ mr: isDesktop ? 3 : 0 }}
-                    id="issuerCardType"
-                    control={control}
-                    label="Kart Tipi"
-                    items={cardTypeList}
-                  />
-                ) : null}
-              </FormControl>
-              <FormControl sx={{ flex: 1 }}>
-                {transactionSubTypeList ? (
-                  <SelectControl
-                    sx={{ mr: isDesktop ? 3 : 0 }}
-                    id="transactionSubType"
-                    control={control}
-                    label="İşlem Tipi"
-                    items={transactionSubTypeList}
-                  />
-                ) : null}
-              </FormControl>
+      <FormControl sx={{ flex: 1 }}>
+  {cardTypeList && (
+    <Controller
+      name="issuerCardType"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedCardType = cardTypeList.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="issuerCardType"
+            options={cardTypeList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedCardType || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Kart Tipi" sx={{ mr: isDesktop ? 3 : 0 }}/>
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
+<FormControl sx={{ flex: 1 }}>
+  {transactionSubTypeList && (
+    <Controller
+      name="transactionSubType"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value } }) => {
+        const selectedSubType = transactionSubTypeList.find(
+          (option) => option.value === value
+        );
+
+        return (
+          <Autocomplete
+            id="transactionSubType"
+            options={transactionSubTypeList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedSubType || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="İşlem Tipi" sx={{ mr: isDesktop ? 3 : 0 }}/>
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
             </Stack>
             <Stack width={isDesktop ? 800 : "auto"} spacing={3} direction="row">
               <FormControl sx={{ flex: 1 }}>

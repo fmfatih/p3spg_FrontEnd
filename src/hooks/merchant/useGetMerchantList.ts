@@ -36,6 +36,9 @@ export type IMerchant = {
   mobilePos: boolean;
   vpos: boolean;
   pos: boolean;
+  try:boolean;
+  usd:boolean;
+  eur:boolean;
 };
 
 export type GetMerchantListResponse = BasePagingResponse<Array<any>>;
