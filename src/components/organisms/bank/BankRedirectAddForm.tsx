@@ -8,6 +8,7 @@ import {
   useGetAcquirerBankList,
   useGetTransactionSubTypeSettingsList,
   useAuthorization,
+  useGetMemberVPosList,
 } from "../../../hooks";
 import {
   Box,
@@ -48,6 +49,8 @@ export const BankRedirectAddForm = () => {
       resolver: zodResolver(addBankRedirectFormSchema),
       defaultValues: initialBankAddRedirectState,
     });
+    const { mutate: getMemberVPosList, data: rawMemberVPosList } =
+    useGetMemberVPosList();
   const { data: rawIssuerBankList } = useGetIssuerBankList();
   const { data: rawAcquirerBankList } = useGetAcquirerBankList();
   const { data: rawMerchantList } = useGetAllMerchantList();
@@ -58,6 +61,7 @@ export const BankRedirectAddForm = () => {
   const { mutate: updateVPosRouting, isLoading: isUpdateLoading } =
     useUpdateVPosRouting();
   const setSnackbar = useSetSnackBar();
+  const [allSelected, setAllSelected] = useState(false);
 
   const transactionSubTypeList = useMemo(() => {
     return rawTransactionSubTypeList?.data?.map(
@@ -83,6 +87,17 @@ export const BankRedirectAddForm = () => {
     useState([] as any);
   const [selectedIssuerBankCodeObjects, setSelectedIssuerBankCodeObjects] =
     useState([] as any);
+    // const [selectedMemberVPos, setSelectedMemberVPos] = useState(null as any);
+
+
+    useEffect(() => {
+      getMemberVPosList({
+        orderBy: "CreateDate",
+        orderByDesc: true,
+        status: "ACTIVE",
+      });
+    }, [getMemberVPosList]);
+  
 
   const issuerBankList = useMemo(() => {
     return rawIssuerBankList?.data?.map(
@@ -117,6 +132,20 @@ export const BankRedirectAddForm = () => {
     );
   }, [rawMerchantList?.data]);
 
+  const memberVPosList = useMemo(() => {
+    return rawMemberVPosList?.data?.map(
+      (memberVPos: { bankName: string; bankCode:string}) => {
+        return {
+          label: `${memberVPos.bankName}`,
+          value: memberVPos.bankCode,
+        };
+      }
+    );
+  }, [rawMemberVPosList?.data]);
+  
+  console.log(rawMemberVPosList);
+  
+
   const cardTypeList = useMemo(() => {
     return rawCardTypeList?.data?.map(
       (cardType: { key: string; value: string }) => {
@@ -138,6 +167,7 @@ export const BankRedirectAddForm = () => {
           merchantId: Number(selectedMerchant?.value),
           issuerCardBankCodes: selectedIssuerBankCodeValues,
           merchantVposBankCode: selectedMerchantVPosBankCode?.value?.toString(),
+          // merchantVposBankCode: selectedMemberVPos?.value?.toString(),
         },
         {
           onSuccess: (data) => {
@@ -173,6 +203,7 @@ export const BankRedirectAddForm = () => {
           merchantId: Number(selectedMerchant?.value),
           issuerCardBankCodes: selectedIssuerBankCodeValues,
           merchantVposBankCode: selectedMerchantVPosBankCode?.value?.toString(),
+          // merchantVposBankCode: selectedMemberVPos?.value?.toString(),
         },
         {
           onSuccess: (data) => {
@@ -228,6 +259,10 @@ export const BankRedirectAddForm = () => {
         label: vPosRouting?.merchantVposBankName,
         value: vPosRouting?.merchantVposBankCode,
       });
+      // setSelectedMemberVPos({
+      //   label: vPosRouting?.merchantVposBankName,
+      //   value: vPosRouting?.merchantVposBankCode,
+      // });
 
       setSelectedIssuerBankCodeValues(
         vPosRouting?.issuerCardBankCodes?.length > 0 && [
@@ -249,6 +284,8 @@ export const BankRedirectAddForm = () => {
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
   const handleBack = () => navigate("/dashboard");
+
+console.log(issuerBankList);
 
   return (
     <>
@@ -366,64 +403,78 @@ export const BankRedirectAddForm = () => {
 
             </Stack>
             <Stack width={isDesktop ? 800 : "auto"} spacing={3} direction="row">
-              <FormControl sx={{ flex: 1 }}>
-                {issuerBankList ? (
-                  <Controller
-                    control={control}
-                    name="issuerCardBankCodes"
-                    render={() => {
-                      return (
-                        <Autocomplete
-                          sx={{ mr: isDesktop ? 3 : 0 }}
-                          multiple
-                          id="issuerCardBankCodes"
-                          onChange={(event, selectedValue) => {
-                            let valueList: Array<string> = [];
-                            let tempObj: Array<T> = [];
-                            selectedValue?.map(
-                              (e: { label: string; value: string }) => {
-                                valueList.push(e.value);
-                                tempObj.push(e);
-                              }
-                            );
-                            setSelectedIssuerBankCodeObjects(tempObj);
-                            setSelectedIssuerBankCodeValues(valueList);
-                          }}
-                          options={issuerBankList}
-                          disableCloseOnSelect
-                          value={selectedIssuerBankCodeObjects}
-                          getOptionLabel={(option: {
-                            label: string;
-                            value: string;
-                          }) => option.label}
-                          renderOption={(props, option, { selected }) => (
-                            <li {...props}>
-                              <Checkbox
-                                icon={icon}
-                                checkedIcon={checkedIcon}
-                                style={{ marginRight: 8 }}
-                                checked={selected}
-                                value={option.value}
-                              />
-                              {option.label}
-                            </li>
-                          )}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label="Yönlendirilecek Kartın Bankası"
-                            />
-                          )}
-                        />
-                      );
-                    }}
-                  />
-                ) : null}
-              </FormControl>
+            <FormControl sx={{ flex: 1 }}>
+  {issuerBankList ? (
+    <Controller
+      control={control}
+      name="issuerCardBankCodes"
+      render={() => {
+        return (
+          <Autocomplete
+            sx={{ mr: isDesktop ? 3 : 0 }}
+            multiple
+            id="issuerCardBankCodes"
+            onChange={(event, selectedValue) => {
+              let valueList: Array<string> = [];
+              let tempObj: Array<T> = [];
+
+              if (selectedValue.some(e => e.value === '9999')) { // Hepsi seçildiyse
+                if (allSelected) {  // 'Hepsi' seçeneği daha önce seçildiyse
+                  selectedValue = [];  // Tüm seçimleri kaldır
+                } else {  // 'Hepsi' seçeneği daha önce seçilmediyse
+                  selectedValue = issuerBankList;  // Tüm seçenekleri seç
+                }
+                setAllSelected(!allSelected);  // 'Hepsi' seçeneğinin seçim durumunu güncelle
+              } 
+
+              selectedValue?.map(
+                (e: { label: string; value: string }) => {
+                  if (e.value !== '9999') { // Hepsi seçeneğini listeye eklememe
+                    valueList.push(e.value);
+                    tempObj.push(e);
+                  }
+                }
+              );
+
+              setSelectedIssuerBankCodeObjects(tempObj);
+              setSelectedIssuerBankCodeValues(valueList);
+            }}
+            options={issuerBankList}
+            disableCloseOnSelect
+            value={selectedIssuerBankCodeObjects.filter(e => e.value !== '9999')} // Hepsi seçeneğini çıktıdan çıkar
+            getOptionLabel={(option: {
+              label: string;
+              value: string;
+            }) => option.label}
+            renderOption={(props, option, { selected }) => (
+              <li {...props}>
+                <Checkbox
+                  icon={icon}
+                  checkedIcon={checkedIcon}
+                  style={{ marginRight: 8 }}
+                  checked={selected || (option.value === '9999' && selectedIssuerBankCodeObjects.length === issuerBankList.length - 1)} // Hepsi seçeneği için kontrol mekanizması
+                  value={option.value}
+                />
+                {option.label}
+              </li>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Yönlendirilecek Kartın Bankası"
+              />)
+            }
+          />
+        );
+      }}
+    />
+  ) : null}
+</FormControl>
+
             </Stack>
             <Stack width={isDesktop ? 800 : "auto"} spacing={3} direction="row">
               <FormControl sx={{ flex: 1 }}>
-                {acquirerBankList ? (
+                {memberVPosList ? (
                   <Controller
                     control={control}
                     name="merchantVposBankCode"
@@ -436,7 +487,7 @@ export const BankRedirectAddForm = () => {
                               setSelectedMerchantVPosBankCode(selectedValue);
                             }}
                             id="merchantVposBankCode"
-                            options={acquirerBankList}
+                            options={memberVPosList}
                             value={selectedMerchantVPosBankCode}
                             getOptionLabel={(option: {
                               label: string;

@@ -292,7 +292,6 @@ export const CampaignListTable = () => {
   }, [deleteRow, showDelete]);
 
   const onSave = () => {
-    console.log("burda");
     getCampaignList(
       {
         size: -1,

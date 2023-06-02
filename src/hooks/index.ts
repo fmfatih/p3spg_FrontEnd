@@ -30,6 +30,7 @@ export * from "./card-bin";
 export * from "./campaign";
 export * from "./merchantPartner";
 export * from "./payment";
+export * from "./reconciliation";
 export * from "./dashboard";
 export * from "./parameter";
 export * from "./nonsecure";

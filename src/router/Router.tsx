@@ -27,8 +27,11 @@ import {
   SettingsNonsecure,
   PaymentWithLinked,
   PaymentWithLinkedList,
-  BusinessBankListing
+  BusinessBankListing,
+  MerchantEndOfDay,
+  BankPayment
 } from "../pages";
+
 
 
 export const router = createBrowserRouter([
@@ -136,6 +139,15 @@ export const router = createBrowserRouter([
     path: "/reporting/payment-reporting",
     element: <PaymentAndTransaction />,
   },
+  {
+    path: "/reporting/merchant-payment",
+    element: <MerchantEndOfDay />,
+  },
+  {
+    path: "/reporting/bank-payment",
+    element: <BankPayment/>,
+  },
+
   {
     path: "/manuel-transactions/link-payment",
     element: <PaymentWithLinked />,

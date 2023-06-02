@@ -39,6 +39,9 @@ export type IMerchant = {
   try:boolean;
   usd:boolean;
   eur:boolean;
+  officialFullName:string;
+  addressLine1:string;
+  iban:string;
 };
 
 export type GetMerchantListResponse = BasePagingResponse<Array<any>>;

@@ -4,12 +4,29 @@ import { axiosInstance } from "../../config/axios";
 
 export interface IMerchantPartnerAddRequest {
   merchantId?: number;
+  officialFullName?: string;
+  officialCitizenNumber?: string;
+  officialMobilePhone?: string;
+
   partnerOneFullName?: string;
   partnerOneCitizenNumber?: string;
   partnerOneMobilePhone?: string;
+
   partnerTwoFullName?: string;
-  partnerTwoCitizenNumber?: string;
-  partnerTwoMobilePhone?: string;
+partnerTwoCitizenNumber?: string;
+partnerTwoMobilePhone?: string;
+
+partnerThreeFullName?: string;
+partnerThreeCitizenNumber?: string;
+partnerThreeMobilePhone?: string;
+
+partnerFourFullName?: string;
+partnerFourCitizenNumber?: string;
+partnerFourMobilePhone?: string;
+
+partnerFiveFullName?: string;
+partnerFiveCitizenNumber?: string;
+partnerFiveMobilePhone?: string;
 }
 
 async function merchantPartnerAdd(

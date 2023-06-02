@@ -88,7 +88,6 @@ export const Table = ({ handleFilterChange, ...props }: TableProps) => {
       .map((item) => {
         const filteredItem = {};
         fieldHeaderNameTuple.map((fieldHeader) => {
-          console.log(fieldHeader);
           if (fieldHeader) {
             filteredItem[fieldHeader[1]] = item[fieldHeader[0]];
           }
@@ -102,7 +101,6 @@ export const Table = ({ handleFilterChange, ...props }: TableProps) => {
 
   const onFilterChange = React.useCallback((filterModel: GridFilterModel) => {
     localStorage.setItem("filterModel", filterModel);
-    console.info(filterModel);
     let request;
     const value = filterModel?.items[0]?.value;
     request = value

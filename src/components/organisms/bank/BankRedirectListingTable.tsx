@@ -339,7 +339,7 @@ export const BankRedirectListingTable = () => {
 
   // }
 
-  console.log(queryOptions);
+  
 
   return (
     <>

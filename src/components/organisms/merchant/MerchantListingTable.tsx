@@ -208,7 +208,7 @@ export const MerchantListingTable = ({
       },
       {
         field: "commissionProfileCode",
-        headerName: "Çalışma Koşulu",
+        headerName: "Çalışma Grubu",
         width: 200,
       },
       { field: "taxNumber", headerName: "Vergi Kimlik No.", width: 200 },

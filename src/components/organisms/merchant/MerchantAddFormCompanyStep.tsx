@@ -46,14 +46,19 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { default as dayjs } from "dayjs";
 
+
 type MerchantAddFormCompanyStepProps = {
   onNext: () => void;
   merchant?: IMerchant;
+  allData?: any;
+  setAllData?: any;
 };
 
 export const MerchantAddFormCompanyStep = ({
   merchant,
   onNext,
+  allData,
+  setAllData,
 }: MerchantAddFormCompanyStepProps) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -85,7 +90,7 @@ export const MerchantAddFormCompanyStep = ({
   );
   const { mutate: getTaxAdministrationList, isLoading: isTaxListLoading } =
     useGetTaxAdministrationList();
-  const { control, reset, handleSubmit, setValue, getValues } =
+  const { control, reset, handleSubmit, setValue, getValues,watch} =
     useForm<FirstStepFormValuesType>({
       resolver: zodResolver(firstStepFormSchema),
       defaultValues: firstStepInitialValues,
@@ -95,7 +100,6 @@ export const MerchantAddFormCompanyStep = ({
   const [selectedMerchant, setSelectedMerchant] = useState(null as any);
 
   const setSnackbar = useSetSnackBar();
-  
 
   useEffect(() => {
     selectedCity &&
@@ -173,13 +177,15 @@ export const MerchantAddFormCompanyStep = ({
   }, [rawCommissionProfileList?.data]);
 
   const cityList = useMemo(() => {
-    return rawCityList?.data?.map((city: { name: string; id: number }) => {
+    return rawCityList?.data?.map((city: { name: string; cityCode:string }) => {
       return {
         label: city.name,
-        value: `${city.id}`,
+        value: city.cityCode,
       };
     });
   }, [rawCityList?.data]);
+
+  
 
   const merchantCategoryList = useMemo(() => {
     return rawMerchantCategoryList?.data?.map(
@@ -246,13 +252,19 @@ export const MerchantAddFormCompanyStep = ({
       ...posList,
     };
 
-    if (merchant && merchant?.id > 0) {
+    if ((merchant && merchant?.id > 0) || (allData && allData?.merchantType)) {
+      console.log(merchant, allData)
       updateMerchant(
-        { ...request, id: merchant?.id || 0 },
+        {
+          ...request,
+          id: allData?.id || 0,
+          merchantId: merchant?.merchantId || allData?.merchantId || 0,
+        },
         {
           onSuccess(data) {
             const merchantId = data.data.merchantId;
             setMerchantId(merchantId);
+            setAllData({ ...allData, ...request, merchantId: merchantId});
             if (data.isSuccess) {
               onNext();
               setSnackbar({
@@ -281,7 +293,10 @@ export const MerchantAddFormCompanyStep = ({
       addMerchant(request, {
         onSuccess(data) {
           const merchantId = data.data.merchantId;
+          const id = data.data.id;
           setMerchantId(merchantId);
+          setAllData({ ...allData, ...request, merchantId: merchantId, id });
+
           if (data.isSuccess) {
             onNext();
             setSnackbar({
@@ -308,13 +323,21 @@ export const MerchantAddFormCompanyStep = ({
     }
   };
 
+  const city=watch("city")
+const mcc=watch("mcc")
+  console.log(city);
+  console.log(mcc);
+  
+  console.log(cityList);
+  
+
   useEffect(() => {
     if (!!merchant && JSON.stringify(merchant) !== "{}") {
       if (selectedCity === null || selectedCity === undefined) {
         setSelectedCity(
           cityList?.find(
             (c: any) =>
-              c.value === merchant?.taxOfficeCode?.toString().substr(0, 2)
+              c.value === merchant?.taxOfficeCode?.toString().substring(0, 2)
           )
         );
       }
@@ -333,6 +356,8 @@ export const MerchantAddFormCompanyStep = ({
         );
       }
 
+
+
       reset({
         merchantType: `${merchant.merchantType}`,
         parentMerchantId: merchant.parentMerchantId,
@@ -346,9 +371,10 @@ export const MerchantAddFormCompanyStep = ({
         taxNumber: merchant.taxNumber,
         taxOfficeCode: merchant.taxOfficeCode,
         citizenshipNumber: merchant.citizenshipNumber,
-        //mcc: "",
+        mcc: merchant.mcc,
         openingDate: dayjs(merchant.openingDate),
         aggreementDate: dayjs(merchant.aggreementDate),
+        postList:merchant.pos,
         posList: {
           vpos: merchant?.vpos,
           pos: merchant?.pos,
@@ -358,8 +384,6 @@ export const MerchantAddFormCompanyStep = ({
         //foundationDate: dayjs(merchant.foundationDate),
       });
     }
-  
-    
   }, [
     cityList,
     merchant,
@@ -370,6 +394,14 @@ export const MerchantAddFormCompanyStep = ({
     selectedMcc,
     setValue,
   ]);
+  useEffect(() => {
+    if (merchant && merchant.taxOfficeCode) {
+      const cityCode = merchant.taxOfficeCode.substring(0, 2);
+      const cityRelatedToTaxOfficeCode = cityList.find(city => city.value === cityCode);
+      
+      setSelectedCity(cityRelatedToTaxOfficeCode);
+    }
+  }, [merchant, cityList]);
 
   const hasLoading =
     isMerchantCategoryLoading ||
@@ -406,6 +438,7 @@ export const MerchantAddFormCompanyStep = ({
                     control={control}
                     defaultValue={merchantTypes[0]?.value}
                     items={merchantTypes}
+               
                   />
                 )}
               </Box>
@@ -427,13 +460,21 @@ export const MerchantAddFormCompanyStep = ({
               width={isDesktop ? 800 : "auto"}
               spacing={3}
               direction={isDesktop ? "row" : "column"}
+              sx={{
+                "& > :nth-of-type(1)": {
+                  flexBasis: "50%",
+                },
+                "& > :nth-of-type(2)": {
+                  flexBasis: "50%",
+                },
+              }}
             >
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 {merchantList && (
                   <Controller
                     control={control}
                     name="parentMerchantId"
-                    render={() => {
+                    render={(fieldState) => {
                       return (
                         <>
                           <Autocomplete
@@ -453,7 +494,11 @@ export const MerchantAddFormCompanyStep = ({
                               value: number;
                             }) => option.label}
                             renderInput={(params) => (
-                              <TextField {...params} label="Ana İşyeri" />
+                              <TextField
+                                {...params}
+                                label="Ana İşyeri"
+                                error={fieldState.invalid}
+                              />
                             )}
                           />
                         </>
@@ -468,7 +513,7 @@ export const MerchantAddFormCompanyStep = ({
                     name="merchantStatusType"
                     control={control}
                     defaultValue=""
-                    render={({ field: { onChange, value } }) => {
+                    render={({ field: { onChange, value }, fieldState }) => {
                       const selectedMerchantStatus = merchantStatuses.find(
                         (option) => option.value === value
                       );
@@ -486,7 +531,11 @@ export const MerchantAddFormCompanyStep = ({
                             onChange(newValue ? newValue.value : "");
                           }}
                           renderInput={(params) => (
-                            <TextField {...params} label="İşyeri Durumu" />
+                            <TextField
+                              {...params}
+                              label="İşyeri Durumu"
+                              error={fieldState.invalid}
+                            />
                           )}
                         />
                       );
@@ -499,6 +548,14 @@ export const MerchantAddFormCompanyStep = ({
               width={isDesktop ? 800 : "auto"}
               spacing={3}
               direction={isDesktop ? "row" : "column"}
+              sx={{
+                "& > :nth-of-type(1)": {
+                  flexBasis: "50%",
+                },
+                "& > :nth-of-type(2)": {
+                  flexBasis: "50%",
+                },
+              }}
             >
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <InputControl
@@ -510,7 +567,7 @@ export const MerchantAddFormCompanyStep = ({
               </FormControl>
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <InputControl
-                  sx={{ mr: isDesktop ? 3 : 0 }}
+                  sx={{ mr: isDesktop ? 0 : 0 }}
                   id="tradeName"
                   control={control}
                   label="İşyeri Ticari Adı"
@@ -521,6 +578,14 @@ export const MerchantAddFormCompanyStep = ({
               width={isDesktop ? 800 : "auto"}
               spacing={3}
               direction={isDesktop ? "row" : "column"}
+              sx={{
+                "& > :nth-of-type(1)": {
+                  flexBasis: "50%",
+                },
+                "& > :nth-of-type(2)": {
+                  flexBasis: "50%",
+                },
+              }}
             >
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <InputControl
@@ -531,13 +596,13 @@ export const MerchantAddFormCompanyStep = ({
                   numeric
                 />
               </FormControl>
-              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+              <FormControl sx={{ width: isDesktop ? "44%" : "100%" }}>
                 {commissionProfileList ? (
                   <Controller
                     name="commissionProfileCode"
                     control={control}
                     defaultValue=""
-                    render={({ field: { onChange, value } }) => {
+                    render={({ field: { onChange, value }, fieldState }) => {
                       const selectedCommissionProfile =
                         commissionProfileList.find(
                           (option) => option.value === value
@@ -556,7 +621,11 @@ export const MerchantAddFormCompanyStep = ({
                             onChange(newValue ? newValue.value : "");
                           }}
                           renderInput={(params) => (
-                            <TextField {...params} label="Çalışma Koşulu" />
+                            <TextField
+                              {...params}
+                              label="Çalışma Grubu"
+                              error={fieldState.invalid}
+                            />
                           )}
                         />
                       );
@@ -567,7 +636,7 @@ export const MerchantAddFormCompanyStep = ({
             </Stack>
             <FormControl sx={{ width: isDesktop ? 800 : "auto" }}>
               <InputControl
-                sx={{ mr: isDesktop ? 3 : 0 }}
+                sx={{ mr: isDesktop ? 0 : 0 }}
                 id="webSite"
                 control={control}
                 label="Web Sitesi"
@@ -583,10 +652,7 @@ export const MerchantAddFormCompanyStep = ({
                   <Controller
                     control={control}
                     name="city"
-                    render={({
-                      field: { onChange, value },
-                      fieldState: { error },
-                    }) => {
+                    render={({ field: { onChange, value }, fieldState }) => {
                       return (
                         <>
                           <Autocomplete
@@ -596,7 +662,7 @@ export const MerchantAddFormCompanyStep = ({
                             value={selectedCity || null}
                             onChange={(event, selectedValue) => {
                               setSelectedCity(selectedValue);
-                              onChange(onChange);
+                              onChange(selectedValue);
                             }}
                             getOptionLabel={(option: {
                               label: string;
@@ -606,6 +672,7 @@ export const MerchantAddFormCompanyStep = ({
                               <TextField
                                 {...params}
                                 label="Vergi Dairesi İli"
+                                error={fieldState.invalid}
                               />
                             )}
                           />
@@ -617,7 +684,7 @@ export const MerchantAddFormCompanyStep = ({
               </FormControl>
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <InputControl
-                  sx={{ mr: isDesktop ? 3 : 0 }}
+                  sx={{ mr: isDesktop ? 0 : 0 }}
                   id="taxNumber"
                   control={control}
                   label="Vergi Numarası"
@@ -631,40 +698,46 @@ export const MerchantAddFormCompanyStep = ({
               spacing={6}
               direction={isDesktop ? "row" : "column"}
             >
-          <FormControl sx={{ width: isDesktop ? "46%" : "100%" }} >
-  {taxAdministrations ? (
-    <Controller
-      name="taxOfficeCode"
-      control={control}
-      defaultValue=""
-      render={({ field: { onChange, value } }) => {
-        const selectedTaxAdministration = taxAdministrations.find(
-          (option) => option.value === value
-        );
+              <FormControl sx={{ width: isDesktop ? "46%" : "100%" }}>
+                {taxAdministrations ? (
+                  <Controller
+                    name="taxOfficeCode"
+                    control={control}
+                    defaultValue=""
+                    render={({ field: { onChange, value }, fieldState }) => {
+                      const selectedTaxAdministration = taxAdministrations.find(
+                        (option) => option.value === value
+                      );
 
-        return (
-          <Autocomplete
-            id="taxOfficeCode"
-            options={taxAdministrations}
-            getOptionSelected={(option, value) => option.value === value}
-            getOptionLabel={(option) => option.label}
-            value={selectedTaxAdministration || null}
-            onChange={(_, newValue) => {
-              onChange(newValue ? newValue.value : "");
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Vergi Dairesi" />
-            )}
-          />
-        );
-      }}
-    />
-  ) : null}
-</FormControl>
+                      return (
+                        <Autocomplete
+                          id="taxOfficeCode"
+                          options={taxAdministrations}
+                          getOptionSelected={(option, value) =>
+                            option.value === value
+                          }
+                          getOptionLabel={(option) => option.label}
+                          value={selectedTaxAdministration || null}
+                          onChange={(_, newValue) => {
+                            onChange(newValue ? newValue.value : "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Vergi Dairesi"
+                              error={fieldState.invalid}
+                            />
+                          )}
+                        />
+                      );
+                    }}
+                  />
+                ) : null}
+              </FormControl>
 
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <InputControl
-                  sx={{ mr: isDesktop ? 3 : 0 }}
+                  sx={{ mr: isDesktop ? 0 : 0 }}
                   id="citizenshipNumber"
                   control={control}
                   label="Kimlik Numarası"
@@ -678,44 +751,46 @@ export const MerchantAddFormCompanyStep = ({
               spacing={3}
               direction={isDesktop ? "row" : "column"}
             >
-              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-                {merchantCategoryList && (
-                  <Controller
-                    control={control}
-                    name="mcc"
-                    render={() => {
-                      return (
-                        <>
-                          <Autocomplete
-                            sx={{ mr: isDesktop ? 3 : 0 }}
-                            options={merchantCategoryList}
-                            onChange={(event, selectedValue) => {
-                              setSelectedMcc(selectedValue);
-                              setValue(
-                                "mcc",
-                                selectedValue?.value?.toString() || ""
-                              );
-                            }}
-                            value={selectedMcc || null}
-                            id="mcc"
-                            loading={isMerchantCategoryLoading}
-                            getOptionLabel={(option: {
-                              label: string;
-                              value: string;
-                            }) => option.label}
-                            renderInput={(params) => (
-                              <TextField {...params} label="MCC" />
-                            )}
-                          />
-                        </>
-                      );
-                    }}
-                  />
-                )}
-              </FormControl>
+<FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+  {merchantCategoryList && (
+    <Controller
+      control={control}
+      name="mcc"
+      defaultValue=""
+      rules={{ required: true }} // Bu satırı ekledik, böylece alanın doldurulması zorunlu olur.
+      render={({ field: { onChange, value }, fieldState }) => {
+        const selectedMerchantCategory =
+          merchantCategoryList.find((option) => option.value === value);
+
+        return (
+          <>
+            <Autocomplete
+              sx={{ mr: isDesktop ? 3 : 0 }}
+              options={merchantCategoryList}
+              getOptionLabel={(option) => option.label}
+              value={selectedMerchantCategory || null}
+              onChange={(_, newValue) => {
+                onChange(newValue ? newValue.value : "");
+                if (newValue) setSelectedMcc(newValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="MCC"
+                  error={fieldState.invalid}
+                />
+              )}
+            />
+          </>
+        );
+      }}
+    />
+  )}
+</FormControl>
+
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <DatePickerControl
-                  sx={{ mr: isDesktop ? 3 : 0 }}
+                  sx={{ mr: isDesktop ? 0 : 0 }}
                   id="openingDate"
                   control={control}
                   label="İşyeri Açılış Tarihi"
@@ -739,7 +814,7 @@ export const MerchantAddFormCompanyStep = ({
               </FormControl>
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <DatePickerControl
-                  sx={{ mr: isDesktop ? 3 : 0 }}
+                  sx={{ mr: isDesktop ? 0 : 0 }}
                   id="closedDate"
                   control={control}
                   label="İşyeri Kapanış Tarihi"

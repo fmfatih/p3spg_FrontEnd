@@ -345,7 +345,6 @@ export const BankCommissionListingTable = ({
       },
       {
         onSuccess: (data) => {
-          console.log(data.data.result);
           if (data.isSuccess) {
             downloadExcel(data?.data?.result || [], "Banka Komisyon Listesi");
           } else {

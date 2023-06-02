@@ -3,9 +3,8 @@ import { default as dayjs } from "dayjs";
 
 export const firstStepFormSchema = zod.object({
   parentMerchantId: zod.any().optional(),
-  merchantStatusType: zod
-    .string()
-    .min(1, { message: "Please enter your phone number" }),
+  merchantStatusType: zod.any().optional(),
+
   merchantType: zod
     .string()
     .min(1, { message: "Please enter your phone number" }),
@@ -27,17 +26,26 @@ export const firstStepFormSchema = zod.object({
   taxOfficeCode: zod
     .string()
     .min(1, { message: "Please enter your phone number" }),
-  citizenshipNumber: zod
-    .string()
-    .length(11, { message: "Please enter your phone number" })
-    .optional()
-    .or(zod.literal("")),
-  mcc: zod.any(),
+    citizenshipNumber: zod.string().optional(),
+  mcc: zod.string().min(1),
+  // mcc: zod.any().refine(value => typeof value === 'string' || typeof value === 'number', {
+  //   message: 'mcc should be a string or a number',
+  // }),
+
   openingDate: zod.any(),
   aggreementDate: zod.any().optional(),
   foundationDate: zod.any(),
   closedDate: zod.any().optional(),
-  city: zod.any(),
+  city: zod.union([
+    zod.null().nullable(),
+    zod.object({
+      // Burada objenizin özelliklerini belirleyebilirsiniz
+      label: zod.string(),
+      value: zod.string(),
+    }),
+  ]).refine(value => value !== null && value !== undefined, {
+    message: "Bu alanın boş bırakılamaz.",
+  }),
 });
 
 export type FirstStepFormValuesType = zod.infer<typeof firstStepFormSchema>;
@@ -57,7 +65,7 @@ export const firstStepInitialValues: FirstStepFormValuesType = {
   webSite: "",
   taxNumber: "",
   taxOfficeCode: "",
-  mcc: null,
+  mcc: "",
   posList: {},
   merchantType: "",
   closedDate: null,
@@ -166,12 +174,31 @@ export const fourthStepInitialValues: FourthStepFormValuesType = {
 
 
 export const partnerStepFormSchema = zod.object({
-  partnerOneFullName: zod
+  officialFullName: zod
     .string()
     .min(1, { message: "Please enter your phone number" }),
-  partnerOneCitizenNumber: zod
+    officialCitizenNumber: zod
     .string()
     .min(11, { message: "Please enter your phone number" }),
+    officialMobilePhone: zod.preprocess(
+      (val) =>
+        String(val)
+          .slice(1)
+          .replaceAll("_", "")
+          .replaceAll("(", "")
+          .replaceAll(")", "")
+          .replaceAll(" ", "")
+          .trim(),
+      zod.string().min(1, { message: "Please enter the mobile phone of partner one" }),
+    ),
+  partnerOneFullName: zod.preprocess(
+    (val) => String(val).trim(),
+    zod.string().optional()
+  ),
+  partnerOneCitizenNumber: zod.preprocess(
+    (val) => String(val).trim(),
+    zod.string().optional()
+  ),
   partnerOneMobilePhone: zod.preprocess(
     (val) =>
       String(val)
@@ -183,6 +210,7 @@ export const partnerStepFormSchema = zod.object({
         .trim(),
     zod.string().optional()
   ),
+
   partnerTwoFullName: zod.preprocess(
     (val) => String(val).trim(),
     zod.string().optional()
@@ -202,17 +230,90 @@ export const partnerStepFormSchema = zod.object({
         .trim(),
     zod.string().optional()
   ),
+
+  partnerThreeFullName: zod.preprocess(
+    (val) => String(val).trim(),
+    zod.string().optional()
+  ),
+  partnerThreeCitizenNumber: zod.preprocess(
+    (val) => String(val).trim(),
+    zod.string().optional()
+  ),
+  partnerThreeMobilePhone: zod.preprocess(
+    (val) =>
+      String(val)
+        .slice(1)
+        .replaceAll("_", "")
+        .replaceAll("(", "")
+        .replaceAll(")", "")
+        .replaceAll(" ", "")
+        .trim(),
+    zod.string().optional()
+  ),
+  partnerFourFullName: zod.preprocess(
+    (val) => String(val).trim(),
+    zod.string().optional()
+  ),
+  partnerFourCitizenNumber: zod.preprocess(
+    (val) => String(val).trim(),
+    zod.string().optional()
+  ),
+  partnerFourMobilePhone: zod.preprocess(
+    (val) =>
+      String(val)
+        .slice(1)
+        .replaceAll("_", "")
+        .replaceAll("(", "")
+        .replaceAll(")", "")
+        .replaceAll(" ", "")
+        .trim(),
+    zod.string().optional()
+  ),
+
+  partnerFiveFullName: zod.preprocess(
+    (val) => String(val).trim(),
+    zod.string().optional()
+  ),
+  partnerFiveCitizenNumber: zod.preprocess(
+    (val) => String(val).trim(),
+    zod.string().optional()
+  ),
+  partnerFiveMobilePhone: zod.preprocess(
+    (val) =>
+      String(val)
+        .slice(1)
+        .replaceAll("_", "")
+        .replaceAll("(", "")
+        .replaceAll(")", "")
+        .replaceAll(" ", "")
+        .trim(),
+    zod.string().optional()
+  ),
 });
 
 export type PartnerStepFormValuesType = zod.infer<typeof partnerStepFormSchema>;
 
+
 export const partnerStepInitialValues: PartnerStepFormValuesType = {
+
+  officialFullName: "",
+  officialCitizenNumber: "",
+  officialMobilePhone: "",
   partnerOneFullName: "",
   partnerOneCitizenNumber: "",
   partnerOneMobilePhone: "",
   partnerTwoFullName: "",
   partnerTwoCitizenNumber: "",
   partnerTwoMobilePhone: "",
+  partnerThreeFullName: "",
+  partnerThreeCitizenNumber: "",
+  partnerThreeMobilePhone: "",
+  partnerFourFullName: "",
+  partnerFourCitizenNumber: "",
+  partnerFourMobilePhone: "",
+  partnerFiveFullName: "",
+  partnerFiveCitizenNumber: "",
+  partnerFiveMobilePhone: "",
 };
 
 export const merchantAuthFormSchema = zod.object({

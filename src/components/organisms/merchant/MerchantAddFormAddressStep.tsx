@@ -11,6 +11,7 @@ import {
   useTheme,
   Autocomplete,
   TextField,
+  Box,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { Button, Loading } from "../../atoms";
@@ -33,12 +34,18 @@ import {
 
 type MerchantAddFormCompanyStepProps = {
   onNext: () => void;
+  onBack: () => void;
   merchant?: any;
+  allData?: any;
+  setAllData?: any;
 };
 
 export const MerchantAddFormAddressStep = ({
   merchant,
   onNext,
+  onBack,
+  allData,
+  setAllData,
 }: MerchantAddFormCompanyStepProps) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -50,7 +57,7 @@ export const MerchantAddFormAddressStep = ({
   const [selectedCity, setSelectedCity] = useState(null as any);
   const [selectedDistrict, setSelectedDistrict] = useState(null as any);
 
-  const [districtList, setDistrictList] = useState();
+  const [districtList, setDistrictList] = useState([]);
   const { mutate: getDistrictList } = useGetDistrictList();
   const { control, handleSubmit, watch, reset, setValue, getValues } =
     useForm<SecondStepFormValuesType>({
@@ -70,11 +77,18 @@ export const MerchantAddFormAddressStep = ({
               (item: { name: string; id: string }) => {
                 return {
                   label: item.name,
-                  value: `${item.id}`,
+                  value: item.id,
                 };
               }
             );
             setDistrictList(tempData);
+       
+            if(tempData) {
+              const foundDistrict = tempData?.find((d: { label: string; value: string }) => Number(d.value) === merchant.districtId);
+              if (foundDistrict) {
+                setSelectedDistrict(foundDistrict?.value);
+              }
+            }
           },
         }
       );
@@ -119,9 +133,10 @@ export const MerchantAddFormAddressStep = ({
       countryCode: "TR",
       primaryAddress: true,
     };
-    if (merchant && merchant?.id > 0) {
+    setAllData({ ...allData, ...request });
+    if ((merchant && merchant?.id > 0 && allData?.addressLine1) || (allData && allData?.addressLine1)) {
       updateMerchantAddress(
-        { ...request, id: merchant?.id || 0 },
+        { ...request, id: merchant?.id || 0  },
         {
           onSuccess(data) {
             if (data.isSuccess) {
@@ -179,12 +194,15 @@ export const MerchantAddFormAddressStep = ({
 
   useEffect(() => {
     if (!!merchant && JSON.stringify(merchant) !== "{}") {
-      setSelectedCity({ label: merchant?.cityName, value: merchant?.cityCode });
+      const foundCity = cityList?.find(city => city.value === merchant?.cityCode?.toString());
+      if (foundCity) {
+        setSelectedCity(foundCity);
+      }
       setSelectedDistrict(merchant?.districtId);
       setValue("districtId", selectedDistrict?.toString());
       reset({
         addressLine1: merchant?.addressLine1,
-        cityId: selectedCity,
+        cityId: foundCity?.id,
         mobilePhoneNumber: merchant?.mobilePhoneNumber,
         zipCode: merchant?.zipCode,
         emailAddress1: merchant?.emailAddress1,
@@ -219,7 +237,7 @@ export const MerchantAddFormAddressStep = ({
             />
           </FormControl>
           <Stack width={isDesktop ? 800 : "auto"} spacing={3} direction="row">
-            <FormControl sx={{ width: isDesktop ? "49%" : "100%" }}>
+            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
               {cityList && (
                 <Controller
                   control={control}
@@ -237,7 +255,7 @@ export const MerchantAddFormAddressStep = ({
                           value={selectedCity || null}
                           onChange={(event, selectedValue) => {
                             setSelectedCity(selectedValue);
-                            onChange(onChange);
+                            onChange(selectedValue);
                           }}
                           getOptionLabel={(option: {
                             label: string;
@@ -253,14 +271,14 @@ export const MerchantAddFormAddressStep = ({
                 />
               )}
             </FormControl>
-            <FormControl sx={{ width: isDesktop ? "45%" : "100%" }}>
+            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
               {districtList ? (
                 <Controller
                   name="districtId"
                   control={control}
                   defaultValue={selectedDistrict}
                   render={({ field: { onChange, value } }) => {
-                    const selectedDistrictItem = districtList.find(
+                    const selectedDistrictItem = districtList?.find(
                       (option) => option.value === value
                     );
 
@@ -271,6 +289,7 @@ export const MerchantAddFormAddressStep = ({
                         getOptionSelected={(option, value) =>
                           option.value === value
                         }
+                        sx={{ mr: isDesktop ? 3 : 0 }}
                         getOptionLabel={(option) => option.label}
                         value={selectedDistrictItem || null}
                         onChange={(_, newValue) => {
@@ -379,12 +398,18 @@ export const MerchantAddFormAddressStep = ({
           py={2}
           px={4}
           justifyContent="flex-end"
+          spacing={2}
         >
-          <Button
-            variant="contained"
-            text="Devam"
-            onClick={handleSubmit(onSubmit)}
-          />
+          <Box>
+            <Button variant="contained" text="Geri" onClick={onBack} />
+          </Box>
+          <Box>
+            <Button
+              variant="contained"
+              text="Devam"
+              onClick={handleSubmit(onSubmit)}
+            />
+          </Box>
         </Stack>
       </Stack>
     </>

@@ -40,6 +40,7 @@ export const Sidebar = ({onCloseMenu}: SidebarProps) => {
 
     return "";
   };
+console.log(userMenu);
 
   
   
@@ -94,6 +95,7 @@ export const Sidebar = ({onCloseMenu}: SidebarProps) => {
                 }
               />
             ))}
+
           </Stack>
         </Stack>
         <Stack

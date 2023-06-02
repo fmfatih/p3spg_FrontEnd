@@ -146,7 +146,6 @@ export const PaymentAndTransactionFilter = () => {
       page: paginationModel.page,
       orderBy: "CreateDate",
     };
-    console.log(transactionType);
 
     GetPaymentAndTransaction(req, {
       onSuccess: (data) => {
@@ -175,13 +174,22 @@ export const PaymentAndTransactionFilter = () => {
     });
   };
 
+  // if (transaction.status !== "SUCCESS") {
+  //   return <Box></Box>;
+  // }
+
+  // const isRefund = transaction.endOfDayFlag;
+  // const buttonLabel = isRefund ? "İade" : "İptal";
+  // const buttonColor = isRefund ? "#EEAB00" : "#F5004A";
+
   function RenderActionButton(transaction: any) {
     let buttonLabel = "";
     let buttonColor = "";
+    const isRefund = transaction.endOfDayFlag;
 
     if (transaction.status === "SUCCESS" && transaction.txnType !== "REFUND") {
-      buttonLabel = transaction.endOfDayFlag ? "İade" : "İptal";
-      buttonColor = transaction.endOfDayFlag ? "#EEAB00" : "#F5004A";
+      buttonLabel = isRefund ? "İade" : "İptal";
+      buttonColor = isRefund ? "#EEAB00" : "#F5004A";
     }
 
     return (
@@ -230,6 +238,46 @@ export const PaymentAndTransactionFilter = () => {
             isOpen: true,
             description: data.message,
           });
+          GetPaymentAndTransaction({
+            size: paginationModel.pageSize,
+            page: paginationModel.page,
+            orderBy: "CreateDate",
+            orderByDesc: true,
+            startDate: dayjs(getValues("startDate")).format(
+              "YYYY-MM-DD HH:mm:ss"
+            ),
+            endDate: dayjs(getValues("endDate")).format("YYYY-MM-DD HH:mm:ss"),
+            orderId: getValues("orderId"),
+            cardNumber: getValues("cardNumber"),
+            authCode: getValues("authCode"),
+            status: getValues("status"),
+            transactionType: getValues("transactionType"),
+            bankCode: getValues("bankCode"),
+          }, {
+            onSuccess: (data) => {
+              if (data.isSuccess) {
+                setTableData(data.data);
+                setSnackbar({
+                  severity: "success",
+                  isOpen: true,
+                  description: data.message,
+                });
+              } else {
+                setSnackbar({
+                  severity: "error",
+                  description: data.message,
+                  isOpen: true,
+                });
+              }
+            },
+            onError: () => {
+              setSnackbar({
+                severity: "error",
+                description: "İşlem sırasında bir hata oluştu",
+                isOpen: true,
+              });
+            },
+          });
         } else {
           setSnackbar({
             severity: "error",
@@ -262,6 +310,46 @@ export const PaymentAndTransactionFilter = () => {
     RefundPaymentAndTransaction(req, {
       onSuccess: (data: any) => {
         if (data.isSuccess) {
+          GetPaymentAndTransaction({
+            size: paginationModel.pageSize,
+            page: paginationModel.page,
+            orderBy: "CreateDate",
+            orderByDesc: true,
+            startDate: dayjs(getValues("startDate")).format(
+              "YYYY-MM-DD HH:mm:ss"
+            ),
+            endDate: dayjs(getValues("endDate")).format("YYYY-MM-DD HH:mm:ss"),
+            orderId: getValues("orderId"),
+            cardNumber: getValues("cardNumber"),
+            authCode: getValues("authCode"),
+            status: getValues("status"),
+            transactionType: getValues("transactionType"),
+            bankCode: getValues("bankCode"),
+          }, {
+            onSuccess: (data) => {
+              if (data.isSuccess) {
+                setTableData(data.data);
+                setSnackbar({
+                  severity: "success",
+                  isOpen: true,
+                  description: data.message,
+                });
+              } else {
+                setSnackbar({
+                  severity: "error",
+                  description: data.message,
+                  isOpen: true,
+                });
+              }
+            },
+            onError: () => {
+              setSnackbar({
+                severity: "error",
+                description: "İşlem sırasında bir hata oluştu",
+                isOpen: true,
+              });
+            },
+          });
           setSnackbar({
             severity: "success",
             isOpen: true,
@@ -283,10 +371,10 @@ export const PaymentAndTransactionFilter = () => {
         });
       },
     });
-
+  
     handleCloseRefundModal();
   };
-
+  
   const columns: GridColDef[] = useMemo(() => {
     return [
       {
@@ -305,32 +393,25 @@ export const PaymentAndTransactionFilter = () => {
           ),
         ],
       },
-
-      { field: "txnTypeDesc", headerName: "İşlem Tipi", width: 150 },
-      { field: "statusDesc", headerName: "İşlem Durumu", width: 200 },
-      { field: "maskedPan", headerName: "Kart Numarası", width: 200 },
-      { field: "cardBankCode", headerName: "Kartın Banka Kodu", width: 200 },
-      { field: "cardBankName", headerName: "Kartın Bankası", width: 200 },
-      { field: "cardHolderName", headerName: "Kart Sahibi", width: 200 },
       { field: "merchantId", headerName: "Üye İşyeri Numarası", width: 180 },
-      { field: "merchantVkn", headerName: "Üye İşyeri VKN", width: 180 },
       {
         field: "merchantName",
         headerName: "Üye İşyeri Adı",
         width: 300,
       },
-      { field: "systemDateFormatted", headerName: "İşlem Zamanı", width: 200 },
+      { field: "maskedPan", headerName: "Kart Numarası", width: 200 },
       {
-        field: "updateDateFormatted",
-        headerName: "İşlemin Gerçekleşme Zamanı",
-        width: 250,
+        field: "orderId",
+        headerName: "Sipariş Numarası",
+        width: 400,
       },
-      { field: "authCode", headerName: "Otorizasyon Kodu", width: 200 },
       { field: "bankName", headerName: "Banka Adı", width: 300 },
-      { field: "bankResponseCode", headerName: "Banka Cevap Kodu", width: 200 },
-      { field: "ResponseMessage", headerName: "Cevap Mesajı", width: 200 },
-      { field: "installmentCount", headerName: "Taksit Sayısı", width: 200 },
       { field: "currencyDesc", headerName: "Para Birimi", width: 150 },
+      { field: "statusDesc", headerName: "İşlem Durumu", width: 200 },
+      { field: "transactionDate", headerName: "İşlem Tarihi", width: 200 },
+      { field: "webUrl", headerName: "WEB URL", width: 200 },
+      { field: "installmentCount", headerName: "Taksit Sayısı", width: 200 },
+  
       {
         field: "totalAmount",
         headerName: "Toplam Tutar",
@@ -344,7 +425,7 @@ export const PaymentAndTransactionFilter = () => {
       },
       {
         field: "amount",
-        headerName: "İşlem Tutarı",
+        headerName: "Tutar",
         width: 200,
         valueFormatter: (params: GridValueFormatterParams<number>) => {
           if (params.value == null) {
@@ -354,8 +435,32 @@ export const PaymentAndTransactionFilter = () => {
         },
       },
       {
+        field: "totalCommission",
+        headerName: "Komisyon Tutar",
+        width: 200,
+        valueFormatter: (params: GridValueFormatterParams<number>) => {
+          if (params.value == null) {
+            return "";
+          }
+          return `${params.value} TL`;
+        },
+      },
+      { field: "txnTypeDesc", headerName: "İşlem Tipi", width: 150 },
+      { field: "paymentModel", headerName: "Ödeme Tipi", width: 200 },
+      { field: "requestIp", headerName: "İstek IP", width: 200 },
+      { field: "description", headerName: "Açıklama", width: 200 },
+      { field: "currency", headerName: "Para Birimi Kodu", width: 200 },
+      { field: "cardHolderName", headerName: "İşlem Yapılan Kart Bilgisi", width: 200 },
+      { field: "failUrl", headerName: "Başarısız İşleme Ait URL", width: 200 },
+      { field: "okUrl", headerName: "Başarılı İşleme Ait URL", width: 200 },
+      { field: "bankblocked", headerName: "Banka Blokesi", width: 200 },
+      { field: "bankblockedday", headerName: "Banka Bloke Günü", width: 200 },
+      { field: "bankcommission", headerName: "Banka Komisyonu", width: 200 },
+      { field: "merchantblocked", headerName: "Üyer İşyeri Blokesi", width: 200 },
+      { field: "merchantblockedday", headerName: "Üyer İşyeri Bloke Günü", width: 200 },
+      {
         field: "merchantcommision",
-        headerName: "Üye İşyeri Kom. Oranı",
+        headerName: "Üye İşyeri Komisyonu",
         width: 200,
         valueFormatter: (params: GridValueFormatterParams<number>) => {
           if (params.value == null) {
@@ -366,7 +471,7 @@ export const PaymentAndTransactionFilter = () => {
       },
       {
         field: "merchantadditionalcommision",
-        headerName: "Üye İşyeri Kom. Tutarı",
+        headerName: "Üye İşyeri Sabit Komisyonu",
         width: 200,
         valueFormatter: (params: GridValueFormatterParams<number>) => {
           if (params.value == null) {
@@ -377,7 +482,7 @@ export const PaymentAndTransactionFilter = () => {
       },
       {
         field: "customercommission",
-        headerName: "Müşteri Kom. Oranı",
+        headerName: "Müşteri Komisyonu",
         width: 200,
         valueFormatter: (params: GridValueFormatterParams<number>) => {
           if (params.value == null) {
@@ -388,7 +493,7 @@ export const PaymentAndTransactionFilter = () => {
       },
       {
         field: "customeradditionalcommission",
-        headerName: "Müş. Kom. Tutarı",
+        headerName: "Müşteri Sabit Komisyonu",
         width: 200,
         valueFormatter: (params: GridValueFormatterParams<number>) => {
           if (params.value == null) {
@@ -397,15 +502,64 @@ export const PaymentAndTransactionFilter = () => {
           return `${params.value} TL`;
         },
       },
-      {
-        field: "orderId",
-        headerName: "Sipariş Numarası",
-        width: 400,
-      },
-      { field: "cardTypeDesc", headerName: "Kart Tipi", width: 200 },
 
-      { field: "paymentModel", headerName: "Ödeme Modeli", width: 200 },
+      { field: "cardType", headerName: "Kart Tipi", width: 200 },
+      { field: "cardTypeDesc", headerName: "Kart Tipi Açıklama", width: 200 },
+      { field: "authCode", headerName: "Otorizasyon Kodu", width: 200 },
       { field: "endOfDayFlag", headerName: "Gün Sonu", width: 200 },
+      { field: "endOfDayId", headerName: "Gün Sonu ID", width: 200 },
+      { field: "endOfDayDate", headerName: "Gün Sonu Tarihi", width: 200 },
+      { field: "cardBankCode", headerName: "Kartın Banka Kodu", width: 200 },
+      { field: "cardBankName", headerName: "Kartın Banka Adı", width: 200 },
+      { field: "responseCode", headerName: "Cevap Kodu", width: 200 },
+      { field: "bankResponseCode", headerName: "Banka Cevap Kodu", width: 200 },
+      { field: "responseMessage", headerName: "Cevap Açıklaması", width: 200 },
+      { field: "systemDateFormatted", headerName: "Sistem Tarihi", width: 200 },
+      { field: "createDateFormatted", headerName: "İşlemin Başlama Tarihi", width: 200 },
+      { field: "updateDateFormatted", headerName: "İşlem Bitiş Tarihi", width: 200 },
+      { field: "id", headerName: "ID", width: 200 },
+      { field: "systemDate", headerName: "Sistem Tarihi", width: 200 },
+      { field: "createDate", headerName: "Oluşturma Tarihi", width: 200 },
+      { field: "createUserId", headerName: "Oluşturan Kullanıcı ID", width: 200 },
+      { field: "createUserName", headerName: "Oluşturan Kullanıcı Adı Soyadı", width: 200 },
+      { field: "updateDate", headerName: "Güncelleme Tarihi", width: 200 },
+      { field: "updateUserId", headerName: "Güncelleme Kullanıcı ID", width: 200 },
+      { field: "updateUserName", headerName: "Güncelleyen Kullanıcı Adı Soyadı", width: 200 },
+
+      { field: "deleteDate", headerName: "Silme Tarihi", width: 200 },
+      { field: "deleteUserId", headerName: "Silinen Kullanıcı ID", width: 200 },
+      { field: "deleteUserName", headerName: "Silinen Kullanıcı Adı Soyadı", width: 200 },
+
+  
+    
+     
+
+      // { field: "cardHolderName", headerName: "Kart Sahibi", width: 200 },
+
+      // { field: "merchantVkn", headerName: "Üye İşyeri VKN", width: 180 },
+  
+  
+      // {
+      //   field: "updateDateFormatted",
+      //   headerName: "İşlemin Gerçekleşme Zamanı",
+      //   width: 250,
+      // },
+
+   
+    
+
+     
+
+  
+
+  
+ 
+ 
+  
+      // { field: "cardTypeDesc", headerName: "Kart Tipi", width: 200 },
+
+   
+ 
     ];
   }, [deleteRow, showDelete]);
 

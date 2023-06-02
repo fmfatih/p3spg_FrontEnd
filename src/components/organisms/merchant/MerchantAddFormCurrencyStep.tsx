@@ -2,7 +2,13 @@
 // @ts-nocheck
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { InputControl, SelectControl, SwitchControl } from "../../molecules";
-import { FormControl, Stack, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  Stack,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useForm } from "react-hook-form";
 import { Button, Loading } from "../../atoms";
 import {
@@ -25,10 +31,16 @@ import {
 
 type MerchantAddFormCompanyStepProps = {
   merchant?: IMerchant;
+  onBack: () => void;
+  allData?: any;
+  setAllData?: any;
 };
 
 export const MerchantAddFormCurrencyStep = ({
   merchant,
+  onBack,
+  allData,
+  setAllData
 }: MerchantAddFormCompanyStepProps) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -37,16 +49,14 @@ export const MerchantAddFormCurrencyStep = ({
   const setSnackbar = useSetSnackBar();
   const [merchantId] = useUserMerchantId();
   const { data: rawBankList } = useGetBankList({});
-  const { mutate: merchantRestrictionAdd, isLoading } = useMerchantRestrictionAdd();
+  const { mutate: merchantRestrictionAdd, isLoading } =
+    useMerchantRestrictionAdd();
   const { mutate: merchantRestrictionUpdate, isUpdateLoading } =
     useMerchantRestrictionUpdate();
   const { control, reset, handleSubmit } = useForm<FourthStepFormValuesType>({
     resolver: zodResolver(fourthStepFormSchema),
     defaultValues: fourthStepInitialValues,
   });
-
-
-
 
   const onSubmit = ({
     try: tryCurrency,
@@ -59,10 +69,10 @@ export const MerchantAddFormCurrencyStep = ({
       usd: usdCurrency,
       eur: eurCurrency,
     };
-    
-    
-    // 
-    if (merchant && merchant?.id > 0) {
+
+    //
+    setAllData({ ...allData, ...request });
+    if ((merchant && merchant?.id > 0 && allData?.try) || (allData && allData?.try)) {
       merchantRestrictionUpdate(
         { ...request, id: merchant?.id || 0 },
         {
@@ -123,37 +133,33 @@ export const MerchantAddFormCurrencyStep = ({
   useEffect(() => {
     if (!!merchant && JSON.stringify(merchant) !== "{}") {
       reset({
-      
         try: merchant.try,
         usd: merchant.usd,
         eur: merchant.eur,
-        
       });
-
     }
   }, [merchant, reset]);
 
-  
   return (
     <>
       {isLoading && <Loading />}
       <Stack pt={3} flex={1} justifyContent="space-between">
         <Stack px={isDesktop ? 4 : 1} spacing={3}>
-        <Stack
-              mb={3}
-              width={isDesktop ? 1000 : "auto"}
-              spacing={3}
-              direction={isDesktop ? "row" : "column"}
-            >
-              <SwitchControl label="TRY" control={control} id="try"  isDisabled={true}/>
-              <SwitchControl
-                label="USD"
-                control={control}
-                id="usd"
-              />
-                     <SwitchControl label="EUR" control={control} id="eur" />
-            </Stack>
-     
+          <Stack
+            mb={3}
+            width={isDesktop ? 1000 : "auto"}
+            spacing={3}
+            direction={isDesktop ? "row" : "column"}
+          >
+            <SwitchControl
+              label="TRY"
+              control={control}
+              id="try"
+              isDisabled={true}
+            />
+            <SwitchControl label="USD" control={control} id="usd" />
+            <SwitchControl label="EUR" control={control} id="eur" />
+          </Stack>
         </Stack>
         <Stack
           borderTop="1px solid #E6E9ED"
@@ -161,12 +167,18 @@ export const MerchantAddFormCurrencyStep = ({
           py={2}
           px={4}
           justifyContent="flex-end"
+          spacing={2}
         >
-          <Button
-            variant="contained"
-            text="Kaydet"
-            onClick={handleSubmit(onSubmit)}
-          />
+          <Box>
+            <Button variant="contained" text="Geri" onClick={onBack} />
+          </Box>
+          <Box>
+            <Button
+              variant="contained"
+              text="Kaydet"
+              onClick={handleSubmit(onSubmit)}
+            />
+          </Box>
         </Stack>
       </Stack>
     </>

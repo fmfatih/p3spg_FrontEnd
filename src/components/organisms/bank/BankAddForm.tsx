@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import {
   IMemberVPos,
   IMerchantVPos,
@@ -71,7 +74,6 @@ export const BankAddForm = () => {
 
   useEffect(() => {
     if (!!memberVPos && JSON.stringify(memberVPos) !== "{}") {
-      console.log("memberVPos", memberVPos);
       reset({
         fullName: memberVPos?.fullName,
         mail: memberVPos?.mail,
@@ -143,7 +145,7 @@ export const BankAddForm = () => {
     remove,
     selectedMerchantId,
   ]);
-  console.log(memberVPos)
+
 
   const acquirerBankList = useMemo(() => {
     return rawAcquirerBankList?.data?.map(
@@ -168,7 +170,6 @@ export const BankAddForm = () => {
   }, [rawMerchantList?.data]);
 
   const onSubmit = (data: BankAddFormValuesType) => {
-    console.log(data);
     const parameters = data?.parameters?.map((item) => {
       return {
         key: item.key,
@@ -254,9 +255,6 @@ export const BankAddForm = () => {
     }
   };
 
-  console.log(selectedMerchantId);
-  console.log(merchantVPos);
-  console.log(merchantList);
 
   return (
     <>

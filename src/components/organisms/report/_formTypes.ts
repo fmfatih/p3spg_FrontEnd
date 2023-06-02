@@ -29,6 +29,65 @@ export const paymentAndTransactionInitialValues: PaymentAndTransactionValuesType
     refundAmount: "",
   };
 
+
+
+
+  export const merchantPaymentFormSchema = zod.object({
+    date: zod.unknown(),
+    paymentFlag:zod.any().optional(),
+    merchantId:zod.any().optional()
+  });
+  
+  export type MerchantPaymentValuesType = zod.infer<
+    typeof merchantPaymentFormSchema
+  >;
+  
+  export const merchantPaymentInitialValues: MerchantPaymentValuesType =
+    {
+      merchantId:0,
+ 
+      // endOfDate: null,
+      paymentFlag:null
+      // endDate: null,
+      // transactionType: "",
+      // orderId: "",
+      // cardNumber: "",
+      // authCode: "",
+      // status: "",
+      // bankCode: "",
+      // refundAmount: "",
+    };
+
+
+
+
+
+    export const bankPaymentFormSchema = zod.object({
+      date: zod.any(),
+      bankCode:zod.any()
+      // endDate: zod.any(),
+      // transactionType: zod.string(),
+      // orderId: zod.string(),
+      // cardNumber: zod.string(),
+      // authCode: zod.string(),
+      // status: zod.string(),
+      // bankCode: zod.string(),
+      // refundAmount: zod.string(),
+    });
+    
+    export type BankPaymentValuesType = zod.infer<
+      typeof bankPaymentFormSchema
+    >;
+    
+    export const bankPaymentInitialValues: BankPaymentValuesType =
+      {
+        bankCode:"",
+    
+      };
+
+
+
+
 export const paymentWithLinkedFormSchema = zod
   .object({
     bankCode: zod.string().min(1),

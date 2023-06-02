@@ -4,6 +4,7 @@
 import { InputControl, SelectControl } from "../../molecules";
 import {
   Autocomplete,
+  Box,
   FormControl,
   Stack,
   TextField,
@@ -32,12 +33,18 @@ import {
 
 type MerchantAddFormCompanyStepProps = {
   onNext: () => void;
+  onBack: () => void;
   merchant?: IMerchant;
+  allData?: any;
+  setAllData?: any;
 };
 
 export const MerchantAddFormBankStep = ({
   merchant,
   onNext,
+  onBack,
+  allData,
+  setAllData,
 }: MerchantAddFormCompanyStepProps) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -87,8 +94,8 @@ export const MerchantAddFormBankStep = ({
       bankCode,
       accountOwner,
     };
-
-    if (merchant && merchant?.id > 0) {
+    setAllData({ ...allData, ...request });
+    if ((merchant && merchant?.id > 0 && allData?.iban) || (allData && allData?.iban)) {
       merchantBankUpdate(
         { ...request, id: merchant?.id || 0 },
         {
@@ -266,12 +273,18 @@ export const MerchantAddFormBankStep = ({
           py={2}
           px={4}
           justifyContent="flex-end"
+          spacing={2}
         >
-          <Button
-            variant="contained"
-            text="Devam"
-            onClick={handleSubmit(onSubmit)}
-          />
+          <Box>
+            <Button variant="contained" text="Geri" onClick={onBack} />
+          </Box>
+          <Box>
+            <Button
+              variant="contained"
+              text="Devam"
+              onClick={handleSubmit(onSubmit)}
+            />
+          </Box>
         </Stack>
       </Stack>
     </>

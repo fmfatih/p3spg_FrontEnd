@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import * as React from 'react';
+// import * as React from "react";
 import {
   IUser,
   IUserAddRequest,
@@ -36,11 +36,11 @@ import { addUserFormSchema, UserAddFormValuesType } from "../_formTypes";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
 import { useUserInfo } from "../../../store/User.state";
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
-import FormLabel from '@mui/material/FormLabel';
+import FormLabel from "@mui/material/FormLabel";
 
 export const UserAddForm = () => {
   const theme = useTheme();
@@ -72,7 +72,7 @@ export const UserAddForm = () => {
   const [userStatus, setUserStatus] = useState("");
 
   const userType = watch("userType");
-  const fullName=watch("fullName")
+  const fullName = watch("fullName");
 
   useEffect(() => {
     if (!!user && JSON.stringify(user) !== "{}") {
@@ -84,7 +84,7 @@ export const UserAddForm = () => {
         label: user?.merchantName || "",
         value: user?.merchantId,
       });
-      setUserStatus(user.status)
+      setUserStatus(user.status);
       reset(
         {
           fullName: user?.fullName,
@@ -94,7 +94,7 @@ export const UserAddForm = () => {
           // userType: `${user.userType}`,
           userType: user ? Number(user.userType) : 0,
           roleIds: tempRoleIds,
-          status:user.status
+          status: user.status,
         },
         {
           keepIsValid: true,
@@ -103,26 +103,56 @@ export const UserAddForm = () => {
     }
   }, [reset, setValue, user]);
 
-// console.log(userTypeList);
-// const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-//   setStatus((event.target as HTMLInputElement).value);
-// };
+  // console.log(userTypeList);
+  // const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   setStatus((event.target as HTMLInputElement).value);
+  // };
+
+  // console.log(userInfo.merchantName);
+
+  //   const merchantList = useMemo(() => {
+  //     return rawMerchantList?.data?.map(
+  //       (rawPosType: { merchantName: string; merchantId: number }) => {
+  //         return {
+  //           label: rawPosType.merchantName,
+  //           value: rawPosType.merchantId,
+  //         };
+  //       }
+  //     );
+  //   }, [rawMerchantList?.data]);
 
   const merchantList = useMemo(() => {
-    return rawMerchantList?.data?.map(
-      (rawPosType: { merchantName: string; merchantId: number }) => {
-        return {
-          label: rawPosType.merchantName,
-          value: rawPosType.merchantId,
-        };
-      }
-    );
-  }, [rawMerchantList?.data]);
+    if (!user || user.id === undefined || userInfo.merchantId === 0) {
+      return rawMerchantList?.data?.map(
+        (rawPosType: { merchantName: string; merchantId: number }) => {
+          return {
+            label: rawPosType.merchantName,
+            value: rawPosType.merchantId,
+          };
+        }
+      );
+    } else {
+      return rawMerchantList?.data
+        ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
+          return rawPosType.merchantId === userInfo.merchantId;
+        })
+        .map((filteredMerchant) => {
+          return {
+            label: filteredMerchant.merchantName,
+            value: filteredMerchant.merchantId,
+          };
+        });
+    }
+  }, [rawMerchantList?.data, userInfo.merchantId, user]);
 
   const roleList = useMemo(() => {
     return rawRoles?.data
       ?.filter((rawRole) => rawRole.userType === userType)
-      .filter(item => (item.userType === 2 && item.order >= userInfo?.order) || item.userType !== 2)
+      .filter(
+        (item) =>
+          (item.userType === 2 && item.order > userInfo?.order) ||
+          item.userType !== 2
+      )
       .map((rawRole: { name: string; id: number; userType: number }) => {
         return {
           label: rawRole.name,
@@ -148,7 +178,7 @@ export const UserAddForm = () => {
     merchant,
     roleIds,
     userType,
-    status
+    status,
   }: UserAddFormValuesType) => {
     const tempRoleIds: Array<number> = [];
 
@@ -231,6 +261,16 @@ export const UserAddForm = () => {
     }
   };
 
+  const [isDisabled, setIsDisabled] = useState(Number(userType) === 1);
+
+  useEffect(() => {
+    setIsDisabled(Number(userType) === 1);
+    if (isDisabled) {
+      setSelectedMerchant(null);
+      setValue("merchant", 0);
+    }
+  }, [userType, isDisabled]);
+
   const handleBack = () => navigate("/dashboard");
 
   return (
@@ -271,38 +311,38 @@ export const UserAddForm = () => {
               />
               {isDesktop && <Box sx={{ flex: 1 }} />}
             </Stack>
-     
 
-<Box flex={1}>
-  {user?.merchantId? (
-    <Controller
-    name="status"
-    control={control}
-    defaultValue={user?.status || "ACTIVE"}
-    render={({ field: { onChange, value } }) => (
-      <FormControl component="fieldset">
-        <FormLabel component="legend">Kullanıcı Durumu</FormLabel>
-        <RadioGroup
-          aria-label="status"
-          name="status"
-          value={value}
-          onChange={onChange}
-        >
-          <FormControlLabel value="ACTIVE" control={<Radio />} label="Aktif" />
-          <FormControlLabel
-            value="BLOCKED"
-            control={<Radio />}
-            label="Blokeli"
-          />
-        </RadioGroup>
-      </FormControl>
-    )}
-  />
-  ):null}
-
-</Box>
-
-
+            <Box flex={1}>
+              {user?.merchantId ? (
+                <Controller
+                  name="status"
+                  control={control}
+                  defaultValue={user?.status || "ACTIVE"}
+                  render={({ field: { onChange, value } }) => (
+                    <FormControl component="fieldset">
+                      <FormLabel component="legend">Kullanıcı Durumu</FormLabel>
+                      <RadioGroup
+                        aria-label="status"
+                        name="status"
+                        value={value}
+                        onChange={onChange}
+                      >
+                        <FormControlLabel
+                          value="ACTIVE"
+                          control={<Radio />}
+                          label="Aktif"
+                        />
+                        <FormControlLabel
+                          value="BLOCKED"
+                          control={<Radio />}
+                          label="Blokeli"
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                  )}
+                />
+              ) : null}
+            </Box>
           </Stack>
           <Box sx={{ my: 5, borderBottom: "1px solid #E6E9ED" }} />
           <Stack spacing={3}>
@@ -321,19 +361,22 @@ export const UserAddForm = () => {
                           <Autocomplete
                             sx={{ mr: 2 }}
                             onChange={(event, selectedValue) => {
-                              setSelectedMerchant(selectedValue);
-                              setValue("merchant", selectedValue?.value || 0);
-                              field.onChange(selectedValue?.value || 0);
-                              console.log(setSelectedMerchant);
+                              if (!isDisabled) {
+                                setSelectedMerchant(selectedValue);
+                                setValue("merchant", selectedValue?.value || 0);
+                                field.onChange(selectedValue?.value || 0);
+                              }
                             }}
                             id="merchant"
                             options={merchantList}
-                            defaultValue={user?.id ? selectedMerchant : null}
+                            defaultValue={
+                              user?.id && !isDisabled ? selectedMerchant : null
+                            }
                             getOptionLabel={(option: {
                               label: string;
                               value: number;
                             }) => option.label}
-                            disabled={Number(userType) === 1}
+                            disabled={isDisabled}
                             renderInput={(params) => (
                               <TextField
                                 {...params}
@@ -348,39 +391,40 @@ export const UserAddForm = () => {
                   />
                 )}
               </FormControl>
+
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 {userTypeList && (
-     <Controller
-     control={control}
-     name="userType"
-     render={({ field: { onChange, value }, fieldState }) => {
-       const selectedUserType = userTypeList.find(
-         (option) => option.value === value
-       );
+                  <Controller
+                    control={control}
+                    name="userType"
+                    render={({ field: { onChange, value }, fieldState }) => {
+                      const selectedUserType = userTypeList.find(
+                        (option) => option.value === value
+                      );
 
-       return (
-         <Autocomplete
-           id="userType"
-           options={userTypeList}
-           getOptionSelected={(option, value) =>
-             option.value === value
-           }
-           getOptionLabel={(option) => option.label}
-           value={selectedUserType || null}
-           onChange={(_, newValue) => {
-             onChange(newValue ? newValue.value : "");
-           }}
-           renderInput={(params) => (
-             <TextField
-               {...params}
-               error={fieldState.invalid}
-               label="Kullanıcı Tipi"
-             />
-           )}
-         />
-       );
-     }}
-   />
+                      return (
+                        <Autocomplete
+                          id="userType"
+                          options={userTypeList}
+                          getOptionSelected={(option, value) =>
+                            option.value === value
+                          }
+                          getOptionLabel={(option) => option.label}
+                          value={selectedUserType || null}
+                          onChange={(_, newValue) => {
+                            onChange(newValue ? newValue.value : "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              error={fieldState.invalid}
+                              label="Kullanıcı Tipi"
+                            />
+                          )}
+                        />
+                      );
+                    }}
+                  />
                 )}
               </FormControl>
             </Stack>
@@ -398,7 +442,6 @@ export const UserAddForm = () => {
                 ) : null}
               </Box>
             </Stack>
-
           </Stack>
         </Stack>
         <Stack
