@@ -75,7 +75,7 @@ export const MerchantAddForm = () => {
     }
   }, [merchant]);
 
-  console.log(allData)
+
 
   return (
     <Stack flex={1}>

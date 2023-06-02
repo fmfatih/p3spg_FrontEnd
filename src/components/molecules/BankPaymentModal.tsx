@@ -289,7 +289,7 @@ export function BankPaymentModal({ transaction, isOpen, handleClose }) {
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: isDesktop ? 1300 : isSmallScreen ? "90%" : "70%",
-          height: isDesktop ? 800 : isSmallScreen ? "80%" : "60%",
+          height: isDesktop ? 800 : isSmallScreen ? '90%' : '80%',
           bgcolor: "background.paper",
           border: "2px solid #2196f3",
           boxShadow: 24,
@@ -311,7 +311,7 @@ export function BankPaymentModal({ transaction, isOpen, handleClose }) {
                 paginationMode="server"
                 rowCount={tableData.totalItems}
                 // rowCount={tableData?.length}
-                sx={{ width: isDesktop ? 1240 : window.innerWidth - 50 }}
+                sx={{ width: isDesktop ? 1240 : "auto",height:isDesktop? "600px":"auto" }}
                 isRowSelectable={() => false}
                 disableColumnMenu
                 rows={tableData}

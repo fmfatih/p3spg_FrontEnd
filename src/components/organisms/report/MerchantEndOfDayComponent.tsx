@@ -408,21 +408,21 @@ export const MerchantEndOfDayComponent = () => {
                   />
                 )}
               </FormControl>
-              <Stack
+            
+            </Stack>
+
+            <Stack
               direction="row"
-              justifyContent="flex-start"
-              width={isDesktop ? 200 : "auto"}
+              justifyContent="flex-end"
+              width={isDesktop ? 700 : "auto"}
             >
               <Button
                 onClick={handleSubmit(onSubmit)}
                 variant="contained"
                 text={"ARA"}
-                fullWidth
+                
               />
             </Stack>
-            </Stack>
-
-      
           </Stack>
           <Stack flex={1} mt={2}>
             {tableData?.result && (

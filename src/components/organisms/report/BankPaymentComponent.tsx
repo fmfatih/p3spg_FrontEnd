@@ -416,7 +416,7 @@ export const BankPaymentComponent = () => {
                 onClick={handleSubmit(onSubmit)}
                 variant="contained"
                 text={"ARA"}
-                sx={{width:150}}
+         
               />
             </Stack>
           </Stack>
