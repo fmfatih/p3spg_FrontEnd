@@ -169,9 +169,7 @@ console.log(userInfo.merchantId);
         },
         {
           
-          onSuccess: (data) => {
-            console.log(data);
-            
+          onSuccess: (data) => {       
             const bankList = data?.data?.result
             .filter((bank: { merchantId: number }) => {
               return bank.merchantId === Number(userInfo.merchantId);
