@@ -158,20 +158,6 @@ export const BankAddForm = () => {
       }
     );
   }, [rawMemberVPosList?.data]);
-
-
-  // const acquirerBankList = useMemo(() => {
-  //   return rawAcquirerBankList?.data?.map(
-  //     (bank: { bankCode: string; bankName: string }) => {
-  //       return {
-  //         label: `${bank.bankName}`,
-  //         value: bank.bankCode,
-  //       };
-  //     }
-  //   );
-  // }, [rawAcquirerBankList?.data]);
-
-
   
 
   const merchantList = useMemo(() => {

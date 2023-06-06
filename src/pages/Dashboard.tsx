@@ -41,26 +41,27 @@ const isWideScreen = useMediaQuery(theme.breakpoints.up('lg'));
       { period: value },
     );
   };
+  const isLargeScreen = useMediaQuery('(min-width: 1440px)');
 
   return (
     <AdminTemplate
       headerProps={{ headerTitle: "Dashboard", hideAddButton: true }}
     >
      
-   <Stack p={isDesktop ? 3 : 0} mb={isDesktop ? 0 : 2}  maxWidth={isDesktop ? 800 : '100%'}>
-      <DashboardWidget
-        onDateClick={handleTransaction}
-        items={dashboardTransactionList?.data || []}
-        widgetTitle="Satış Tipi"
-      />
-    </Stack>
-    <Stack p={isDesktop ? 3 : 0} maxWidth={isDesktop ? 800 : '100%'}>
-      <DashboardWidget
-        onDateClick={handleBankList}
-        items={dashboardBankList?.data || []}
-        widgetTitle="Banka Satış"
-      />
-    </Stack>
+     <Stack p={isDesktop ? 3 : 0} mb={isDesktop ? 0 : 2} maxWidth={isLargeScreen ? '1000px' : (isDesktop ? '800px' : '100%')}>
+  <DashboardWidget
+    onDateClick={handleTransaction}
+    items={dashboardTransactionList?.data || []}
+    widgetTitle="Satış Tipi"
+  />
+</Stack>
+<Stack p={isDesktop ? 3 : 0} maxWidth={isLargeScreen ? '1000px' : (isDesktop ? '800px' : '100%')}>
+  <DashboardWidget
+    onDateClick={handleBankList}
+    items={dashboardBankList?.data || []}
+    widgetTitle="Banka Satış"
+  />
+</Stack>
     </AdminTemplate>
   );
 };

@@ -374,6 +374,8 @@ export const PaymentAndTransactionFilter = () => {
   
     handleCloseRefundModal();
   };
+console.log(tableData);
+
   
   const columns: GridColDef[] = useMemo(() => {
     return [
@@ -408,8 +410,8 @@ export const PaymentAndTransactionFilter = () => {
       { field: "bankName", headerName: "Banka Adı", width: 300 },
       { field: "currencyDesc", headerName: "Para Birimi", width: 150 },
       { field: "statusDesc", headerName: "İşlem Durumu", width: 200 },
-      { field: "transactionDate", headerName: "İşlem Tarihi", width: 200 },
-      { field: "webUrl", headerName: "WEB URL", width: 200 },
+      { field: "systemDateFormatted", headerName: "İşlem Tarihi", width: 200 },
+      { field: "webUrl", headerName: "WEB Url", width: 200 },
       { field: "installmentCount", headerName: "Taksit Sayısı", width: 200 },
   
       {
@@ -435,7 +437,7 @@ export const PaymentAndTransactionFilter = () => {
         },
       },
       {
-        field: "totalCommission",
+        field: "totalComission",
         headerName: "Komisyon Tutar",
         width: 200,
         valueFormatter: (params: GridValueFormatterParams<number>) => {
@@ -453,11 +455,11 @@ export const PaymentAndTransactionFilter = () => {
       { field: "cardHolderName", headerName: "İşlem Yapılan Kart Bilgisi", width: 200 },
       { field: "failUrl", headerName: "Başarısız İşleme Ait URL", width: 200 },
       { field: "okUrl", headerName: "Başarılı İşleme Ait URL", width: 200 },
-      { field: "bankblocked", headerName: "Banka Blokesi", width: 200 },
+      { field: "bankblocked", headerName: "Banka Blokesi", width: 200,  valueFormatter: (params) => params.value ? "Evet" : "Hayır",},
       { field: "bankblockedday", headerName: "Banka Bloke Günü", width: 200 },
       { field: "bankcommission", headerName: "Banka Komisyonu", width: 200 },
-      { field: "merchantblocked", headerName: "Üyer İşyeri Blokesi", width: 200 },
-      { field: "merchantblockedday", headerName: "Üyer İşyeri Bloke Günü", width: 200 },
+      { field: "merchantblocked", headerName: "Üye İşyeri Blokesi", width: 200,valueFormatter: (params) => params.value ? "Evet" : "Hayır", },
+      { field: "merchantblockedday", headerName: "Üye İşyeri Bloke Günü", width: 200 },
       {
         field: "merchantcommision",
         headerName: "Üye İşyeri Komisyonu",
@@ -520,15 +522,15 @@ export const PaymentAndTransactionFilter = () => {
       { field: "id", headerName: "ID", width: 200 },
       { field: "systemDate", headerName: "Sistem Tarihi", width: 200 },
       { field: "createDate", headerName: "Oluşturma Tarihi", width: 200 },
-      { field: "createUserId", headerName: "Oluşturan Kullanıcı ID", width: 200 },
-      { field: "createUserName", headerName: "Oluşturan Kullanıcı Adı Soyadı", width: 200 },
-      { field: "updateDate", headerName: "Güncelleme Tarihi", width: 200 },
-      { field: "updateUserId", headerName: "Güncelleme Kullanıcı ID", width: 200 },
-      { field: "updateUserName", headerName: "Güncelleyen Kullanıcı Adı Soyadı", width: 200 },
+      // { field: "createUserId", headerName: "Oluşturan Kullanıcı ID", width: 200 },
+      // { field: "createUserName", headerName: "Oluşturan Kullanıcı Adı Soyadı", width: 200 },
+      // { field: "updateDate", headerName: "Güncelleme Tarihi", width: 200 },
+      // { field: "updateUserId", headerName: "Güncelleme Kullanıcı ID", width: 200 },
+      // { field: "updateUserName", headerName: "Güncelleyen Kullanıcı Adı Soyadı", width: 200 },
 
-      { field: "deleteDate", headerName: "Silme Tarihi", width: 200 },
-      { field: "deleteUserId", headerName: "Silinen Kullanıcı ID", width: 200 },
-      { field: "deleteUserName", headerName: "Silinen Kullanıcı Adı Soyadı", width: 200 },
+      // { field: "deleteDate", headerName: "Silme Tarihi", width: 200 },
+      // { field: "deleteUserId", headerName: "Silinen Kullanıcı ID", width: 200 },
+      // { field: "deleteUserName", headerName: "Silinen Kullanıcı Adı Soyadı", width: 200 },
 
   
     
