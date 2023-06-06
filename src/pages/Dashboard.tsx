@@ -5,11 +5,13 @@ import {
 import { Stack } from "@mui/system";
 import { AdminTemplate, DashboardWidget } from "../components";
 import { useEffect } from "react";
-import { useMediaQuery, useTheme } from "@mui/material";
+import { Container,useMediaQuery, useTheme } from "@mui/material";
 
 export const Dashboard = () => {
   const theme = useTheme();
+
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+const isWideScreen = useMediaQuery(theme.breakpoints.up('lg'));
   const { data: dashboardTransactionList, mutate: getDashboardTransactionList } =
     useGetDashboardTransactionList();
   const { data: dashboardBankList, mutate: getDashboardBankList } = useGetDashboardBankList();
@@ -44,20 +46,21 @@ export const Dashboard = () => {
     <AdminTemplate
       headerProps={{ headerTitle: "Dashboard", hideAddButton: true }}
     >
-      <Stack p={isDesktop ? 3 : 0} mb={isDesktop ? 0 : 2}>
-        <DashboardWidget
-          onDateClick={handleTransaction}
-          items={dashboardTransactionList?.data || []}
-          widgetTitle="Satış Tipi"
-        />
-      </Stack>
-      <Stack p={isDesktop ? 3 : 0}>
-        <DashboardWidget
-          onDateClick={handleBankList}
-          items={dashboardBankList?.data || []}
-          widgetTitle="Banka Satış"
-        />
-      </Stack>
+     
+   <Stack p={isDesktop ? 3 : 0} mb={isDesktop ? 0 : 2}  maxWidth={isDesktop ? 800 : '100%'}>
+      <DashboardWidget
+        onDateClick={handleTransaction}
+        items={dashboardTransactionList?.data || []}
+        widgetTitle="Satış Tipi"
+      />
+    </Stack>
+    <Stack p={isDesktop ? 3 : 0} maxWidth={isDesktop ? 800 : '100%'}>
+      <DashboardWidget
+        onDateClick={handleBankList}
+        items={dashboardBankList?.data || []}
+        widgetTitle="Banka Satış"
+      />
+    </Stack>
     </AdminTemplate>
   );
 };

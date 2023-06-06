@@ -2,7 +2,7 @@ import * as zod from "zod";
 
 export const addBankFormSchema = zod
   .object({
-    mail: zod.string(),
+    mail: zod.any(),
     fullName: zod.string(),
     phoneNumber: zod.preprocess(
       (val) =>

@@ -332,8 +332,8 @@ export const CampaignListTable = () => {
           <Stack spacing={4}>
             <Stack
               spacing={3}
-              direction="row"
-              width={isDesktop ? 1308 : "auto"}
+              direction={isDesktop?"row":"column"}
+              width={isDesktop ? 800 : "auto"}
             >
               <FormControl sx={{ flex: 1 }}>
                 <DatePickerControl
@@ -356,8 +356,8 @@ export const CampaignListTable = () => {
             </Stack>
             <Stack
               spacing={3}
-              direction="row"
-              width={isDesktop ? 1308 : "auto"}
+              direction={isDesktop?"row":"column"}
+              width={isDesktop ? 800 : "auto"}
             >
        <FormControl sx={{ flex: 1 }}>
   {acquirerBankList && (
@@ -462,7 +462,7 @@ export const CampaignListTable = () => {
             <Stack
               direction="row"
               justifyContent="flex-end"
-              width={isDesktop ? 1308 : "auto"}
+              width={isDesktop ? 800 : "auto"}
             >
               <Button
                 onClick={handleSubmit(onSubmit)}

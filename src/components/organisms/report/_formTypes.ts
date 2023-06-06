@@ -47,7 +47,7 @@ export const paymentAndTransactionInitialValues: PaymentAndTransactionValuesType
       merchantId:0,
  
       // endOfDate: null,
-      paymentFlag:null
+      paymentFlag:true
       // endDate: null,
       // transactionType: "",
       // orderId: "",

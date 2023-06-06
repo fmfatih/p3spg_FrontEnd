@@ -11,6 +11,7 @@ import {
   useMerchantVPosAddWithSettings,
   useGetAcquirerBankList,
   useAuthorization,
+  useGetMemberVPosList
 } from "../../../hooks";
 import {
   Box,
@@ -68,6 +69,9 @@ export const BankAddForm = () => {
     control,
     name: "parameters",
   });
+  const { mutate: getMemberVPosList, data: rawMemberVPosList } =
+  useGetMemberVPosList();
+
 
   const [, setSelectedMerchant] = useState({} as any);
   const handleBack = () => navigate("/dashboard");
@@ -147,16 +151,45 @@ export const BankAddForm = () => {
   ]);
 
 
-  const acquirerBankList = useMemo(() => {
-    return rawAcquirerBankList?.data?.map(
-      (bank: { bankCode: string; bankName: string }) => {
+  
+  useEffect(() => {
+    getMemberVPosList({
+      orderBy: "CreateDate",
+      orderByDesc: true,
+      status: "ACTIVE",
+    });
+  }, [getMemberVPosList]);
+
+
+
+
+
+
+  const memberVPosList = useMemo(() => {
+    return rawMemberVPosList?.data?.map(
+      (memberVPos: { bankName: string; bankCode:string}) => {
         return {
-          label: `${bank.bankName}`,
-          value: bank.bankCode,
+          label: `${memberVPos.bankName}`,
+          value: memberVPos.bankCode,
         };
       }
     );
-  }, [rawAcquirerBankList?.data]);
+  }, [rawMemberVPosList?.data]);
+
+
+  // const acquirerBankList = useMemo(() => {
+  //   return rawAcquirerBankList?.data?.map(
+  //     (bank: { bankCode: string; bankName: string }) => {
+  //       return {
+  //         label: `${bank.bankName}`,
+  //         value: bank.bankCode,
+  //       };
+  //     }
+  //   );
+  // }, [rawAcquirerBankList?.data]);
+
+
+  
 
   const merchantList = useMemo(() => {
     return rawMerchantList?.data?.map(
@@ -376,20 +409,20 @@ export const BankAddForm = () => {
           <Stack mb={3} spacing={3}>
             <Stack width={isDesktop ? 800 : "auto"} direction="row">
             <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-  {acquirerBankList && (
+  {memberVPosList && (
     <Controller
       name="bankCode"
       control={control}
       defaultValue=""
       render={({ field: { onChange, value } }) => {
-        const selectedBank = acquirerBankList.find(
+        const selectedBank = memberVPosList.find(
           (option) => option.value === value
         );
 
         return (
           <Autocomplete
             id="bankCode"
-            options={acquirerBankList}
+            options={memberVPosList}
             getOptionSelected={(option, value) => option.value === value}
             getOptionLabel={(option) => option.label}
             value={selectedBank || null}

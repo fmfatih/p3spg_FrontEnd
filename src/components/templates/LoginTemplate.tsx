@@ -22,6 +22,10 @@ import { useSetSnackBar } from "../../store/Snackbar.state";
 export const LoginTemplate = () => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
+const isMediumScreen = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const { mutate: login, isLoading } = useLogin();
   const setSnackbar = useSetSnackBar();
   const [, setUserInfo] = useUserInfo();
@@ -85,11 +89,13 @@ export const LoginTemplate = () => {
       >
         <Stack>
           <img
-            style={{
-              height: isDesktop ? "100vh" : "340px",
-              overflow: isDesktop ? "auto" : "hidden",
-              width: '650px'
-            }}
+     style={{
+      height: isDesktop ? "100vh" : "400px",
+      width: isDesktop ? '650px' : '100%',
+      objectFit: isMediumScreen ? "cover" : "fill",
+      objectPosition: "center",  
+      overflow: isDesktop ? "auto" : "hidden",
+  }}
             src={LoginBG}
             alt="login background"
           />
@@ -103,7 +109,7 @@ export const LoginTemplate = () => {
           <Stack
             spacing={3}
             borderRadius={4}
-            backgroundColor={isDesktop ? undefined : "#FFF"}
+            backgroundColor={isDesktop ? "#FFF" : "#FFF"}
             p={isDesktop ? 6 : 4}
             border="1px solid gray"
             width={isDesktop ? "456px" : "90%"}

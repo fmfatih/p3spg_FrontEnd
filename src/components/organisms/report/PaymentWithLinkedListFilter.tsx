@@ -41,7 +41,7 @@ import { useSetSnackBar } from "../../../store/Snackbar.state";
 export const PaymentWithLinkedListFilter = () => {
   const { showDelete, showUpdate } = useAuthorization();
   const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const isDesktop = useMediaQuery(theme.breakpoints.up("lg"));
   const { data: rawMerchantList } = useGetAllMerchantList();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
@@ -286,10 +286,10 @@ export const PaymentWithLinkedListFilter = () => {
           <Stack spacing={4}>
             <Stack
               spacing={3}
-              direction="row"
+              direction={isDesktop?"row":"column"}
               width={isDesktop ? 1308 : "auto"}
             >
-              <FormControl sx={{ width: "50%" }}>
+              <FormControl sx={{ flex: isDesktop ? 1 : "auto" }}>
                 {merchantList && (
                   <Controller
                     control={control}
@@ -319,7 +319,7 @@ export const PaymentWithLinkedListFilter = () => {
                   />
                 )}
               </FormControl>
-              <FormControl sx={{ flex: 1 }}>
+              <FormControl sx={{ flex: isDesktop ? 1 : "auto" }}>
                 {paymentstatusList ? (
                   <Controller
                     name="status"

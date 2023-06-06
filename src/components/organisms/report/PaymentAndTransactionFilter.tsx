@@ -656,7 +656,8 @@ export const PaymentAndTransactionFilter = () => {
             <Stack
               spacing={3}
               direction={isDesktop ? "row" : "column"}
-              width={isDesktop ? 1308 : "auto"}
+              width={isDesktop ? "100%" : "auto"}
+              maxWidth={1308}
             >
               <FormControl sx={{ flex: isDesktop ? 1 : "auto" }}>
                 <DateTimePickerControl
@@ -720,7 +721,8 @@ export const PaymentAndTransactionFilter = () => {
             <Stack
               spacing={3}
               direction={isDesktop ? "row" : "column"}
-              width={isDesktop ? 1308 : "auto"}
+              width={isDesktop ? "100%" : "auto"}
+                maxWidth={1308}
             >
               <FormControl sx={{ flex: 1 }}>
                 <InputControl
@@ -806,7 +808,8 @@ export const PaymentAndTransactionFilter = () => {
             <Stack
               direction="row"
               justifyContent="flex-end"
-              width={isDesktop ? 1308 : "auto"}
+              width={isDesktop ? "100%" : "auto"}
+              maxWidth={1308}
             >
               <Button
                 onClick={handleSubmit(onSubmit)}
