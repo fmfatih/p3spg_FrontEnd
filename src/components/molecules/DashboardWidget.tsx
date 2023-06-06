@@ -135,9 +135,9 @@ export const DashboardWidget = ({
         </Stack>
         <Stack
           flexWrap="wrap"
-          width={isDesktop ? 880 : "auto"}
+          width={isDesktop ? "100%" : "auto"}
           mt={3}
-          direction={isDesktopH ? "row" : "column"}
+          direction={ "row" }
         >
           {items.map((item, index) => (
             <Stack m={1}>
