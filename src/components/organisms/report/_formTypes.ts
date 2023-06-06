@@ -90,7 +90,7 @@ export const paymentAndTransactionInitialValues: PaymentAndTransactionValuesType
 
 export const paymentWithLinkedFormSchema = zod
   .object({
-    bankCode: zod.string().min(1),
+    bankCode: zod.string().optional(),
     orderId: zod.string(),
     merchantId: zod.number(),
     amount: zod.string().min(1, { message: "Please enter your phone number" }),

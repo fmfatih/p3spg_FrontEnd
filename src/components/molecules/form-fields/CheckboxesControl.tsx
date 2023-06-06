@@ -56,7 +56,7 @@ export function CheckboxesControl<TFormFields>(
               {title}
             </Typography>
             <FormGroup sx={sx} row={row}>
-              {items.map((item) => (
+              {items?.map((item) => (
                 <FormControlLabel
                   key={item.value}
                   value={item.value}

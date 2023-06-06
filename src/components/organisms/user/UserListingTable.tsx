@@ -259,7 +259,7 @@ export const UserListingTable = () => {
     <>
       {hasLoading && <Loading />}
       <Stack flex={1} p={2}>
-        {tableData?.result?.length && (
+        {tableData && tableData.result && tableData.result.length > 0 && (
           <>
             <Table
               paginationModel={paginationModel}

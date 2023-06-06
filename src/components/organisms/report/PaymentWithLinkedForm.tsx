@@ -57,7 +57,7 @@ export const PaymentWithLinkedForm = () => {
   const { data:rawMerchantVposList} = useGetMerchantVPosList();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
-    pageSize: 25,
+    pageSize: -1,
   });
   const { control, handleSubmit, setValue } =
     useForm<PaymentWithLinkedValuesType>({
@@ -73,10 +73,10 @@ export const PaymentWithLinkedForm = () => {
     useEffect(() => {
       getMerchantVPosList(
         {
-          // size: paginationModel.pageSize,
-          // page: paginationModel.page,
-          // orderBy: "CreateDate",
-          // orderByDesc: true,
+          size: paginationModel.pageSize,
+          page: paginationModel.page,
+          orderBy: "CreateDate",
+          orderByDesc: true,
           status: "ACTIVE",
         },
         {
@@ -470,6 +470,7 @@ export const PaymentWithLinkedForm = () => {
                     onClick={() => {
                       navigator.clipboard.writeText(currentUrl || "");
                     }}
+                    style={{ color: '#0C9FDC' }} 
                     edge="end"
                   >
                     <ContentCopyIcon />
