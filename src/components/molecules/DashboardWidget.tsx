@@ -82,6 +82,7 @@ export const DashboardWidget = ({
         bankCode: item.bankCode,
       });
   };
+  const isDesktopH = window.innerWidth >= 1500;
   const isMediumScreen = useMediaQuery('(min-width: 900px) and (max-width: 1024px)');
   return (
     <>
@@ -136,7 +137,7 @@ export const DashboardWidget = ({
           flexWrap="wrap"
           width={isDesktop ? 880 : "auto"}
           mt={3}
-          direction={isMediumScreen ? "column" : "row"}
+          direction={isDesktopH ? "row" : "column"}
         >
           {items.map((item, index) => (
             <Stack m={1}>

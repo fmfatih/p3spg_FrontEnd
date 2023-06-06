@@ -576,7 +576,7 @@ console.log(userInfo.merchantId);
       { field: "cardType", headerName: "Kart Tipi", width: 200 },
       { field: "cardTypeDesc", headerName: "Kart Tipi Açıklama", width: 200 },
       { field: "authCode", headerName: "Otorizasyon Kodu", width: 200 },
-      { field: "endOfDayFlag", headerName: "Gün Sonu", width: 200 },
+      { field: "endOfDayFlag", headerName: "Gün Sonu", width: 200 , valueFormatter: (params) => params.value ? "Evet" : "Hayır", },
       { field: "endOfDayId", headerName: "Gün Sonu ID", width: 200 },
       { field: "endOfDayDate", headerName: "Gün Sonu Tarihi", width: 200 },
       { field: "cardBankCode", headerName: "Kartın Banka Kodu", width: 200 },

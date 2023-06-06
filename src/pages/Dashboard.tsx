@@ -5,7 +5,7 @@ import {
 import { Stack } from "@mui/system";
 import { AdminTemplate, DashboardWidget } from "../components";
 import { useEffect } from "react";
-import { Container,useMediaQuery, useTheme } from "@mui/material";
+import { Container,Grid,useMediaQuery, useTheme } from "@mui/material";
 
 export const Dashboard = () => {
   const theme = useTheme();
@@ -48,14 +48,19 @@ const isWideScreen = useMediaQuery(theme.breakpoints.up('lg'));
       headerProps={{ headerTitle: "Dashboard", hideAddButton: true }}
     >
      
-     <Stack p={isDesktop ? 3 : 0} mb={isDesktop ? 0 : 2} maxWidth={isLargeScreen ? '1000px' : (isDesktop ? '800px' : '100%')}>
+
+
+
+
+
+     <Stack p={isDesktop ? 3 : 0} mb={isDesktop ? 0 : 2} maxWidth={isLargeScreen ? '1200px' : (isDesktop ? '600px' : '100%')}>
   <DashboardWidget
     onDateClick={handleTransaction}
     items={dashboardTransactionList?.data || []}
     widgetTitle="Satış Tipi"
   />
 </Stack>
-<Stack p={isDesktop ? 3 : 0} maxWidth={isLargeScreen ? '1000px' : (isDesktop ? '800px' : '100%')}>
+<Stack p={isDesktop ? 3 : 0} maxWidth={isLargeScreen ? '1200px' : (isDesktop ? '600px' : '100%')}>
   <DashboardWidget
     onDateClick={handleBankList}
     items={dashboardBankList?.data || []}
