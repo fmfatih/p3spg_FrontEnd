@@ -35,6 +35,7 @@ export type IMerchantVPos = {
   deleteUserId: number;
   // memberVposSettings?: Array<any>;
   merchantVposSettings?: Array<any>;
+  
 };
 
 export type IGetMerchantVPosListResponse = BasePagingResponse<Array<IMerchantVPos>>;

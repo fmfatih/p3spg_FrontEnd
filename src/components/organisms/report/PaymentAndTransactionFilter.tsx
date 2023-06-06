@@ -19,6 +19,8 @@ import {
   BasePagingResponse,
   PagingResponse,
   useAuthorization,
+  useGetMerchantVPosList,
+  useGetMemberVPosList,
 } from "../../../hooks";
 import {
   GridColDef,
@@ -51,11 +53,13 @@ import {
 } from "../../molecules";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
 import { downloadExcel } from "../../../util/downloadExcel";
+import { useUserInfo } from "../../../store/User.state";
 
 export const PaymentAndTransactionFilter = () => {
   const theme = useTheme();
   const { showDelete, showUpdate } = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const [userInfo] = useUserInfo();
   const { control, handleSubmit, setValue, getValues } =
     useForm<PaymentAndTransactionValuesType>({
       resolver: zodResolver(paymentAndTransactionFormSchema),
@@ -64,7 +68,7 @@ export const PaymentAndTransactionFilter = () => {
   const [tableData, setTableData] = useState<PagingResponse<Array<any>>>();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
-    pageSize: 25,
+    pageSize: -1,
   });
   const [tableselectedRow, setTableSelectedRow] = useState({} as any);
   const {
@@ -84,6 +88,9 @@ export const PaymentAndTransactionFilter = () => {
     {}
   );
   const { data: rawAcquirerBankList } = useGetAcquirerBankList();
+  const { mutate: getMemberVPosList, data: rawMemberVPosList } =
+  useGetMemberVPosList();
+  const { mutate: getMerchantVPosList, isLoading } = useGetMerchantVPosList();
   const setSnackbar = useSetSnackBar();
 
   useEffect(() => {
@@ -93,7 +100,8 @@ export const PaymentAndTransactionFilter = () => {
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
-
+  const [merchantBankList, setMerchantBankList] = useState([]);
+  const [bankList, setBankList] = useState([]);
   const transactionStatusList = useMemo(() => {
     return rawTransactionStatusList?.data?.map(
       (resourceType: { value: string; key: string }) => {
@@ -104,9 +112,12 @@ export const PaymentAndTransactionFilter = () => {
       }
     );
   }, [rawTransactionStatusList?.data]);
+console.log(userInfo.merchantId);
+
+  
 
   const payment3DTrxSettingsList = useMemo(() => {
-    return rawPayment3DTrxSettingsList?.data?.map(
+    return rawPayment3DTrxSettingsList?.data?.filter((resourceType) => resourceType.status === "ACTIVE").map(
       (resourceType: { value: string; key: string }) => {
         return {
           label: resourceType.value,
@@ -115,6 +126,7 @@ export const PaymentAndTransactionFilter = () => {
       }
     );
   }, [rawPayment3DTrxSettingsList?.data]);
+
 
   const acquirerBankList = useMemo(() => {
     return rawAcquirerBankList?.data?.map(
@@ -126,6 +138,64 @@ export const PaymentAndTransactionFilter = () => {
       }
     );
   }, [rawAcquirerBankList?.data]);
+
+
+  useEffect(() => {
+    if (userInfo.merchantId === 0) {
+      getMemberVPosList({
+        orderBy: "CreateDate",
+        orderByDesc: true,
+        status: "ACTIVE",
+      })
+      .then(data => {
+        const bankList = data?.data?.result?.map(
+          (bank: { bankCode: string; bankName: string }) => {
+            return {
+              label: `${bank.bankName}`,
+              value: bank.bankCode,
+            };
+          }
+        );
+        setBankList(bankList);
+      });
+    } else {
+      getMerchantVPosList(
+        {
+          size: paginationModel.pageSize,
+          page: paginationModel.page,
+          orderBy: "CreateDate",
+          orderByDesc: true,
+          status: "ACTIVE",
+        },
+        {
+          
+          onSuccess: (data) => {
+            console.log(data);
+            
+            const bankList = data?.data?.result
+            .filter((bank: { merchantId: number }) => {
+              return bank.merchantId === Number(userInfo.merchantId);
+            })
+              .map(
+                (bank: { bankCode: string; bankName: string, merchantId: number }) => {
+                  return {
+                    label: `${bank.bankName}`,
+                    value: bank.bankCode,
+                  };
+                }
+              );
+           
+            setBankList(bankList);
+  
+          },
+        }
+      );
+    }
+  }, [getMerchantVPosList, getMemberVPosList, userInfo.merchantId]);
+  
+
+
+  
 
   const onSubmit = (data: PaymentAndTransactionValuesType) => {
     setTableData(undefined);
@@ -374,7 +444,7 @@ export const PaymentAndTransactionFilter = () => {
   
     handleCloseRefundModal();
   };
-console.log(tableData);
+
 
   
   const columns: GridColDef[] = useMemo(() => {
@@ -775,20 +845,20 @@ console.log(tableData);
               </FormControl>
 
               <FormControl sx={{ flex: 1 }}>
-                {acquirerBankList && (
+                {bankList && (
                   <Controller
                     name="bankCode"
                     control={control}
                     defaultValue=""
                     render={({ field: { onChange, value } }) => {
-                      const selectedBank = acquirerBankList.find(
+                      const selectedBank = bankList.find(
                         (option) => option.value === value
                       );
 
                       return (
                         <Autocomplete
                           id="bankCode"
-                          options={acquirerBankList}
+                          options={bankList}
                           getOptionSelected={(option, value) =>
                             option.value === value
                           }
