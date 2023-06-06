@@ -88,20 +88,9 @@ export const BankAddForm = () => {
         bankCode: `${memberVPos.bankCode}`,
       });
     }
-  }, [reset, memberVPos, setValue,]);
+  }, [reset, memberVPos, setValue]);
 
-  // useEffect(() => {
-  //   if (!!merchantVPos && JSON.stringify(merchantVPos) !== "{}") {
-  //     reset({
-  //       fullName: merchantVPos?.fullName,
-  //       mail: merchantVPos?.mail,
-  //       phoneNumber: merchantVPos.phoneNumber,
-  //       officePhone: merchantVPos.officePhone,
-  //       description: merchantVPos.description,
-  //       bankCode: `${merchantVPos.bankCode}`,
-  //     });
-  //   }
-  // }, [reset, merchantVPos, setValue]);
+
 
   useEffect(() => {
     let req = {};
@@ -118,14 +107,12 @@ export const BankAddForm = () => {
 
     if (!!bankCode) {
       getDefaultVposSettingsList(req, {
-        onSuccess: (data: {
-          data: Array<{ key: string; type: string; label: string }>;
-        }) => {
+        onSuccess: (data: { data: Array<{ key: string; type: string }> }) => {
           remove();
           data?.data?.map((item) => {
             const tempOBJ: any = {
               key: item.key,
-              label: item?.label,
+              label: item.key,
               type: "string",
             };
             if (!!memberVPos) {
@@ -159,10 +146,6 @@ export const BankAddForm = () => {
       status: "ACTIVE",
     });
   }, [getMemberVPosList]);
-
-
-
-
 
 
   const memberVPosList = useMemo(() => {
@@ -211,81 +194,41 @@ export const BankAddForm = () => {
       };
     });
 
-    if (memberVPos?.memberId && memberVPos?.memberName) {
-      memberVPosAddWithSettings(
-        {
-          ...data,
-          parameters,
-          phoneNumber: data.phoneNumber ? `05${data.phoneNumber}` : "",
-          officePhone: data.officePhone ? `05${data.officePhone}` : "",
-          defaultBank: false,
-          memberId: 1,
-          merchantID: selectedMerchantId || 0,
-        },
-        {
-          onSuccess: (data) => {
-            if (data.isSuccess) {
-              setSnackbar({
-                severity: "success",
-                isOpen: true,
-                description: data.message,
-              });
-            } else {
-              setSnackbar({
-                severity: "error",
-                description: data.message,
-                isOpen: true,
-              });
-            }
-          },
-          onError: () => {
+    memberVPosAddWithSettings(
+      {
+        ...data,
+        parameters,
+        phoneNumber: data.phoneNumber ? `05${data.phoneNumber}` : "",
+        officePhone: data.officePhone ? `05${data.officePhone}` : "",
+        defaultBank: false,
+        memberId: 1,
+        merchantID: selectedMerchantId || 0,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            setSnackbar({
+              severity: "success",
+              isOpen: true,
+              description: data.message,
+            });
+          } else {
             setSnackbar({
               severity: "error",
-              description: "İşlem sırasında bir hata oluştu",
+              description: data.message,
               isOpen: true,
             });
-          },
-        }
-      );
-    }
-
-    if (merchantVPos?.merchantId && merchantVPos?.merchantName) {
-      merchantVPosAddWithSettings(
-        {
-          ...data,
-          parameters,
-          phoneNumber: data.phoneNumber ? `05${data.phoneNumber}` : "",
-          officePhone: data.officePhone ? `05${data.officePhone}` : "",
-          defaultBank: false,
-          memberId: 1,
-          merchantID: selectedMerchantId || 0,
+          }
         },
-        {
-          onSuccess: (data) => {
-            if (data.isSuccess) {
-              setSnackbar({
-                severity: "success",
-                isOpen: true,
-                description: data.message,
-              });
-            } else {
-              setSnackbar({
-                severity: "error",
-                description: data.message,
-                isOpen: true,
-              });
-            }
-          },
-          onError: () => {
-            setSnackbar({
-              severity: "error",
-              description: "İşlem sırasında bir hata oluştu",
-              isOpen: true,
-            });
-          },
-        }
-      );
-    }
+        onError: () => {
+          setSnackbar({
+            severity: "error",
+            description: "İşlem sırasında bir hata oluştu",
+            isOpen: true,
+          });
+        },
+      }
+    );
   };
 
 

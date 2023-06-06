@@ -27,7 +27,7 @@ export const addBankFormSchema = zod
       zod.string()
     ),
     description: zod.string().optional(),
-    webAddress: zod.string().optional(),
+    // webAddress: zod.string().optional(),
     bankCode: zod.string(),
     parameters: zod.any().array(),
     merchantID: zod.any(),
