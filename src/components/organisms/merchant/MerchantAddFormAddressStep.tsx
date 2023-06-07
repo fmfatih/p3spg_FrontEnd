@@ -101,7 +101,17 @@ export const MerchantAddFormAddressStep = ({
         value: `${city.id}`,
       };
     });
+
   }, [rawCityList?.data]);
+  useEffect(() => {
+    if(cityList) {
+      const foundCity = cityList?.find((city: { label: string; value: string }) => city.value === merchant.cityCode?.toString());
+      if (foundCity) {
+        setSelectedCity(foundCity);
+      }
+    }
+  }, [cityList, setSelectedCity, merchant.cityCode]);
+  
 
   const onSubmit = ({
     zipCode,
@@ -125,7 +135,7 @@ export const MerchantAddFormAddressStep = ({
         mobilePhoneNumber.length === 10 ? mobilePhoneNumber : "",
       faxNumber: faxNumber.length === 10 ? faxNumber : "",
       addressLine2: addressLine2 || "",
-      cityId: cityId ? Number(selectedCity?.value) : 0,
+      cityId: selectedCity ? Number(selectedCity.value) : 0,
       districtId: Number(districtId),
       zipCode,
       emailAddress1: emailAddress1?.length > 0 ? emailAddress1 : "",
@@ -202,7 +212,7 @@ export const MerchantAddFormAddressStep = ({
       setValue("districtId", selectedDistrict?.toString());
       reset({
         addressLine1: merchant?.addressLine1,
-        cityId: foundCity?.id,
+        cityId: foundCity?.id || selectedCity,
         mobilePhoneNumber: merchant?.mobilePhoneNumber,
         zipCode: merchant?.zipCode,
         emailAddress1: merchant?.emailAddress1,
@@ -239,36 +249,35 @@ export const MerchantAddFormAddressStep = ({
           <Stack width={isDesktop ? 800 : "auto"} spacing={3} direction="row">
             <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
               {cityList && (
-                <Controller
-                  control={control}
-                  name="cityId"
-                  render={({
-                    field: { onChange, value },
-                    fieldState: { error },
-                  }) => {
-                    return (
-                      <>
-                        <Autocomplete
-                          sx={{ mr: isDesktop ? 3 : 0 }}
-                          id="cityId"
-                          options={cityList}
-                          value={selectedCity || null}
-                          onChange={(event, selectedValue) => {
-                            setSelectedCity(selectedValue);
-                            onChange(selectedValue);
-                          }}
-                          getOptionLabel={(option: {
-                            label: string;
-                            value: number;
-                          }) => option.label}
-                          renderInput={(params) => (
-                            <TextField {...params} label="İl" />
-                          )}
-                        />
-                      </>
-                    );
-                  }}
-                />
+           <Controller
+           control={control}
+           name="cityId"
+           render={({
+             field: { onChange, value },
+             fieldState: { error },
+           }) => {
+             return (
+               <Autocomplete
+                 sx={{ mr: isDesktop ? 3 : 0 }}
+                 id="cityId"
+                 options={cityList}
+                 value={selectedCity || null}
+                 onChange={(event, selectedValue) => {
+                   setSelectedCity(selectedValue);
+                   onChange(selectedValue ? selectedValue.value : "");
+                 }}
+                 getOptionLabel={(option: {
+                   label: string;
+                   value: number;
+                 }) => option.label}
+                 renderInput={(params) => (
+                   <TextField {...params} label="İl" />
+                 )}
+               />
+             );
+           }}
+         />
+         
               )}
             </FormControl>
             <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>

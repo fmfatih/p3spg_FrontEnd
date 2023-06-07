@@ -71,6 +71,8 @@ export const MerchantAddFormBankStep = ({
       }
     );
   }, [rawCurrencyCodeList?.data]);
+  console.log(currencyCodeList);
+  
 
   const bankList = useMemo(() => {
     return rawBankList?.data?.map((bank: { name: string; code: string }) => {
@@ -103,6 +105,7 @@ export const MerchantAddFormBankStep = ({
             onNext();
             if (data.isSuccess) {
               //navigate("/merchant-management/merchant-listing");
+          
               setSnackbar({
                 severity: "success",
                 isOpen: true,
@@ -157,14 +160,29 @@ export const MerchantAddFormBankStep = ({
 
   useEffect(() => {
     if (!!merchant && JSON.stringify(merchant) !== "{}") {
+      console.log('Merchant:', merchant);  // Bu satırı ekleyin
       reset({
-        currencyCode: merchant?.currencyCode || "949",
+        currencyCode: merchant?.currencyCode?.toString(),
         iban: merchant?.iban || "",
         bankCode: merchant?.bankCode,
         accountOwner: merchant?.accountOwner || "",
       });
+    
     }
+
   }, [merchant, reset]);
+  useEffect(() => {
+    if (merchant) {
+      console.log('Merchant:', merchant);
+      console.log('CurrencyCode:', merchant.currencyCode);
+ 
+    }
+  }, [merchant]);
+  
+
+  useEffect(() => {
+    console.log('currencyCodeList:', currencyCodeList);
+  }, [currencyCodeList]);
 
   return (
     <>
@@ -178,34 +196,36 @@ export const MerchantAddFormBankStep = ({
           >
             <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
               {currencyCodeList && (
-                <Controller
-                  name="currencyCode"
-                  control={control}
-                  defaultValue=""
-                  render={({ field: { onChange, value } }) => {
-                    const selectedCurrency = currencyCodeList.find(
-                      (option) => option.value === value
-                    );
-
-                    return (
-                      <Autocomplete
-                        id="currencyCode"
-                        options={currencyCodeList}
-                        getOptionSelected={(option, value) =>
-                          option.value === value
-                        }
-                        getOptionLabel={(option) => option.label}
-                        value={selectedCurrency || null}
-                        onChange={(_, newValue) => {
-                          onChange(newValue ? newValue.value : "");
-                        }}
-                        renderInput={(params) => (
-                          <TextField {...params} label="Para Birimi" />
-                        )}
-                      />
-                    );
-                  }}
-                />
+              <Controller
+              name="currencyCode"
+              control={control}
+              defaultValue=""
+              render={({ field: { onChange, value } }) => {
+                const selectedCurrency = currencyCodeList?.find(
+                  (option) => option.value === value
+                );
+            
+                return (
+                  <Autocomplete
+                    id="currencyCode"
+                    options={currencyCodeList}
+                    defaultValue={currencyCodeList?.find(option => option.value === merchant?.currencyCode)}
+                    getOptionSelected={(option, value) =>
+                      option.value === value
+                    }
+                    getOptionLabel={(option) => option.label}
+                    value={selectedCurrency || null}
+                    onChange={(_, newValue) => {
+                      onChange(newValue ? newValue.value : "");
+                    }}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Para Birimi" />
+                    )}
+                  />
+                );
+              }}
+            />
+            
               )}
             </FormControl>
 

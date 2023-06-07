@@ -397,7 +397,7 @@ const mcc=watch("mcc")
   useEffect(() => {
     if (merchant && merchant.taxOfficeCode) {
       const cityCode = merchant.taxOfficeCode.substring(0, 2);
-      const cityRelatedToTaxOfficeCode = cityList.find(city => city.value === cityCode);
+      const cityRelatedToTaxOfficeCode = cityList?.find(city => city.value === cityCode);
       
       setSelectedCity(cityRelatedToTaxOfficeCode);
     }

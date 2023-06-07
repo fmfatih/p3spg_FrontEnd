@@ -16,7 +16,7 @@ async function merchantRestrictionUpdate(
 ): Promise<any> {
   try {
     return (
-      await axiosInstance.put("/MerchantBank/Update", { ...data })
+      await axiosInstance.put("/MerchantRestriction/Update", { ...data })
     ).data;
   } catch (ex) {
     throw ((ex as AxiosError).response?.data as any).error;
