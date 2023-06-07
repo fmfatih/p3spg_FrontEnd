@@ -253,7 +253,6 @@ export const MerchantAddFormCompanyStep = ({
     };
 
     if ((merchant && merchant?.id > 0) || (allData && allData?.merchantType)) {
-      console.log(merchant, allData)
       updateMerchant(
         {
           ...request,
@@ -264,9 +263,13 @@ export const MerchantAddFormCompanyStep = ({
           onSuccess(data) {
             const merchantId = data.data.merchantId;
             setMerchantId(merchantId);
-            setAllData({ ...allData, ...request, merchantId: merchantId});
+            setAllData({   ...request,...allData, merchantId: merchantId});
+            console.log(allData);
+            console.log(request);
+            
             if (data.isSuccess) {
               onNext();
+              
               setSnackbar({
                 severity: "success",
                 isOpen: true,
@@ -325,10 +328,7 @@ export const MerchantAddFormCompanyStep = ({
 
   const city=watch("city")
 const mcc=watch("mcc")
-  console.log(city);
-  console.log(mcc);
-  
-  console.log(cityList);
+
   
 
   useEffect(() => {

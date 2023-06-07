@@ -105,7 +105,7 @@ export const MerchantAddFormBankStep = ({
             onNext();
             if (data.isSuccess) {
               //navigate("/merchant-management/merchant-listing");
-          
+              
               setSnackbar({
                 severity: "success",
                 isOpen: true,

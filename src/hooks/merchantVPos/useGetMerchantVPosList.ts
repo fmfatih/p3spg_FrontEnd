@@ -33,7 +33,7 @@ export type IMerchantVPos = {
   updateUserId: number;
   deleteDate: string;
   deleteUserId: number;
-  // memberVposSettings?: Array<any>;
+  memberVposSettings?: Array<any>;
   merchantVposSettings?: Array<any>;
   
 };

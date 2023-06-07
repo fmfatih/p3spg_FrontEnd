@@ -12,7 +12,7 @@ import {
   useGetAcquirerBankList,
   useAuthorization,
   useGetMemberVPosList,
-  useGetMerchantVPosList
+  useGetMerchantVPosList,
 } from "../../../hooks";
 import {
   Box,
@@ -70,9 +70,12 @@ export const BankAddForm = () => {
     control,
     name: "parameters",
   });
-  const { mutate: getMerchantVPosList, data: rawMerchantVPosList } =
-  useGetMerchantVPosList();
+  const [vPosList, setVPosList] = useState(null);
+  const { mutate: getMemberVPosList, data: rawMemberVPosList } =
+    useGetMemberVPosList();
 
+  const { mutate: getMerchantVPosList, data: rawMerchantVPosList } =
+    useGetMerchantVPosList();
 
   const [, setSelectedMerchant] = useState({} as any);
   const handleBack = () => navigate("/dashboard");
@@ -90,8 +93,6 @@ export const BankAddForm = () => {
       });
     }
   }, [reset, memberVPos, setValue]);
-
-
 
   useEffect(() => {
     let req = {};
@@ -125,6 +126,16 @@ export const BankAddForm = () => {
                 }
               });
             }
+            if (!!merchantVPos) {
+              merchantVPos?.merchantVposSettings?.map((merchantVPosItem) => {
+                if (
+                  merchantVPosItem.key.toLowerCase() === item.key.toLowerCase()
+                ) {
+                  tempOBJ.value = merchantVPosItem.value;
+                }
+              });
+            }
+            // console.log(tempOBJ)
             append(tempOBJ);
           });
         },
@@ -137,29 +148,52 @@ export const BankAddForm = () => {
     remove,
     selectedMerchantId,
   ]);
+  console.log(memberVPos);
+  console.log(merchantVPos);
 
-
-  
   useEffect(() => {
-    getMerchantVPosList({
-      orderBy: "CreateDate",
-      orderByDesc: true,
-      status: "ACTIVE",
-    });
-  }, [getMerchantVPosList]);
+    if (selectedMerchantId || merchantVPos?.merchantName) {
+      getMerchantVPosList({
+        orderBy: "CreateDate",
+        orderByDesc: true,
+        status: "ACTIVE",
+      });
+    } else {
+      getMemberVPosList({
+        orderBy: "CreateDate",
+        orderByDesc: true,
+        status: "ACTIVE",
+      });
+    }
+  }, [
+    getMerchantVPosList,
+    getMemberVPosList,
+    merchantVPos?.merchantName,
+    selectedMerchantId,
+  ]);
 
-
-  const merchantVPosList = useMemo(() => {
-    return rawMerchantVPosList?.data?.map(
-      (merchantVPos: { bankName: string; bankCode:string}) => {
-        return {
-          label: `${merchantVPos.bankName}`,
+  useEffect(() => {
+    if (selectedMerchantId || merchantVPos?.merchantName) {
+      setVPosList(
+        rawMerchantVPosList?.data?.map((merchantVPos) => ({
+          label: merchantVPos.bankName,
           value: merchantVPos.bankCode,
-        };
-      }
-    );
-  }, [rawMerchantVPosList?.data]);
-  
+        }))
+      );
+    } else {
+      setVPosList(
+        rawMemberVPosList?.data?.map((memberVPos) => ({
+          label: memberVPos.bankName,
+          value: memberVPos.bankCode,
+        }))
+      );
+    }
+  }, [
+    rawMerchantVPosList?.data,
+    rawMemberVPosList?.data,
+    merchantVPos?.merchantName,
+    selectedMerchantId,
+  ]);
 
   const merchantList = useMemo(() => {
     return rawMerchantList?.data?.map(
@@ -218,7 +252,6 @@ export const BankAddForm = () => {
     );
   };
 
-
   return (
     <>
       {isLoading && <Loading />}
@@ -227,7 +260,7 @@ export const BankAddForm = () => {
           <Stack spacing={4}>
             <Stack width={isDesktop ? 800 : "auto"} spacing={3} direction="row">
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-                {merchantList?.length > 0 && (
+                {!memberVPos?.memberName && merchantList?.length > 0 && (
                   <Controller
                     control={control}
                     name="merchantID"
@@ -248,7 +281,6 @@ export const BankAddForm = () => {
                             }}
                             id="merchant"
                             options={merchantList}
-                            //defaultValue={selectedMerchant}
                             getOptionLabel={(option: {
                               label: string;
                               value: number;
@@ -290,6 +322,7 @@ export const BankAddForm = () => {
                   direction={isDesktop ? "row" : "column"}
                 >
                   <FormatInputControl
+                   sx={{ flex: 1 }}
                     defaultValue=""
                     label="Telefon Numarası"
                     control={control}
@@ -299,6 +332,7 @@ export const BankAddForm = () => {
                     format="0(###) ### ## ##"
                   />
                   <FormatInputControl
+                   sx={{ flex: 1 }}
                     defaultValue=""
                     label="Sabit Telefon Numarası"
                     control={control}
@@ -338,37 +372,42 @@ export const BankAddForm = () => {
           <Box sx={{ my: 5, borderBottom: "1px solid #E6E9ED" }} />
           <Stack mb={3} spacing={3}>
             <Stack width={isDesktop ? 800 : "auto"} direction="row">
-            <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-  {merchantVPosList&& (
-    <Controller
-      name="bankCode"
-      control={control}
-      defaultValue=""
-      render={({ field: { onChange, value } }) => {
-        const selectedBank = merchantVPosList?.find(
-          (option) => option.value === value
-        );
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                {vPosList && (
+                  <Controller
+                    name="bankCode"
+                    control={control}
+                    defaultValue=""
+                    render={({ field: { onChange, value } }) => {
+                      const selectedBank = vPosList?.find(
+                        (option) => option.value === value
+                      );
 
-        return (
-          <Autocomplete
-            id="bankCode"
-            options={merchantVPosList}
-            getOptionSelected={(option, value) => option.value === value}
-            getOptionLabel={(option) => option.label}
-            value={selectedBank || null}
-            onChange={(_, newValue) => {
-              onChange(newValue ? newValue.value : "");
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Banka" sx={{ mr: isDesktop ? 3 : 0 }}/>
-            )}
-          />
-        );
-      }}
-    />
-  )}
-</FormControl>
-
+                      return (
+                        <Autocomplete
+                          id="bankCode"
+                          options={vPosList}
+                          getOptionSelected={(option, value) =>
+                            option.value === value
+                          }
+                          getOptionLabel={(option) => option.label}
+                          value={selectedBank || null}
+                          onChange={(_, newValue) => {
+                            onChange(newValue ? newValue.value : "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Banka"
+                              sx={{ mr: isDesktop ? 3 : 0 }}
+                            />
+                          )}
+                        />
+                      );
+                    }}
+                  />
+                )}
+              </FormControl>
             </Stack>
           </Stack>
           {fields?.length ? (
