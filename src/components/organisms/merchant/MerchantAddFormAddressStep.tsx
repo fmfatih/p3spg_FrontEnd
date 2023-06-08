@@ -105,7 +105,7 @@ export const MerchantAddFormAddressStep = ({
   }, [rawCityList?.data]);
   useEffect(() => {
     if(cityList) {
-      const foundCity = cityList?.find((city: { label: string; value: string }) => city.value === merchant.cityCode?.toString());
+      const foundCity = cityList?.find((city: { label: string; value: string }) => city.value === merchant.cityCode?.toString() || merchant.cityId?.toString());
       if (foundCity) {
         setSelectedCity(foundCity);
       }
@@ -143,13 +143,13 @@ export const MerchantAddFormAddressStep = ({
       countryCode: "TR",
       primaryAddress: true,
     };
-    setAllData({ ...allData, ...request });
     if ((merchant && merchant?.id > 0 && allData?.addressLine1) || (allData && allData?.addressLine1)) {
       updateMerchantAddress(
         { ...request, id: merchant?.id || 0  },
         {
           onSuccess(data) {
             if (data.isSuccess) {
+              setAllData({ ...allData, ...request });
               onNext();
               setSnackbar({
                 severity: "success",

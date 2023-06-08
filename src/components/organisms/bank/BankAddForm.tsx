@@ -39,6 +39,7 @@ import {
   BankAddFormValuesType,
   initialState,
 } from "./_formTypes";
+import { useUserInfo } from "../../../store/User.state";
 
 export const BankAddForm = () => {
   const theme = useTheme();
@@ -50,7 +51,7 @@ export const BankAddForm = () => {
   const merchantVPos = useLocation().state as unknown as
     | IMerchantVPos
     | undefined;
-
+  const [userInfo] = useUserInfo();
   const { control, reset, watch, handleSubmit, setValue, errors } =
     useForm<BankAddFormValuesType>({
       resolver: zodResolver(addBankFormSchema),
@@ -110,6 +111,8 @@ export const BankAddForm = () => {
     if (!!bankCode) {
       getDefaultVposSettingsList(req, {
         onSuccess: (data: { data: Array<{ key: string; type: string }> }) => {
+          console.log(merchantVPos);
+          console.log(data);
           remove();
           data?.data?.map((item) => {
             const tempOBJ: any = {
@@ -118,6 +121,7 @@ export const BankAddForm = () => {
               type: "string",
             };
             if (!!memberVPos) {
+              console.log("HİT12");
               memberVPos?.memberVposSettings?.map((memberVPosItem) => {
                 if (
                   memberVPosItem.key.toLowerCase() === item.key.toLowerCase()
@@ -148,8 +152,6 @@ export const BankAddForm = () => {
     remove,
     selectedMerchantId,
   ]);
-  console.log(memberVPos);
-  console.log(merchantVPos);
 
   useEffect(() => {
     if (selectedMerchantId || merchantVPos?.merchantName) {
@@ -195,16 +197,40 @@ export const BankAddForm = () => {
     selectedMerchantId,
   ]);
 
+  // const merchantList = useMemo(() => {
+  //   return rawMerchantList?.data?.map(
+  //     (rawPosType: { merchantName: string; merchantId: number }) => {
+  //       return {
+  //         label: rawPosType.merchantName,
+  //         value: rawPosType.merchantId,
+  //       };
+  //     }
+  //   );
+  // }, [rawMerchantList?.data]);
+
   const merchantList = useMemo(() => {
-    return rawMerchantList?.data?.map(
-      (rawPosType: { merchantName: string; merchantId: number }) => {
-        return {
-          label: rawPosType.merchantName,
-          value: rawPosType.merchantId,
-        };
-      }
-    );
-  }, [rawMerchantList?.data]);
+    if (userInfo?.merchantId === 0) {
+      return rawMerchantList?.data?.map(
+        (rawPosType: { merchantName: string; merchantId: number }) => {
+          return {
+            label: rawPosType.merchantName,
+            value: rawPosType.merchantId,
+          };
+        }
+      );
+    } else {
+      return rawMerchantList?.data
+        ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
+          return rawPosType.merchantId === Number(userInfo.merchantId);
+        })
+        .map((filteredMerchant) => {
+          return {
+            label: filteredMerchant.merchantName,
+            value: filteredMerchant.merchantId,
+          };
+        });
+    }
+  }, [rawMerchantList?.data, userInfo.merchantId]);
 
   const onSubmit = (data: BankAddFormValuesType) => {
     const parameters = data?.parameters?.map((item) => {
@@ -322,7 +348,7 @@ export const BankAddForm = () => {
                   direction={isDesktop ? "row" : "column"}
                 >
                   <FormatInputControl
-                   sx={{ flex: 1 }}
+                    sx={{ flex: 1 }}
                     defaultValue=""
                     label="Telefon Numarası"
                     control={control}
@@ -332,7 +358,7 @@ export const BankAddForm = () => {
                     format="0(###) ### ## ##"
                   />
                   <FormatInputControl
-                   sx={{ flex: 1 }}
+                    sx={{ flex: 1 }}
                     defaultValue=""
                     label="Sabit Telefon Numarası"
                     control={control}

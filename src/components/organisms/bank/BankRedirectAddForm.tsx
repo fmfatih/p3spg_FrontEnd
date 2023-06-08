@@ -121,16 +121,41 @@ export const BankRedirectAddForm = () => {
     );
   }, [rawAcquirerBankList?.data]);
 
+  // const merchantList = useMemo(() => {
+  //   return rawMerchantList?.data?.map(
+  //     (merchant: { merchantName: string; merchantId: number }) => {
+  //       return {
+  //         label: `${merchant.merchantName}`,
+  //         value: merchant.merchantId,
+  //       };
+  //     }
+  //   );
+  // }, [rawMerchantList?.data]);
+
   const merchantList = useMemo(() => {
-    return rawMerchantList?.data?.map(
-      (merchant: { merchantName: string; merchantId: number }) => {
-        return {
-          label: `${merchant.merchantName}`,
-          value: merchant.merchantId,
-        };
-      }
-    );
-  }, [rawMerchantList?.data]);
+ 
+    if (userInfo.merchantId === 0) {
+        return rawMerchantList?.data?.map(
+            (rawPosType: { merchantName: string; merchantId: number }) => {
+                return {
+                    label: rawPosType.merchantName,
+                    value: rawPosType.merchantId,
+                };
+            }
+        );
+    } else {
+        return rawMerchantList?.data
+            ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
+                return rawPosType.merchantId === Number(userInfo.merchantId);
+            })
+            .map((filteredMerchant) => {
+                return {
+                    label: filteredMerchant.merchantName,
+                    value: filteredMerchant.merchantId,
+                };
+            });
+    }
+}, [rawMerchantList?.data, userInfo.merchantId]);
 
   const memberVPosList = useMemo(() => {
     return rawMemberVPosList?.data?.map(

@@ -146,17 +146,18 @@ console.log(userInfo.merchantId);
         orderBy: "CreateDate",
         orderByDesc: true,
         status: "ACTIVE",
-      })
-      .then(data => {
-        const bankList = data?.data?.result?.map(
-          (bank: { bankCode: string; bankName: string }) => {
-            return {
-              label: `${bank.bankName}`,
-              value: bank.bankCode,
-            };
-          }
-        );
-        setBankList(bankList);
+      }, {
+        onSuccess: (data) => {
+          const bankList = data?.data?.result?.map(
+            (bank: { bankCode: string; bankName: string }) => {
+              return {
+                label: `${bank.bankName}`,
+                value: bank.bankCode,
+              };
+            }
+          );
+          setBankList(bankList);
+        }
       });
     } else {
       getMerchantVPosList(

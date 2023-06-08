@@ -22,7 +22,7 @@ import { useSetSnackBar } from "../../store/Snackbar.state";
 export const LoginTemplate = () => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
 const isMediumScreen = useMediaQuery(theme.breakpoints.between('sm', 'md'));
 const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -91,7 +91,8 @@ const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
           <img
      style={{
       height: isDesktop ? "100vh" : "400px",
-      width: isDesktop ? '650px' : '100%',
+      width: isLargeScreen ? '650px' : (isDesktop ? '100%' : '100%'),
+      paddingRight:"5px",
       objectFit: isMediumScreen ? "cover" : "fill",
       objectPosition: "center",  
       overflow: isDesktop ? "auto" : "hidden",

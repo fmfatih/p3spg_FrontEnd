@@ -77,6 +77,8 @@ export const MerchantAddForm = () => {
 
 
 
+
+
   return (
     <Stack flex={1}>
       <Stack>
@@ -96,7 +98,7 @@ export const MerchantAddForm = () => {
       </Stack>
       {activeStep === 0 && (
         <MerchantAddFormCompanyStep
-          merchant={merchant?.id ? merchant : allData}
+          merchant={ allData}
           onNext={handleNext}
           allData={allData}
           setAllData={setAllData}
@@ -104,7 +106,7 @@ export const MerchantAddForm = () => {
       )}
       {activeStep === 1 && (
         <MerchantAddFormPartnerStep
-          merchant={merchant?.officialFullName? merchant : allData}
+          merchant={allData}
           onNext={handleNext}
           onBack={handleBack}
           allData={allData}
@@ -113,7 +115,7 @@ export const MerchantAddForm = () => {
       )}
       {activeStep === 2 && (
         <MerchantAddFormAddressStep
-          merchant={merchant?.addressLine1?merchant:allData}
+          merchant={allData}
           onNext={handleNext}
           onBack={handleBack}
           allData={allData}
@@ -122,7 +124,7 @@ export const MerchantAddForm = () => {
       )}
       {activeStep === 3 && (
         <MerchantAddFormBankStep
-          merchant={merchant?.iban?merchant:allData}
+          merchant={allData}
           onNext={handleNext}
           onBack={handleBack}
           allData={allData}
@@ -131,7 +133,7 @@ export const MerchantAddForm = () => {
       )}
       {activeStep === 4 && (
         <MerchantAddFormCurrencyStep
-          merchant={merchant?.try?merchant:allData}
+          merchant={allData}
           onBack={handleBack}
           allData={allData}
           setAllData={setAllData}

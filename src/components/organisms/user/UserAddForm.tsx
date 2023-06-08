@@ -121,30 +121,32 @@ export const UserAddForm = () => {
   //     );
   //   }, [rawMerchantList?.data]);
 
-  const merchantList = useMemo(() => {
-    if (!user || user.id === undefined || userInfo.merchantId === 0) {
-      return rawMerchantList?.data?.map(
-        (rawPosType: { merchantName: string; merchantId: number }) => {
-          return {
-            label: rawPosType.merchantName,
-            value: rawPosType.merchantId,
-          };
-        }
-      );
-    } else {
-      return rawMerchantList?.data
-        ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
-          return rawPosType.merchantId === userInfo.merchantId;
-        })
-        .map((filteredMerchant) => {
-          return {
-            label: filteredMerchant.merchantName,
-            value: filteredMerchant.merchantId,
-          };
-        });
-    }
-  }, [rawMerchantList?.data, userInfo.merchantId, user]);
 
+  const merchantList = useMemo(() => {
+ 
+    if (userInfo.merchantId === 0) {
+        return rawMerchantList?.data?.map(
+            (rawPosType: { merchantName: string; merchantId: number }) => {
+                return {
+                    label: rawPosType.merchantName,
+                    value: rawPosType.merchantId,
+                };
+            }
+        );
+    } else {
+        return rawMerchantList?.data
+            ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
+                return rawPosType.merchantId === Number(userInfo.merchantId);
+            })
+            .map((filteredMerchant) => {
+                return {
+                    label: filteredMerchant.merchantName,
+                    value: filteredMerchant.merchantId,
+                };
+            });
+    }
+}, [rawMerchantList?.data, userInfo.merchantId]);
+  
   const roleList = useMemo(() => {
     return rawRoles?.data
       ?.filter((rawRole) => rawRole.userType === userType)

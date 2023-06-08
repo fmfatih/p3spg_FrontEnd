@@ -45,6 +45,7 @@ import {
 } from "./_formTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { default as dayjs } from "dayjs";
+import { useUserInfo } from "../../../store/User.state";
 
 
 type MerchantAddFormCompanyStepProps = {
@@ -75,6 +76,7 @@ export const MerchantAddFormCompanyStep = ({
   const { data: rawPosTypes, isLoading: isPosTypeLoading } = useGetPosTypeList(
     {}
   );
+  const [userInfo] = useUserInfo();
   const { data: rawMerchantList, isLoading: isMerchantListLoading } =
     useGetAllMerchantList();
   const {
@@ -154,16 +156,41 @@ export const MerchantAddFormCompanyStep = ({
     );
   }, [rawPosTypes?.data]);
 
+  // const merchantList = useMemo(() => {
+  //   return rawMerchantList?.data?.map(
+  //     (rawPosType: { merchantName: string; merchantId: number }) => {
+  //       return {
+  //         label: rawPosType.merchantName,
+  //         value: rawPosType.merchantId,
+  //       };
+  //     }
+  //   );
+  // }, [rawMerchantList?.data]);
+
   const merchantList = useMemo(() => {
-    return rawMerchantList?.data?.map(
-      (rawPosType: { merchantName: string; merchantId: number }) => {
-        return {
-          label: rawPosType.merchantName,
-          value: rawPosType.merchantId,
-        };
-      }
-    );
-  }, [rawMerchantList?.data]);
+ 
+    if (userInfo.merchantId === 0) {
+        return rawMerchantList?.data?.map(
+            (rawPosType: { merchantName: string; merchantId: number }) => {
+                return {
+                    label: rawPosType.merchantName,
+                    value: rawPosType.merchantId,
+                };
+            }
+        );
+    } else {
+        return rawMerchantList?.data
+            ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
+                return rawPosType.merchantId === Number(userInfo.merchantId);
+            })
+            .map((filteredMerchant) => {
+                return {
+                    label: filteredMerchant.merchantName,
+                    value: filteredMerchant.merchantId,
+                };
+            });
+    }
+}, [rawMerchantList?.data, userInfo.merchantId]);
 
   const commissionProfileList = useMemo(() => {
     return rawCommissionProfileList?.data?.map(

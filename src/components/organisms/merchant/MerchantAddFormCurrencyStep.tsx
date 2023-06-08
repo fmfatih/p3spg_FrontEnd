@@ -71,13 +71,14 @@ export const MerchantAddFormCurrencyStep = ({
     };
 
     //
-    setAllData({ ...allData, ...request });
+  
     if ((merchant && merchant?.id > 0 && allData?.try) || (allData && allData?.try)) {
       merchantRestrictionUpdate(
         { ...request, id: merchant?.id || 0 },
         {
           onSuccess(data) {
             if (data.isSuccess) {
+              setAllData({ ...allData, ...request });
               navigate("/merchant-management/merchant-listing");
               setSnackbar({
                 severity: "success",
