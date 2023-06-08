@@ -103,16 +103,21 @@ export const BankAddForm = () => {
         merchantId: selectedMerchantId,
       };
     } else {
-      req = {
-        bankCode: bankCode,
-      };
+      if (merchantVPos?.merchantId) {
+        req = {
+          bankCode: bankCode,
+          merchantId: merchantVPos?.merchantId,
+        };
+      } else {
+        req = {
+          bankCode: bankCode,
+        };
+      }
     }
 
     if (!!bankCode) {
       getDefaultVposSettingsList(req, {
         onSuccess: (data: { data: Array<{ key: string; type: string }> }) => {
-          console.log(merchantVPos);
-          console.log(data);
           remove();
           data?.data?.map((item) => {
             const tempOBJ: any = {
@@ -121,7 +126,6 @@ export const BankAddForm = () => {
               type: "string",
             };
             if (!!memberVPos) {
-              console.log("HİT12");
               memberVPos?.memberVposSettings?.map((memberVPosItem) => {
                 if (
                   memberVPosItem.key.toLowerCase() === item.key.toLowerCase()
@@ -139,7 +143,7 @@ export const BankAddForm = () => {
                 }
               });
             }
-            // console.log(tempOBJ)
+
             append(tempOBJ);
           });
         },
