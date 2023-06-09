@@ -20,6 +20,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
 import { downloadExcel } from "../../../util/downloadExcel";
+import { useUserInfo } from "../../../store/User.state";
 
 function RenderStatus(props: GridRenderCellParams<any, string>) {
   const { value } = props;
@@ -36,6 +37,7 @@ export const MerchantListingTable = ({
 }: MerchantListingTableProps) => {
   const theme = useTheme();
   const {showDelete, showUpdate} = useAuthorization();
+  const [userInfo] = useUserInfo();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [tableData, setTableData] = useState<PagingResponse<Array<any>>>();
   const [paginationModel, setPaginationModel] = React.useState({
@@ -53,7 +55,10 @@ export const MerchantListingTable = ({
         page: paginationModel.page,
         orderBy: "CreateDate",
         orderByDesc: true,
+        merchantId: userInfo ? userInfo.merchantId : undefined
+   
       },
+      
       {
         onSuccess: (data) => {
           if (data.isSuccess) {

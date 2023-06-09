@@ -9,6 +9,7 @@ export type GetMerchantVPosListRequest = {
   orderByDesc?: boolean;
   orderBy?: string;
   status: "ACTIVE" | "PASSIVE";
+  merchantId?: string | number;  
 };
 
 export type IMerchantVPos = {
@@ -46,6 +47,7 @@ async function getMerchantVPosList({
   size,
   orderByDesc = true,
   orderBy = "CreateDate",
+  merchantId,
 }: GetMerchantVPosListRequest): Promise<IGetMerchantVPosListResponse> {
   const data = {
     page,
@@ -53,6 +55,7 @@ async function getMerchantVPosList({
     orderByDesc,
     orderBy,
     status,
+    merchantId
   };
   try {
     if ((page === 0 || page) && size)

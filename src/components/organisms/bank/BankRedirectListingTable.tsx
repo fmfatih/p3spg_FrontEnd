@@ -24,11 +24,11 @@ import { useSetSnackBar } from "../../../store/Snackbar.state";
 import { PagingResponse } from "../../../hooks/_types";
 import { downloadExcel } from "../../../util/downloadExcel";
 import SearchTable from "../../../components/atoms/SearchTable";
-
+import { useUserInfo } from "../../../store/User.state";
 export const BankRedirectListingTable = () => {
   const [text, setText] = useState("");
   const [queryOptions, setQueryOptions] = React.useState({});
-
+  const [userInfo] = useUserInfo();
   const theme = useTheme();
   const { showDelete, showUpdate } = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -76,6 +76,7 @@ export const BankRedirectListingTable = () => {
       orderBy: "CreateDate",
       orderByDesc: true,
       searchText: text,
+      merchantId: userInfo ? userInfo.merchantId : undefined
     };
 
     if (queryOptions?.field && queryOptions?.value !== undefined) {

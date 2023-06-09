@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import React from "react";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
 import { downloadExcel } from "../../../util/downloadExcel";
+import { useUserInfo } from "../../../store/User.state";
 
 function RenderStatus(props: GridRenderCellParams<any, string>) {
   const { value } = props;
@@ -35,6 +36,7 @@ type BusinessBankListingProps = {
 export const BusinessBankListingActiveTable = ({
   onRowClick,
 }: BusinessBankListingProps) => {
+  const [userInfo] = useUserInfo();
   const theme = useTheme();
   const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -63,6 +65,7 @@ export const BusinessBankListingActiveTable = ({
         orderBy: "CreateDate",
         orderByDesc: true,
         status: "ACTIVE",
+        merchantId: userInfo ? userInfo.merchantId : undefined
       },
       {
         onSuccess: (data) => {

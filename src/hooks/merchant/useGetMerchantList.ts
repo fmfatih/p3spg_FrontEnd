@@ -8,6 +8,7 @@ export type GetMerchantListRequest = {
   size?: number;
   orderByDesc?: boolean;
   orderBy?: string;
+  merchantId?: string | number;  
 };
 
 export type IMerchant = {
@@ -51,12 +52,14 @@ async function getMerchantList({
   size = 15,
   orderByDesc = true,
   orderBy = "CreateDate",
+  merchantId
 }: GetMerchantListRequest): Promise<any> {
   const data = {
     page,
     size,
     orderByDesc,
     orderBy,
+    merchantId
   };
   try {
     return (await axiosInstance.post("/Merchant/List", data)).data;
