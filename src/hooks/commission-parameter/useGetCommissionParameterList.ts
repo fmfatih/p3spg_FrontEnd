@@ -12,6 +12,7 @@ export interface ICommissionParameter {
   submerchantName: string;
   txnType: string;
   onus: boolean;
+  commissionFlag:boolean;
   international: boolean;
   amex: boolean;
   installment: number;
@@ -23,8 +24,8 @@ export interface ICommissionParameter {
   merchantblockedday: number;
   merchantcommission: number;
   merchantadditionalcommission: number;
-  customercommission: number;
-  customeradditionalcommission: number;
+  // customercommission: number;
+  // customeradditionalcommission: number;
   minAmount: number;
   maxAmount: number;
   cardType: string;

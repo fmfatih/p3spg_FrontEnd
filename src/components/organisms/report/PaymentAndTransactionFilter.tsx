@@ -552,27 +552,23 @@ console.log(userInfo.merchantId);
         },
       },
       {
-        field: "customercommission",
-        headerName: "Müşteri Komisyonu",
+        field: "commissionFlag",
+        headerName: "Komisyon Yansıtıldı mı?",
         width: 200,
-        valueFormatter: (params: GridValueFormatterParams<number>) => {
-          if (params.value == null) {
-            return "";
-          }
-          return `${params.value} %`;
-        },
+        valueFormatter: (params) => params.value ? "Evet" : "Hayır",
+
       },
-      {
-        field: "customeradditionalcommission",
-        headerName: "Müşteri Sabit Komisyonu",
-        width: 200,
-        valueFormatter: (params: GridValueFormatterParams<number>) => {
-          if (params.value == null) {
-            return "";
-          }
-          return `${params.value} TL`;
-        },
-      },
+      // {
+      //   field: "customeradditionalcommission",
+      //   headerName: "Müşteri Sabit Komisyonu",
+      //   width: 200,
+      //   valueFormatter: (params: GridValueFormatterParams<number>) => {
+      //     if (params.value == null) {
+      //       return "";
+      //     }
+      //     return `${params.value} TL`;
+      //   },
+      // },
 
       { field: "cardType", headerName: "Kart Tipi", width: 200 },
       { field: "cardTypeDesc", headerName: "Kart Tipi Açıklama", width: 200 },

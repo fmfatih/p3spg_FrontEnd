@@ -11,6 +11,7 @@ export interface IVPosRoutingUpdateRequest {
   transactionSubType: string;
   id: number;
   onusRouting: boolean;
+  profileCode: string;
 }
 
 async function vPosRoutingUpdate(

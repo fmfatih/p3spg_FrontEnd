@@ -36,6 +36,7 @@ import { useSetSnackBar } from "../../../store/Snackbar.state";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   addBankFormSchema,
+  addSecondBankSchema,
   BankAddFormValuesType,
   initialState,
 } from "./_formTypes";
@@ -54,12 +55,14 @@ export const BankAddForm = () => {
   const [userInfo] = useUserInfo();
   const { control, reset, watch, handleSubmit, setValue, errors } =
     useForm<BankAddFormValuesType>({
-      resolver: zodResolver(addBankFormSchema),
+      resolver: merchantVPos?.merchantName
+        ? zodResolver(addSecondBankSchema)
+        : zodResolver(addBankFormSchema),
       defaultValues: initialState,
     });
   const bankCode = watch("bankCode");
   const selectedMerchantId = watch("merchantID");
-  const { data: rawAcquirerBankList } = useGetAcquirerBankList();
+  const { data: rawAcquirerBankList, refetch } = useGetAcquirerBankList();
   const { mutate: getDefaultVposSettingsList } =
     useGetDefaultVPosSettingsList();
   const { mutate: memberVPosAddWithSettings, isLoading } =
@@ -159,11 +162,9 @@ export const BankAddForm = () => {
 
   useEffect(() => {
     if (selectedMerchantId || merchantVPos?.merchantName) {
-      getMerchantVPosList({
-        orderBy: "CreateDate",
-        orderByDesc: true,
-        status: "ACTIVE",
-      });
+      if (!rawAcquirerBankList) {
+        refetch();
+      }
     } else {
       getMemberVPosList({
         orderBy: "CreateDate",
@@ -176,14 +177,15 @@ export const BankAddForm = () => {
     getMemberVPosList,
     merchantVPos?.merchantName,
     selectedMerchantId,
+    rawAcquirerBankList,
   ]);
 
   useEffect(() => {
     if (selectedMerchantId || merchantVPos?.merchantName) {
       setVPosList(
-        rawMerchantVPosList?.data?.map((merchantVPos) => ({
-          label: merchantVPos.bankName,
-          value: merchantVPos.bankCode,
+        rawAcquirerBankList?.data?.map((acquireBank) => ({
+          label: acquireBank.bankName,
+          value: acquireBank.bankCode,
         }))
       );
     } else {
@@ -199,6 +201,7 @@ export const BankAddForm = () => {
     rawMemberVPosList?.data,
     merchantVPos?.merchantName,
     selectedMerchantId,
+    rawAcquirerBankList,
   ]);
 
   // const merchantList = useMemo(() => {

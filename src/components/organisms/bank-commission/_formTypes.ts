@@ -8,6 +8,7 @@ export const bankAddFormSchema = zod
     merchantId: zod.any(),
     submerchantId: zod.any(),
     onus: zod.boolean(),
+    commissionFlag:zod.boolean(),
     international: zod.boolean(),
     amex: zod.boolean(),
     bankcode: zod.string(),
@@ -26,10 +27,10 @@ export const bankAddFormSchema = zod
       .string()
       .min(1, { message: "Please enter your phone number" }),
     merchantadditionalcommission: zod.string(),
-    customercommission: zod
-      .string()
-      .min(1, { message: "Please enter your phone number" }),
-    customeradditionalcommission: zod.string(),
+    // customercommission: zod
+    //   .string()
+    //   .min(1, { message: "Please enter your phone number" }),
+    // customeradditionalcommission: zod.string(),
     minAmount: zod
       .string()
       .min(1, { message: "Please enter your phone number" }),
@@ -62,6 +63,7 @@ export const bankAddInitialValues: BankAddFormSchemaFormValuesType = {
   merchantId: null,
   submerchantId: null,
   onus: false,
+  commissionFlag:false,
   international: false,
   amex: false,
   installment: "",
@@ -69,7 +71,7 @@ export const bankAddInitialValues: BankAddFormSchemaFormValuesType = {
   bankblocked: false,
   bankblockedday: "",
   bankcommission: "",
-  customercommission: "",
+  // customercommission: "",
   customeradditionalcommission: "",
   //bankAdditionalCommission: "",
   minAmount: "",

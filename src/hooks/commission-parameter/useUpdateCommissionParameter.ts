@@ -9,6 +9,7 @@ export interface IUpdateCommissionParameterRequest {
   submerchantId: number;
   txnType: string;
   onus: boolean;
+  commissionFlag:boolean;
   international: boolean;
   amex: boolean;
   installment: number;
@@ -20,8 +21,8 @@ export interface IUpdateCommissionParameterRequest {
   merchantblockedday: number;
   merchantcommission: number;
   merchantadditionalcommission: number;
-  customercommission: number;
-  customeradditionalcommission: number;
+  // customercommission: number;
+  // customeradditionalcommission: number;
 }
 
 async function updateCommissionParameter(

@@ -10,6 +10,7 @@ export interface IVPosRoutingRequest {
   merchantVposBankCode: string;
   transactionSubType: string;
   onusRouting: boolean;
+  profileCode:string;
 }
 
 async function addVPosRouting(data: IVPosRoutingRequest): Promise<any> {

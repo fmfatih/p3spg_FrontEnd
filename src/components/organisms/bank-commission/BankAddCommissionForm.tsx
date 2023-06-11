@@ -139,6 +139,7 @@ export const BankAddCommissionForm = () => {
     merchantId,
     submerchantId,
     onus,
+    commissionFlag,
     international,
     amex,
     cardType,
@@ -151,8 +152,8 @@ export const BankAddCommissionForm = () => {
     merchantblockedday,
     merchantcommission,
     merchantadditionalcommission,
-    customercommission,
-    customeradditionalcommission,
+    // customercommission,
+    // customeradditionalcommission,
     minAmount,
     maxAmount,
     txnType,
@@ -163,6 +164,7 @@ export const BankAddCommissionForm = () => {
       submerchantId: Number(selectedSubMerchant?.value) || 0,
       txnType: txnType,
       onus: !!onus,
+      commissionFlag: !!commissionFlag,
       international: !!international,
       amex: !!amex,
       cardType: international ?  "" : cardType,
@@ -175,8 +177,8 @@ export const BankAddCommissionForm = () => {
       merchantblockedday: Number(merchantblockedday),
       merchantcommission: Number(merchantcommission),
       merchantadditionalcommission: Number(merchantadditionalcommission),
-      customercommission: Number(customercommission),
-      customeradditionalcommission: Number(customeradditionalcommission),
+      // customercommission: Number(customercommission),
+      // customeradditionalcommission: Number(customeradditionalcommission),
       minAmount: Number(minAmount),
       maxAmount: Number(maxAmount),
     };
@@ -265,6 +267,7 @@ export const BankAddCommissionForm = () => {
           value: commissionParameter.submerchantId,
         },
         onus: commissionParameter.onus,
+        commissionFlag: commissionParameter.commissionFlag,
         international: commissionParameter.international,
         amex: commissionParameter.amex,
         txnType: commissionParameter.txnType,
@@ -273,10 +276,10 @@ export const BankAddCommissionForm = () => {
         bankblocked: commissionParameter.bankblocked,
         bankblockedday: commissionParameter?.bankblockedday?.toString() || "",
         bankcommission: commissionParameter?.bankcommission?.toString() || "",
-        customercommission:
-          commissionParameter?.customercommission?.toString() || "",
-        customeradditionalcommission:
-          commissionParameter?.customeradditionalcommission?.toString() || "",
+        // customercommission:
+        //   commissionParameter?.customercommission?.toString() || "",
+        // customeradditionalcommission:
+        //   commissionParameter?.customeradditionalcommission?.toString() || "",
         minAmount: commissionParameter?.minAmount?.toString() || "",
         maxAmount: commissionParameter?.maxAmount?.toString() || "",
         cardType: commissionParameter.cardType,
@@ -337,6 +340,7 @@ export const BankAddCommissionForm = () => {
     />
   )}
 </FormControl>
+
 
 <FormControl sx={{ flex: 1 }}>
   {payment3DTrxSettingsList && (
@@ -603,7 +607,12 @@ export const BankAddCommissionForm = () => {
                     adornmentText="%"
                   />
                 </FormControl>
+                <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                <SwitchControl label="Komisyon Yansıt" control={control} id="commissionFlag" />
+                </FormControl>
               </Stack>
+              
+        
             </Stack>
             <Stack mb={3} spacing={3}>
               <Stack
@@ -655,7 +664,7 @@ export const BankAddCommissionForm = () => {
                 </FormControl>
               </Stack>
             </Stack>
-            <Stack mb={3} spacing={3}>
+            {/* <Stack mb={3} spacing={3}>
               <Stack
                 spacing={3}
                 width={isDesktop ? 800 : "auto"}
@@ -680,7 +689,7 @@ export const BankAddCommissionForm = () => {
                   />
                 </FormControl>
               </Stack>
-            </Stack>
+            </Stack> */}
             <Stack mb={3} spacing={3}>
               <Stack
                 spacing={3}

@@ -9,6 +9,7 @@ import {
   useGetTransactionSubTypeSettingsList,
   useAuthorization,
   useGetMemberVPosList,
+  useGetCommissionProfileList,
 } from "../../../hooks";
 import {
   Box,
@@ -53,6 +54,7 @@ export const BankRedirectAddForm = () => {
     useGetMemberVPosList();
   const { data: rawIssuerBankList } = useGetIssuerBankList();
   const { data: rawAcquirerBankList } = useGetAcquirerBankList();
+  const { data: rawCommissionProfileList } = useGetCommissionProfileList({});
   const { data: rawMerchantList } = useGetAllMerchantList();
   const { data: rawCardTypeList } = useGetCardTypeList({});
   const { data: rawTransactionSubTypeList } =
@@ -87,6 +89,8 @@ export const BankRedirectAddForm = () => {
     useState([] as any);
   const [selectedIssuerBankCodeObjects, setSelectedIssuerBankCodeObjects] =
     useState([] as any);
+    const [selectedProfileCode, setSelectedProfileCode] = useState(null as any);
+
     // const [selectedMemberVPos, setSelectedMemberVPos] = useState(null as any);
 
 
@@ -120,6 +124,17 @@ export const BankRedirectAddForm = () => {
       }
     );
   }, [rawAcquirerBankList?.data]);
+
+  const commissionProfileList = useMemo(() => {
+    return rawCommissionProfileList?.data?.map(
+      (commissionProfule: { name: string; code: string }) => {
+        return {
+          label: `${commissionProfule.name}`,
+          value: commissionProfule.code,
+        };
+      }
+    );
+  }, [rawCommissionProfileList?.data]);
 
   // const merchantList = useMemo(() => {
   //   return rawMerchantList?.data?.map(
@@ -193,6 +208,7 @@ export const BankRedirectAddForm = () => {
           issuerCardBankCodes: selectedIssuerBankCodeValues,
           merchantVposBankCode: selectedMerchantVPosBankCode?.value?.toString(),
           // merchantVposBankCode: selectedMemberVPos?.value?.toString(),
+          profileCode: selectedProfileCode?.value,
         },
         {
           onSuccess: (data) => {
@@ -229,6 +245,7 @@ export const BankRedirectAddForm = () => {
           issuerCardBankCodes: selectedIssuerBankCodeValues,
           merchantVposBankCode: selectedMerchantVPosBankCode?.value?.toString(),
           // merchantVposBankCode: selectedMemberVPos?.value?.toString(),
+          profileCode: selectedProfileCode?.value,
         },
         {
           onSuccess: (data) => {
@@ -294,6 +311,13 @@ export const BankRedirectAddForm = () => {
           vPosRouting?.issuerCardBankCodes[0],
         ]
       );
+      if (vPosRouting && vPosRouting.profileCode) {
+        const profile = commissionProfileList?.find(
+          (profile) => profile.value === vPosRouting.profileCode
+        );
+    
+        setSelectedProfileCode(profile || null);
+      }
       setSelectedIssuerBankCodeObjects([
         {
           label: vPosRouting?.issuerCardBankName?.toString(),
@@ -315,17 +339,59 @@ console.log(issuerBankList);
   return (
     <>
       {(isLoading || isUpdateLoading) && <Loading />}
+      
       <Stack flex={1} justifyContent="space-between">
         <Stack flex={1} p={2}>
           <Stack spacing={4}>
-            <Stack width={isDesktop ? 800 : "auto"} spacing={3} direction="row">
-              <SwitchControl
-                label="On Us Yönlendirilsin"
-                control={control}
-                id="onusRouting"
-              />
-              {isDesktop && <Box flex={1} />}
-            </Stack>
+          <Stack
+    width={isDesktop ? 800 : "auto"}
+    spacing={3}
+    direction={isDesktop ? "row" : "column"}
+    sx={{
+        "& > :nth-of-type(1)": {
+            flexBasis: "50%",
+        },
+        "& > :nth-of-type(2)": {
+            flexBasis: "50%",
+        },
+    }}
+>
+    <SwitchControl
+        label="On Us Yönlendirilsin"
+        control={control}
+        id="onusRouting"
+    />
+
+<FormControl sx={{ flex: 1 }}>
+  {commissionProfileList && (
+    <Controller
+      name="profileCode"
+      control={control}
+      defaultValue={selectedProfileCode}
+      render={({ field: { onChange, value } }) => {
+        return (
+          <Autocomplete
+            id="profileCode"
+            options={commissionProfileList}
+            getOptionSelected={(option, value) => option.value === value}
+            getOptionLabel={(option) => option.label}
+            value={selectedProfileCode || null}
+            onChange={(event, newValue) => {
+              setSelectedProfileCode(newValue);
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Çalışma Gurubu" />
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
+
+</Stack>
+
             <Stack width={isDesktop ? 800 : "auto"} spacing={3} direction="row">
               <FormControl sx={{ flex: 1 }}>
                 {merchantList ? (

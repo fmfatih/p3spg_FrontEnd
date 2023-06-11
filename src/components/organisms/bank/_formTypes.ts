@@ -85,6 +85,11 @@ export const addBankFormSchema = zod
     }
   );
 
+export const addSecondBankSchema = zod.object({
+  bankCode: zod.any(),
+  merchantID: zod.any(),
+});
+
 export type BankAddFormValuesType = zod.infer<typeof addBankFormSchema>;
 
 export const initialState: BankAddFormValuesType = {
@@ -99,13 +104,14 @@ export const initialState: BankAddFormValuesType = {
 
 export const addBankRedirectFormSchema = zod.object({
   onusRouting: zod.boolean(),
-  merchantId: zod.number().min(1, { message: "Please enter your name" }),
+  merchantId: zod.number().optional(),
   issuerCardBankCodes: zod.any(),
   issuerCardType: zod
     .string()
     .min(1, { message: "Please enter your phone number" }),
   merchantVposBankCode: zod.any(),
   transactionSubType: zod.string(),
+  profileCode:zod.any()
 });
 
 export type BankAddRedirectFormValuesType = zod.infer<
@@ -119,4 +125,5 @@ export const initialBankAddRedirectState: BankAddRedirectFormValuesType = {
   issuerCardType: "",
   merchantVposBankCode: null,
   transactionSubType: "",
+  profileCode:"",
 };

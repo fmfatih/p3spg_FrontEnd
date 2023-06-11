@@ -9,6 +9,8 @@ export type GetVPosRoutingListRequest = {
   orderByDesc?: boolean;
   orderBy?: string;
   searchText?: string;
+  profileCode:string;
+  merchantId?: string | number;  
   [key: string]: string | number | boolean | undefined;
 };
 
@@ -20,6 +22,7 @@ export type IVPosRouting = {
   issuerCardType: string;
   merchantVposBankCode: string;
   merchantVposBankName: string;
+ profileCode:string;
   id: number;
   status: string;
   transactionSubType?: string;
