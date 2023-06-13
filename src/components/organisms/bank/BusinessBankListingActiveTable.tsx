@@ -65,7 +65,7 @@ export const BusinessBankListingActiveTable = ({
         orderBy: "CreateDate",
         orderByDesc: true,
         status: "ACTIVE",
-        merchantId: userInfo ? userInfo.merchantId : undefined
+        merchantId: userInfo ? Number(userInfo.merchantId) : undefined
       },
       {
         onSuccess: (data) => {
@@ -200,8 +200,8 @@ export const BusinessBankListingActiveTable = ({
               {
                 id: params.row.id,
                 merchantId: params.row.merchantId,
-                // bankCodes: params.row.bankCode,
-                bankCodes: [params.row.bankCode],
+                bankCode: params.row.bankCode,
+                // bankCodes: [params.row.bankCode],
                 defaultBank: val,
                 status: "ACTIVE",
                 
@@ -214,7 +214,7 @@ export const BusinessBankListingActiveTable = ({
                     orderBy: "CreateDate",
                     orderByDesc: true,
                     status: "ACTIVE",
-                    merchantId: userInfo ? userInfo.merchantId : undefined
+                    merchantId: userInfo ? Number(userInfo.merchantId) : undefined
                   });
                 },
               }
@@ -238,7 +238,7 @@ export const BusinessBankListingActiveTable = ({
         orderBy: "CreateDate",
         orderByDesc: true,
         status: "ACTIVE",
-        merchantId: userInfo ? userInfo.merchantId : undefined
+        merchantId: userInfo ? Number(userInfo.merchantId) : undefined
       },
       {
         onSuccess: (data) => {

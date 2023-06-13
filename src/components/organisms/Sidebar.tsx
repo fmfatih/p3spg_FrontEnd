@@ -1,15 +1,17 @@
 import { Logo150 } from "../../assets/images";
 import { Box, IconButton, Stack, Typography, Link, useTheme, useMediaQuery } from "@mui/material";
-import {
-  DashboardIcon,
-  UserIcon,
-} from "../../assets/icons";
+// import {
+  
+//   UserIcon,
+// } from "../../assets/icons";
 import { NavigationItem } from "../molecules";
 import { initialUserInfoState, useUserInfo } from "../../store/User.state";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useNavigate } from "react-router-dom";
 import { StorageKeys } from "../../common/storageKeys";
 import { useGetUserMenuList } from "../../hooks";
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import * as Icons from '@mui/icons-material';
 
 export type SidebarProps = {
   onCloseMenu?: () => void;
@@ -39,11 +41,7 @@ export const Sidebar = ({onCloseMenu}: SidebarProps) => {
       );
 
     return "";
-  };
-// console.log(userMenu);
-
-  
-  
+  };  
   return (
     <Box maxWidth={isDesktop ? 260 : undefined}>
       <Stack
@@ -78,23 +76,26 @@ export const Sidebar = ({onCloseMenu}: SidebarProps) => {
               title="Ana Ekran"
               Icon={DashboardIcon}
             />
-            {userMenu?.data?.map((menuItem) => (
-              <NavigationItem
-                url={menuItem.id}
-                title={menuItem.title}
-                Icon={UserIcon}
-                navItems={
-                  menuItem?.childs
-                    ? menuItem?.childs?.map((childItem) => {
-                        return {
-                          text: childItem.title,
-                          url: `${menuItem.id}/${childItem.id}`,
-                        };
-                      })
-                    : undefined
-                }
-              />
-            ))}
+     {userMenu?.data?.map((menuItem) => {
+  const IconComponent = Icons[menuItem.icon as keyof typeof Icons];
+  return (
+    <NavigationItem
+      url={menuItem.id}
+      title={menuItem.title}
+      Icon={IconComponent}
+      navItems={
+        menuItem?.childs
+          ? menuItem?.childs?.map((childItem) => {
+              return {
+                text: childItem.title,
+                url: `${menuItem.id}/${childItem.id}`,
+              };
+            })
+          : undefined
+      }
+    />
+  );
+})}
 
           </Stack>
         </Stack>

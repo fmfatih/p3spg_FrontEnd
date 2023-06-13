@@ -347,7 +347,6 @@ export const BankAddForm = () => {
                 {!memberVPos?.memberName && merchantList?.length > 0 && (
                   <Controller
                     control={control}
-                    // defaultValue={merchantVPos?.merchantId}
                     name="merchantID"
                     render={() => {
                       return (

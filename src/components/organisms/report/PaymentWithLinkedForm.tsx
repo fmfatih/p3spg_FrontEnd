@@ -54,7 +54,7 @@ export const PaymentWithLinkedForm = () => {
   const setSnackbar = useSetSnackBar();
   const [currentUrl, setCurrentUrl] = useState(undefined);
   const [userInfo] = useUserInfo();
-  const { data:rawMerchantVposList} = useGetMerchantVPosList();
+  const { data: rawMerchantVposList } = useGetMerchantVPosList();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: -1,
@@ -64,41 +64,35 @@ export const PaymentWithLinkedForm = () => {
       resolver: zodResolver(paymentWithLinkedFormSchema),
       defaultValues: paymentWithLinkedInitialValues,
     });
-    const [merchantBankList, setMerchantBankList] = useState([]);
+  const [merchantBankList, setMerchantBankList] = useState([]);
 
-    const { mutate: getMerchantVPosList, isLoading } = useGetMerchantVPosList();
+  const { mutate: getMerchantVPosList, isLoading } = useGetMerchantVPosList();
 
+  useEffect(() => {
+    getMerchantVPosList(
+      {
+        size: paginationModel.pageSize,
+        page: paginationModel.page,
+        orderBy: "CreateDate",
+        orderByDesc: true,
+        status: "ACTIVE",
+      },
+      {
+        onSuccess: (data) => {
+          const bankList = data?.data?.result?.map(
+            (bank: { bankCode: string; bankName: string }) => {
+              return {
+                label: `${bank.bankName}`,
+                value: bank.bankCode,
+              };
+            }
+          );
 
-
-    useEffect(() => {
-      getMerchantVPosList(
-        {
-          size: paginationModel.pageSize,
-          page: paginationModel.page,
-          orderBy: "CreateDate",
-          orderByDesc: true,
-          status: "ACTIVE",
+          setMerchantBankList(bankList); // Here we set the merchantBankList
         },
-        {
-          onSuccess: (data) => {
-            const bankList = data?.data?.result?.map(
-              (bank: { bankCode: string; bankName: string }) => {
-                return {
-                  label: `${bank.bankName}`,
-                  value: bank.bankCode,
-                };
-              }
-            );
-    
-            setMerchantBankList(bankList); // Here we set the merchantBankList
-          },
-        }
-      );
-    }, [getMerchantVPosList])
-    
-
-
-  
+      }
+    );
+  }, [getMerchantVPosList]);
 
   // const acquirerBankList = useMemo(() => {
   //   return rawAcquirerBankList?.data?.map(
@@ -191,7 +185,7 @@ export const PaymentWithLinkedForm = () => {
 
   useEffect(() => {
     setValue("startDate", dayjs());
-    setValue("endDate", dayjs());
+    setValue("endDate", dayjs().add(+1,"day"));
     setValue("installmentCount", "0");
   }, [setValue]);
 
@@ -212,38 +206,38 @@ export const PaymentWithLinkedForm = () => {
               spacing={3}
               direction={isDesktop ? "row" : "column"}
             >
-             <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-  {merchantBankList && (
-    <Controller
-      name="bankCode"
-      control={control}
-      defaultValue=""
-      render={({ field: { onChange, value } }) => {
-        const selectedBank = merchantBankList.find(
-          (option) => option.value === value
-        );
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                {merchantBankList && (
+                  <Controller
+                    name="bankCode"
+                    control={control}
+                    defaultValue=""
+                    render={({ field: { onChange, value } }) => {
+                      const selectedBank = merchantBankList.find(
+                        (option) => option.value === value
+                      );
 
-        return (
-          <Autocomplete
-            id="bankCode"
-            options={merchantBankList}
-            getOptionSelected={(option, value) =>
-              option.value === value
-            }
-            getOptionLabel={(option) => option.label}
-            value={selectedBank || null}
-            onChange={(_, newValue) => {
-              onChange(newValue ? newValue.value : "");
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Banka" />
-            )}
-          />
-        );
-      }}
-    />
-  )}
-</FormControl>
+                      return (
+                        <Autocomplete
+                          id="bankCode"
+                          options={merchantBankList}
+                          getOptionSelected={(option, value) =>
+                            option.value === value
+                          }
+                          getOptionLabel={(option) => option.label}
+                          value={selectedBank || null}
+                          onChange={(_, newValue) => {
+                            onChange(newValue ? newValue.value : "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField {...params} label="Banka" />
+                          )}
+                        />
+                      );
+                    }}
+                  />
+                )}
+              </FormControl>
 
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <InputControl
@@ -316,7 +310,7 @@ export const PaymentWithLinkedForm = () => {
                   id="endDate"
                   control={control}
                   label="Bitiş Tarihi"
-                  defaultValue={dayjs()}
+                  defaultValue={dayjs().add(+1, 'day')}
                 />
               </FormControl>
             </Stack>
@@ -470,7 +464,7 @@ export const PaymentWithLinkedForm = () => {
                     onClick={() => {
                       navigator.clipboard.writeText(currentUrl || "");
                     }}
-                    style={{ color: '#0C9FDC' }} 
+                    style={{ color: "#0C9FDC" }}
                     edge="end"
                   >
                     <ContentCopyIcon />

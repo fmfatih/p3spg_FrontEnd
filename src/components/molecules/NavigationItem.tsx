@@ -17,7 +17,8 @@ interface IconProps {
 }
 
 type NavigationItemProps = {
-  Icon: (props: SVGProps<SVGSVGElement> & IconProps) => JSX.Element;
+  // Icon: (props: SVGProps<SVGSVGElement> & IconProps) => JSX.Element;
+  Icon: React.ComponentType; 
   title: string;
   url: string;
   navItems?: Array<INavItem>;
@@ -46,13 +47,14 @@ export const NavigationItem = ({ navItems, title, url, Icon }: NavigationItemPro
             expandIcon={<ExpandMoreIcon color={isExpanded ? 'primary' : undefined}/>}
             sx={{ padding: 0, margin: 0, border: 0 }}>
             <Stack spacing={2} alignItems="center" direction="row">
-              <Icon colors={isExpanded ? {
+              {/* <Icon colors={isExpanded ? {
                 dark: '#0c9fdc',
                 main: '#85cfed'
               } : {
                 dark: '#41414d',
                 main: '#c0c0c7'
-              }} />
+              }} /> */}
+              <Icon sx={{ fill: isExpanded ? '#0c9fdc' : '#41414d' }} />
               <Typography color={isExpanded ? 'primary' : 'text.subtle'} variant='body2'>{title}</Typography>
             </Stack>
           </AccordionSummary>
@@ -78,13 +80,15 @@ export const NavigationItem = ({ navItems, title, url, Icon }: NavigationItemPro
       ) : (
         <Link href={`/${url}`} underline="none">
           <Stack my={2} spacing={2} alignItems="center" direction="row" >
-            <Icon colors= {location.pathname === url ? {
+            {/* <Icon colors= {location.pathname === url ? {
                 dark: '#0c9fdc',
                 main: '#85cfed'
               } : {
                 dark: '#41414d',
                 main: '#c0c0c7'
-              }}/>
+              }}/> */}
+              <Icon sx={{ fill: location.pathname === url ? '#0c9fdc' : '#41414d' }} />
+
             <Typography color={location.pathname === url ? 'primary' : 'text.subtle'} variant='body2' >{title}</Typography>
           </Stack>
         </Link>

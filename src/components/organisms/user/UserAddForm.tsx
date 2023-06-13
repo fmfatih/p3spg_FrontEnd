@@ -145,7 +145,7 @@ export const UserAddForm = () => {
                 };
             });
     }
-}, [rawMerchantList?.data, userInfo.merchantId]);
+}, [rawMerchantList?.data, userInfo?.merchantId]);
   
   const roleList = useMemo(() => {
     return rawRoles?.data

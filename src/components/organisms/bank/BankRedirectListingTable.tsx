@@ -76,7 +76,7 @@ export const BankRedirectListingTable = () => {
       orderBy: "CreateDate",
       orderByDesc: true,
       searchText: text,
-      merchantId: userInfo ? userInfo.merchantId : undefined
+      merchantId: userInfo ? Number(userInfo?.merchantId) : undefined,
     };
 
     if (queryOptions?.field && queryOptions?.value !== undefined) {
@@ -339,8 +339,6 @@ export const BankRedirectListingTable = () => {
   //   }
 
   // }
-
-  
 
   return (
     <>

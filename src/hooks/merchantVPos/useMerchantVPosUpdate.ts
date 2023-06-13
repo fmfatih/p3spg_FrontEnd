@@ -6,7 +6,7 @@ export interface IMerchantVPosUpdateRequest {
   id: number;
   // memberId: number;
   merchantId: number;
-  bankCodes: string[];
+  bankCode: string;
   defaultBank : boolean;
   status : "ACTIVE" | "PASSIVE" | "BLOCKED"
 }
