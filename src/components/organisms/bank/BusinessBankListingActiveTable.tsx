@@ -96,6 +96,8 @@ export const BusinessBankListingActiveTable = ({
   const editRow = React.useCallback(
     (merchantVPos: IMerchantVPos) => () => {
       navigate("/vpos-management/vpos-bankdefinition", { state: merchantVPos });
+      console.log(merchantVPos);
+      
     },
     [navigate]
   );
@@ -198,9 +200,11 @@ export const BusinessBankListingActiveTable = ({
               {
                 id: params.row.id,
                 merchantId: params.row.merchantId,
-                bankCode: params.row.bankCode,
+                // bankCodes: params.row.bankCode,
+                bankCodes: [params.row.bankCode],
                 defaultBank: val,
                 status: "ACTIVE",
+                
               },
               {
                 onSuccess: () => {
@@ -210,6 +214,7 @@ export const BusinessBankListingActiveTable = ({
                     orderBy: "CreateDate",
                     orderByDesc: true,
                     status: "ACTIVE",
+                    merchantId: userInfo ? userInfo.merchantId : undefined
                   });
                 },
               }
@@ -233,6 +238,7 @@ export const BusinessBankListingActiveTable = ({
         orderBy: "CreateDate",
         orderByDesc: true,
         status: "ACTIVE",
+        merchantId: userInfo ? userInfo.merchantId : undefined
       },
       {
         onSuccess: (data) => {

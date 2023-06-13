@@ -9,7 +9,7 @@ export interface IMerchantVPosAddWithSettingsRequest {
   phoneNumber: string;
   description?: string;
   // memberId: number;
-  merchantId: number;
+  // merchantId?: number;
   bankCode: string;
   defaultBank: boolean;
   parameters: Array<any>;

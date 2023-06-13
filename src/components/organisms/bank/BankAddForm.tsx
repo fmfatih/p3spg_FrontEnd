@@ -13,6 +13,7 @@ import {
   useAuthorization,
   useGetMemberVPosList,
   useGetMerchantVPosList,
+  useMemberVPosUpdateWithSettings,
 } from "../../../hooks";
 import {
   Box,
@@ -67,6 +68,8 @@ export const BankAddForm = () => {
     useGetDefaultVPosSettingsList();
   const { mutate: memberVPosAddWithSettings, isLoading } =
     useMemberVPosAddWithSettings();
+  const { mutate: memberVPosUpdateWithSettings } =
+    useMemberVPosUpdateWithSettings();
   const { mutate: merchantVPosAddWithSettings, isLoading: merchantLoading } =
     useMerchantVPosAddWithSettings();
   const { data: rawMerchantList } = useGetAllMerchantList();
@@ -93,10 +96,12 @@ export const BankAddForm = () => {
         officePhone: memberVPos.officePhone,
         description: memberVPos.description,
         // webAddress: memberVPos.webAddress,
+        merchantID: memberVPos?.merchantId,
         bankCode: `${memberVPos.bankCode}`,
       });
     }
   }, [reset, memberVPos, setValue]);
+
 
   useEffect(() => {
     let req = {};
@@ -120,13 +125,16 @@ export const BankAddForm = () => {
 
     if (!!bankCode) {
       getDefaultVposSettingsList(req, {
-        onSuccess: (data: { data: Array<{ key: string; type: string }> }) => {
+        onSuccess: (data: {
+          data: Array<{ key: string; type: string; value: string }>;
+        }) => {
           remove();
           data?.data?.map((item) => {
             const tempOBJ: any = {
               key: item.key,
-              label: item.key,
+              label: item.label,
               type: "string",
+              value: item.value,
             };
             if (!!memberVPos) {
               memberVPos?.memberVposSettings?.map((memberVPosItem) => {
@@ -178,6 +186,7 @@ export const BankAddForm = () => {
     merchantVPos?.merchantName,
     selectedMerchantId,
     rawAcquirerBankList,
+    bankCode,
   ]);
 
   useEffect(() => {
@@ -202,6 +211,7 @@ export const BankAddForm = () => {
     merchantVPos?.merchantName,
     selectedMerchantId,
     rawAcquirerBankList,
+    bankCode,
   ]);
 
   // const merchantList = useMemo(() => {
@@ -248,42 +258,83 @@ export const BankAddForm = () => {
       };
     });
 
-    memberVPosAddWithSettings(
-      {
-        ...data,
-        parameters,
-        phoneNumber: data.phoneNumber ? `05${data.phoneNumber}` : "",
-        officePhone: data.officePhone ? `05${data.officePhone}` : "",
-        defaultBank: false,
-        memberId: 1,
-        merchantID: selectedMerchantId || 0,
-      },
-      {
-        onSuccess: (data) => {
-          if (data.isSuccess) {
-            setSnackbar({
-              severity: "success",
-              isOpen: true,
-              description: data.message,
-            });
-          } else {
+    if (!!memberVPos?.id) {
+      memberVPosUpdateWithSettings(
+        {
+          ...data,
+
+          parameters,
+          phoneNumber: data.phoneNumber ? `${data.phoneNumber}` : "",
+          officePhone: data.officePhone ? `${data.officePhone}` : "",
+          defaultBank: false,
+          memberId: 1,
+          merchantID: selectedMerchantId || 0,
+        },
+        {
+          onSuccess: (data) => {
+            if (data.isSuccess) {
+              setSnackbar({
+                severity: "success",
+                isOpen: true,
+                description: data.message,
+              });
+            } else {
+              setSnackbar({
+                severity: "error",
+                description: data.message,
+                isOpen: true,
+              });
+            }
+          },
+          onError: () => {
             setSnackbar({
               severity: "error",
-              description: data.message,
+              description: "İşlem sırasında bir hata oluştu",
               isOpen: true,
             });
-          }
+          },
+        }
+      );
+    } else {
+      memberVPosAddWithSettings(
+        {
+          ...data,
+          parameters,
+          phoneNumber: data.phoneNumber ? `${data.phoneNumber}` : "",
+          officePhone: data.officePhone ? `${data.officePhone}` : "",
+          defaultBank: false,
+          memberId: 1,
+          merchantID: selectedMerchantId || 0,
         },
-        onError: () => {
-          setSnackbar({
-            severity: "error",
-            description: "İşlem sırasında bir hata oluştu",
-            isOpen: true,
-          });
-        },
-      }
-    );
+        {
+          onSuccess: (data) => {
+            if (data.isSuccess) {
+              setSnackbar({
+                severity: "success",
+                isOpen: true,
+                description: data.message,
+              });
+            } else {
+              setSnackbar({
+                severity: "error",
+                description: data.message,
+                isOpen: true,
+              });
+            }
+          },
+          onError: () => {
+            setSnackbar({
+              severity: "error",
+              description: "İşlem sırasında bir hata oluştu",
+              isOpen: true,
+            });
+          },
+        }
+      );
+    }
   };
+
+
 
   return (
     <>
@@ -296,6 +347,7 @@ export const BankAddForm = () => {
                 {!memberVPos?.memberName && merchantList?.length > 0 && (
                   <Controller
                     control={control}
+                    // defaultValue={merchantVPos?.merchantId}
                     name="merchantID"
                     render={() => {
                       return (

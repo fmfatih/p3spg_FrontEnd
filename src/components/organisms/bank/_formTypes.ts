@@ -87,7 +87,8 @@ export const addBankFormSchema = zod
 
 export const addSecondBankSchema = zod.object({
   bankCode: zod.any(),
-  merchantID: zod.any(),
+  merchantID: zod.number().optional(),
+  parameters: zod.any().array(),
 });
 
 export type BankAddFormValuesType = zod.infer<typeof addBankFormSchema>;
