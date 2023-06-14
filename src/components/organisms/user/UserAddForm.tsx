@@ -303,6 +303,7 @@ export const UserAddForm = () => {
             </Stack>
             <Stack width={isDesktop ? 800 : "auto"} spacing={3} direction="row">
               <FormatInputControl
+                sx={{ flex: 1 }}
                 defaultValue=""
                 label="Telefon Numarası"
                 control={control}
@@ -351,6 +352,7 @@ export const UserAddForm = () => {
             <Stack
               width={isDesktop ? 800 : "auto"}
               direction={isDesktop ? "row" : "column"}
+              spacing={3}
             >
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 {merchantList && (
@@ -361,7 +363,7 @@ export const UserAddForm = () => {
                       return (
                         <>
                           <Autocomplete
-                            sx={{ mr: 2 }}
+                            
                             onChange={(event, selectedValue) => {
                               if (!isDisabled) {
                                 setSelectedMerchant(selectedValue);
