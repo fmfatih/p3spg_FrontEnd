@@ -223,6 +223,7 @@ export const BankRedirectListingTable = () => {
         field: "merchantId",
         headerName: "Üye İşyeri Numarası",
         width: 200,
+        disableColumnMenu: userInfo?.merchantId !== 0 
       },
       {
         field: "merchantName",

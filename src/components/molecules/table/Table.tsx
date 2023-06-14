@@ -165,6 +165,17 @@ export const Table = ({ handleFilterChange, ...props }: TableProps) => {
       localeText={{
         toolbarColumns: "Kolonlar",
         columnMenuFilter: "Filtre",
+        filterPanelColumns:"Kolon",
+        filterPanelInputPlaceholder:"Değer Ara",
+        filterPanelOperator: "Operatör",
+        filterOperatorContains: "İçerir",
+        filterOperatorEquals: "Eşittir",
+        filterOperatorStartsWith: "İle Başlar",
+        filterOperatorEndsWith: "İle Biter",
+        filterOperatorIsEmpty: "Boştur",
+        filterOperatorIsNotEmpty: "Boş Değildir",
+        filterOperatorIsAnyOf: "Herhangi Biri",
+        filterPanelInputLabel:"Değer",
         columnMenuHideColumn: "Gizle",
         columnMenuManageColumns: "Kolonlar",
         columnMenuSortAsc: "Artan Sırala",
@@ -182,7 +193,7 @@ export const Table = ({ handleFilterChange, ...props }: TableProps) => {
           labelDisplayedRows: ({ from, to, count }) =>
           `${from}/${to} (${count} veri)`,
         },
- 
+
       }}
       columnVisibilityModel={model}
       onColumnVisibilityModelChange={handleColumnVisibilityChange}
