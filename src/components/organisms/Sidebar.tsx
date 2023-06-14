@@ -51,7 +51,7 @@ export const Sidebar = ({onCloseMenu}: SidebarProps) => {
           px: 2,
           pt: isDesktop ? 3 : 0,
           height: isDesktop ? "100vh" : 'auto',
-          overflow: "scroll",
+          overflow: "hidden",
           justifyContent: "space-between",
         }}
       >
