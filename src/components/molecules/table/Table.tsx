@@ -179,7 +179,10 @@ export const Table = ({ handleFilterChange, ...props }: TableProps) => {
         toolbarFilters: "Ara",
         MuiTablePagination: {
           labelRowsPerPage: "Sayfa Başına Satır",
+          labelDisplayedRows: ({ from, to, count }) =>
+          `${from}/${to} (${count} veri)`,
         },
+ 
       }}
       columnVisibilityModel={model}
       onColumnVisibilityModelChange={handleColumnVisibilityChange}

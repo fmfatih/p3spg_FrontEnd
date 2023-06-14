@@ -402,7 +402,7 @@ console.log(issuerBankList);
                       return (
                         <>
                           <Autocomplete
-                            sx={{ mr: isDesktop ? 3 : 0 }}
+                            sx={{ mr: isDesktop ? 0 : 0 }}
                             onChange={(event, selectedValue) => {
                               setSelectedMerchant(selectedValue);
                               setValue("merchantId", selectedValue?.value || 0);
@@ -502,7 +502,7 @@ console.log(issuerBankList);
       render={() => {
         return (
           <Autocomplete
-            sx={{ mr: isDesktop ? 3 : 0 }}
+            sx={{ mr: isDesktop ? 0 : 0 }}
             multiple
             id="issuerCardBankCodes"
             onChange={(event, selectedValue) => {
@@ -573,7 +573,7 @@ console.log(issuerBankList);
                       return (
                         <>
                           <Autocomplete
-                            sx={{ mr: isDesktop ? 3 : 0 }}
+                            sx={{ mr: isDesktop ? 0 : 0 }}
                             onChange={(event, selectedValue) => {
                               setSelectedMerchantVPosBankCode(selectedValue);
                             }}
