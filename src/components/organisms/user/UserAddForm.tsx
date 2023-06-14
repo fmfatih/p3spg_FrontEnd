@@ -62,11 +62,17 @@ export const UserAddForm = () => {
       resolver: zodResolver(addUserFormSchema),
     });
 
+  const [selectedMerchant, setSelectedMerchant] = useState(
+    user
+      ? Number(userInfo.merchantId) !== 0
+        ? { label: userInfo.merchantName, value: Number(userInfo.merchantId) }
+        : null
+      : null
+  );
   const [userStatus, setUserStatus] = useState("");
 
   const userType = watch("userType");
   const fullName = watch("fullName");
-  const merchantDropdownValue = watch("merchant");
 
   useEffect(() => {
     if (!!user && JSON.stringify(user) !== "{}") {
@@ -74,9 +80,11 @@ export const UserAddForm = () => {
         (acc, curr) => ((acc[curr?.key] = true), acc),
         {}
       );
-
+      setSelectedMerchant({
+        label: user?.merchantName || "",
+        value: user?.merchantId,
+      });
       setUserStatus(user.status);
-
       reset(
         {
           fullName: user?.fullName,
@@ -113,30 +121,32 @@ export const UserAddForm = () => {
   //     );
   //   }, [rawMerchantList?.data]);
 
-  const merchantList = useMemo(() => {
-    if (userInfo.merchantId == 0) {
-      return rawMerchantList?.data?.map(
-        (rawPosType: { merchantName: string; merchantId: number }) => {
-          return {
-            label: rawPosType.merchantName,
-            value: rawPosType.merchantId,
-          };
-        }
-      );
-    } else {
-      return rawMerchantList?.data
-        ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
-          return rawPosType.merchantId === Number(userInfo.merchantId);
-        })
-        .map((filteredMerchant) => {
-          return {
-            label: filteredMerchant.merchantName,
-            value: filteredMerchant.merchantId,
-          };
-        });
-    }
-  }, [rawMerchantList?.data, userInfo?.merchantId]);
 
+  const merchantList = useMemo(() => {
+ 
+    if (userInfo.merchantId == 0) {
+        return rawMerchantList?.data?.map(
+            (rawPosType: { merchantName: string; merchantId: number }) => {
+                return {
+                    label: rawPosType.merchantName,
+                    value: rawPosType.merchantId,
+                };
+            }
+        );
+    } else {
+        return rawMerchantList?.data
+            ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
+                return rawPosType.merchantId === Number(userInfo.merchantId);
+            })
+            .map((filteredMerchant) => {
+                return {
+                    label: filteredMerchant.merchantName,
+                    value: filteredMerchant.merchantId,
+                };
+            });
+    }
+}, [rawMerchantList?.data, userInfo?.merchantId]);
+  
   const roleList = useMemo(() => {
     return rawRoles?.data
       ?.filter((rawRole) => rawRole.userType === userType)
@@ -186,7 +196,7 @@ export const UserAddForm = () => {
       phoneNumber: phoneNumber || "",
       userType: Number(userType),
       roleIds: tempRoleIds,
-      merchantId: Number(merchantDropdownValue?.value) || 0,
+      merchantId: Number(selectedMerchant?.value) || 0,
       status: status,
     };
 
@@ -258,12 +268,12 @@ export const UserAddForm = () => {
   useEffect(() => {
     setIsDisabled(Number(userType) === 1);
     if (isDisabled) {
+      setSelectedMerchant(null);
       setValue("merchant", 0);
     }
   }, [userType, isDisabled]);
 
   const handleBack = () => navigate("/dashboard");
-  console.log(merchantDropdownValue);
 
   return (
     <>
@@ -306,7 +316,7 @@ export const UserAddForm = () => {
             </Stack>
 
             <Box flex={1}>
-              {user?.merchantId ? (
+              {user?.id ? (
                 <Controller
                   name="status"
                   control={control}
@@ -353,30 +363,14 @@ export const UserAddForm = () => {
                       return (
                         <>
                           <Autocomplete
+                            value={user?.id && !isDisabled ? selectedMerchant : null}
                             onChange={(event, selectedValue) => {
-                              console.log(selectedValue);
-                              if (!isDisabled && selectedValue) {
-                                setValue("merchant", {
-                                  label: selectedValue?.label,
-                                  value: selectedValue?.value,
-                                });
-                                field.onChange({
-                                  label: selectedValue?.label,
-                                  value: selectedValue?.value,
-                                });
+                              if (!isDisabled) {
+                                setSelectedMerchant(selectedValue);
+                                setValue("merchant", selectedValue?.value || 0);
+                                field.onChange(selectedValue?.value || 0);
                               }
                             }}
-                            value={
-                              field.value
-                                ? {
-                                    label: field.value.label,
-                                    value: field.value.value,
-                                  }
-                                : {
-                                    label: "",
-                                    value: "",
-                                  }
-                            }
                             id="merchant"
                             options={merchantList}
                             getOptionLabel={(option: {
