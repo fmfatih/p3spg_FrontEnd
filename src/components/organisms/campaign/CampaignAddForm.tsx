@@ -341,7 +341,7 @@ export const CampaignAddForm = () => {
               />
             </FormControl>
           </Stack>
-          <Stack direction={isDesktop ? "row" : 'column'} justifyContent="flex-end" width={isDesktop ? 800 : 'auto'}>
+          <Stack direction={isDesktop ? "row" : 'column'} spacing={3} justifyContent="flex-end" width={isDesktop ? 800 : 'auto'}>
             {!!showCreate && (
               <Button
                 onClick={handleSubmit(onSubmit)}

@@ -381,7 +381,7 @@ export const MerchantEndOfDayComponent = () => {
                       return (
                         <>
                           <Autocomplete
-                            sx={{ mr: 2 }}
+                            sx={{ mr:isDesktop? 2:0 }}
                             onChange={(event, selectedValue) => {
                               setSelectedMerchant(selectedValue);
                               setValue("merchantId", selectedValue?.value || 0);
