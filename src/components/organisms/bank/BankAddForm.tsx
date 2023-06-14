@@ -226,7 +226,7 @@ export const BankAddForm = () => {
   // }, [rawMerchantList?.data]);
 
   const merchantList = useMemo(() => {
-    if (userInfo?.merchantId === 0) {
+    if (userInfo?.merchantId == 0) {
       return rawMerchantList?.data?.map(
         (rawPosType: { merchantName: string; merchantId: number }) => {
           return {

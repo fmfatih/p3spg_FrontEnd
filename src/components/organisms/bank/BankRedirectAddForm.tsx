@@ -149,7 +149,7 @@ export const BankRedirectAddForm = () => {
 
   const merchantList = useMemo(() => {
  
-    if (userInfo.merchantId === 0) {
+    if (userInfo.merchantId == 0) {
         return rawMerchantList?.data?.map(
             (rawPosType: { merchantName: string; merchantId: number }) => {
                 return {
@@ -204,7 +204,7 @@ export const BankRedirectAddForm = () => {
           ...data,
           id: vPosRouting?.id,
           memberId: 1,
-          merchantId: Number(selectedMerchant?.value),
+          merchantId: Number(selectedMerchant?.value) || 0,
           issuerCardBankCodes: selectedIssuerBankCodeValues,
           merchantVposBankCode: selectedMerchantVPosBankCode?.value?.toString(),
           // merchantVposBankCode: selectedMemberVPos?.value?.toString(),
@@ -241,7 +241,7 @@ export const BankRedirectAddForm = () => {
         {
           ...data,
           memberId: 1,
-          merchantId: Number(selectedMerchant?.value),
+          merchantId: Number(selectedMerchant?.value) || 0,
           issuerCardBankCodes: selectedIssuerBankCodeValues,
           merchantVposBankCode: selectedMerchantVPosBankCode?.value?.toString(),
           // merchantVposBankCode: selectedMemberVPos?.value?.toString(),
