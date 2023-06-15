@@ -415,7 +415,7 @@ console.log(issuerBankList);
                               value: number;
                             }) => option.label}
                             renderInput={(params) => (
-                              <TextField {...params} label="Üye İşyeri" required={true} />
+                              <TextField {...params} label="Üye İşyeri"  />
                             )}
                           />
                         </>
