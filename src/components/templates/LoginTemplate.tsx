@@ -106,6 +106,11 @@ const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
           flex={isDesktop ? 1 : "auto"}
           justifyContent="center"
           alignItems="center"
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              handleSubmit(onSubmit)();
+            }
+          }}
         >
           <Stack
             spacing={3}
