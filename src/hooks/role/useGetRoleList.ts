@@ -8,6 +8,7 @@ export type GetRoleListRequest = {
   size?: number;
   orderByDesc?: boolean;
   orderBy?: string
+  [key: string]: string | number | boolean | undefined;
 }
 
 export type IRole ={
@@ -29,21 +30,32 @@ export type IRole ={
 
 export type GetRoleListResponse = BasePagingResponse<Array<IRole>>;
 
-async function getRoleList({page= 0, size= 15, orderByDesc= true, orderBy = "CreateDate"}: GetRoleListRequest): Promise<GetRoleListResponse> {
-  const data = {
-    page,
-    size,
-    orderByDesc,
-    orderBy
-  };
+// async function getRoleList({page= 0, size= 15, orderByDesc= true, orderBy = "CreateDate"}: GetRoleListRequest): Promise<GetRoleListResponse> {
+//   const data = {
+//     page,
+//     size,
+//     orderByDesc,
+//     orderBy
+//   };
 
+//   try {
+//     return (await axiosInstance.post("/Role/List", data))
+//       .data;
+//   } catch (ex) {
+//     throw ((ex as AxiosError).response?.data as any).error;
+//   }
+// }
+
+async function getRoleList(
+  data: GetRoleListRequest
+): Promise<GetRoleListResponse> {
   try {
-    return (await axiosInstance.post("/Role/List", data))
-      .data;
+    return (await axiosInstance.post("/Role/List", data)).data;
   } catch (ex) {
     throw ((ex as AxiosError).response?.data as any).error;
   }
 }
+
 
 export function useGetRoleList() {
   return useMutation<GetRoleListResponse, Error, GetRoleListRequest>((variables) =>

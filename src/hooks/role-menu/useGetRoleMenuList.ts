@@ -8,6 +8,7 @@ export type GetRoleMenuListRequest = {
   size?: number;
   orderByDesc?: boolean;
   orderBy?: string;
+  [key: string]: string | number | boolean | undefined;
 };
 
 export type IRoleMenu = {
@@ -30,25 +31,36 @@ export type IRoleMenu = {
 
 export type GetRoleMenuListResponse = BasePagingResponse<Array<IRoleMenu>>;
 
-async function getRoleMenuList({
-  page = 0,
-  size = 15,
-  orderByDesc = true,
-  orderBy = "CreateDate",
-}: GetRoleMenuListRequest): Promise<GetRoleMenuListResponse> {
-  const data = {
-    page,
-    size,
-    orderByDesc,
-    orderBy,
-  };
+// async function getRoleMenuList({
+//   page = 0,
+//   size = 15,
+//   orderByDesc = true,
+//   orderBy = "CreateDate",
+// }: GetRoleMenuListRequest): Promise<GetRoleMenuListResponse> {
+//   const data = {
+//     page,
+//     size,
+//     orderByDesc,
+//     orderBy,
+//   };
 
+//   try {
+//     return (await axiosInstance.post("/RoleMenu/List", data)).data;
+//   } catch (ex) {
+//     throw ((ex as AxiosError).response?.data as any).error;
+//   }
+// }
+
+async function getRoleMenuList(
+  data: GetRoleMenuListRequest
+): Promise<GetRoleMenuListResponse> {
   try {
     return (await axiosInstance.post("/RoleMenu/List", data)).data;
   } catch (ex) {
     throw ((ex as AxiosError).response?.data as any).error;
   }
 }
+
 
 export function useGetRoleMenuList() {
   return useMutation<GetRoleMenuListResponse, Error, GetRoleMenuListRequest>(

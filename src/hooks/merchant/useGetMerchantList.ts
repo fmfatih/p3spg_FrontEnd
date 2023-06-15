@@ -9,6 +9,7 @@ export type GetMerchantListRequest = {
   orderByDesc?: boolean;
   orderBy?: string;
   merchantId?: string | number;  
+  [key: string]: string | number | boolean | undefined;
 };
 
 export type IMerchant = {
@@ -47,20 +48,30 @@ export type IMerchant = {
 
 export type GetMerchantListResponse = BasePagingResponse<Array<any>>;
 
-async function getMerchantList({
-  page = 0,
-  size = 15,
-  orderByDesc = true,
-  orderBy = "CreateDate",
-  merchantId
-}: GetMerchantListRequest): Promise<any> {
-  const data = {
-    page,
-    size,
-    orderByDesc,
-    orderBy,
-    merchantId
-  };
+// async function getMerchantList({
+//   page = 0,
+//   size = 15,
+//   orderByDesc = true,
+//   orderBy = "CreateDate",
+//   merchantId
+// }: GetMerchantListRequest): Promise<any> {
+//   const data = {
+//     page,
+//     size,
+//     orderByDesc,
+//     orderBy,
+//     merchantId
+//   };
+//   try {
+//     return (await axiosInstance.post("/Merchant/List", data)).data;
+//   } catch (ex) {
+//     throw ((ex as AxiosError).response?.data as any).error;
+//   }
+// }
+
+async function getMerchantList(
+  data: GetMerchantListRequest
+): Promise<any> {
   try {
     return (await axiosInstance.post("/Merchant/List", data)).data;
   } catch (ex) {

@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useMemo, useState } from "react";
 import { Stack, useMediaQuery, useTheme } from "@mui/material";
 import {
@@ -28,8 +31,9 @@ export const MenuListingTable = ({
   isMenuOpen,
 }: MenuListingTableProps) => {
   const theme = useTheme();
-  const {showDelete, showUpdate} = useAuthorization();
+  const { showDelete, showUpdate } = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const [queryOptions, setQueryOptions] = React.useState({});
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
@@ -53,37 +57,40 @@ export const MenuListingTable = ({
   }, [getMenuList, isMenuOpen, paginationModel.page, paginationModel.pageSize]);
 
   useEffect(() => {
-    getMenuList(
-      {
-        size: paginationModel.pageSize,
-        page: paginationModel.page,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-      },
-      {
-        onSuccess: (data) => {
-          if (!data.isSuccess) {
-            setSnackbar({
-              severity: "error",
-              description: data.message,
-              isOpen: true,
-            });
-          }
-        },
-        onError: () => {
+    const requestPayload = {
+      size: paginationModel.pageSize,
+      page: paginationModel.page,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+    };
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+
+    getMenuList(requestPayload, {
+      onSuccess: (data) => {
+        if (!data.isSuccess) {
           setSnackbar({
             severity: "error",
-            description: "İşlem sırasında bir hata oluştu",
+            description: data.message,
             isOpen: true,
           });
-        },
-      }
-    );
+        }
+      },
+      onError: () => {
+        setSnackbar({
+          severity: "error",
+          description: "İşlem sırasında bir hata oluştu",
+          isOpen: true,
+        });
+      },
+    });
   }, [
     getMenuList,
     paginationModel.page,
     paginationModel.pageSize,
     setSnackbar,
+    queryOptions,
   ]);
 
   const handleChangePagination = (model: GridPaginationModel) => {
@@ -173,11 +180,15 @@ export const MenuListingTable = ({
         type: "actions",
         width: 80,
         getActions: (params) => [
-          !!showDelete ? <GridActionsCellItem
-            label="Sil"
-            onClick={deleteRow(params.row)}
-            showInMenu
-          /> : <></>,
+          !!showDelete ? (
+            <GridActionsCellItem
+              label="Sil"
+              onClick={deleteRow(params.row)}
+              showInMenu
+            />
+          ) : (
+            <></>
+          ),
         ],
       },
       { field: "id", headerName: "Menü ID", width: 150 },
@@ -194,35 +205,56 @@ export const MenuListingTable = ({
   }, [deleteRow, showDelete]);
 
   const onSave = () => {
-    getMenuList(
-      {
-        size: -1,
-        page: 0,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-      },
-      {
-        onSuccess: (data) => {
-          if (data.isSuccess) {
-            downloadExcel(data?.data?.result || [], "Menü Listesi");
-          } else {
-            setSnackbar({
-              severity: "error",
-              description: data.message,
-              isOpen: true,
-            });
-          }
-        },
-        onError: () => {
+    const requestPayload = {
+      size: -1,
+      page: 0,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+
+    getMenuList(requestPayload, {
+      onSuccess: (data) => {
+        if (data.isSuccess) {
+          downloadExcel(data?.data?.result || [], "Menü Listesi");
+        } else {
           setSnackbar({
             severity: "error",
-            description: "İşlem sırasında bir hata oluştu",
+            description: data.message,
             isOpen: true,
           });
-        },
-      }
-    );
+        }
+      },
+      onError: () => {
+        setSnackbar({
+          severity: "error",
+          description: "İşlem sırasında bir hata oluştu",
+          isOpen: true,
+        });
+      },
+    });
   };
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, delay);
+    };
+  };
+
+  const handleFilterChange = debounce((props) => {
+    if (props === "clearFilter") {
+      return setQueryOptions({});
+    }
+    if (props.value?.toString()?.length >= 1) {
+      setQueryOptions(props);
+    }
+  }, 500);
 
   const hasLoading = isLoading || isDeleteLoading;
 
@@ -233,6 +265,7 @@ export const MenuListingTable = ({
         {tableData?.result?.length && (
           <>
             <Table
+              handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
@@ -240,7 +273,7 @@ export const MenuListingTable = ({
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               isRowSelectable={() => false}
               onRowClick={!!showUpdate ? onRowClick : () => null}
-              disableColumnMenu
+              // disableColumnMenu
               rows={tableData.result}
               columns={columns}
               exportFileName="Menü Listesi"

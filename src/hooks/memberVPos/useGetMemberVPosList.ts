@@ -9,6 +9,7 @@ export type GetMemberVPosListRequest = {
   orderByDesc?: boolean;
   orderBy?: string;
   status: "ACTIVE" | "PASSIVE";
+  [key: string]: string | number | boolean | undefined;
 };
 
 export type IMemberVPos = {
@@ -36,22 +37,37 @@ export type IMemberVPos = {
 
 export type IGetMemberVPosListResponse = BasePagingResponse<Array<IMemberVPos>>;
 
-async function getMemberVPosList({
-  status,
-  page,
-  size,
-  orderByDesc = true,
-  orderBy = "CreateDate",
-}: GetMemberVPosListRequest): Promise<IGetMemberVPosListResponse> {
-  const data = {
-    page,
-    size,
-    orderByDesc,
-    orderBy,
-    status,
-  };
+// async function getMemberVPosList({
+//   status,
+//   page,
+//   size,
+//   orderByDesc = true,
+//   orderBy = "CreateDate",
+// }: GetMemberVPosListRequest): Promise<IGetMemberVPosListResponse> {
+//   const data = {
+//     page,
+//     size,
+//     orderByDesc,
+//     orderBy,
+//     status,
+//   };
+//   try {
+//     if ((page === 0 || page) && size)
+//       return (await axiosInstance.post("/MemberVPos/List", data)).data;
+//     else
+//       return (
+//         await axiosInstance.post("/MemberVPos/ListWithoutPagination", data)
+//       ).data;
+//   } catch (ex) {
+//     throw ((ex as AxiosError).response?.data as any).error;
+//   }
+// }
+
+async function getMemberVPosList(
+  data: GetMemberVPosListRequest
+): Promise<IGetMemberVPosListResponse> {
   try {
-    if ((page === 0 || page) && size)
+    if ((data.page === 0 || data.page) && data.size)
       return (await axiosInstance.post("/MemberVPos/List", data)).data;
     else
       return (
@@ -61,6 +77,7 @@ async function getMemberVPosList({
     throw ((ex as AxiosError).response?.data as any).error;
   }
 }
+
 
 export function useGetMemberVPosList() {
   return useMutation<

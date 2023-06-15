@@ -39,6 +39,7 @@ export const MerchantListingTable = ({
   const {showDelete, showUpdate} = useAuthorization();
   const [userInfo] = useUserInfo();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const [queryOptions, setQueryOptions] = React.useState({});
   const [tableData, setTableData] = useState<PagingResponse<Array<any>>>();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
@@ -49,16 +50,20 @@ export const MerchantListingTable = ({
   const setSnackbar = useSetSnackBar();
 
   useEffect(() => {
-    getMerchantList(
-      {
-        size: paginationModel.pageSize,
+    const requestPayload = {
+      size: paginationModel.pageSize,
         page: paginationModel.page,
         orderBy: "CreateDate",
         orderByDesc: true,
-        merchantId: userInfo ? userInfo.merchantId : undefined
-   
-      },
-      
+      merchantId: userInfo ? Number(userInfo.merchantId) : undefined
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+
+    getMerchantList(
+    requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -85,6 +90,7 @@ export const MerchantListingTable = ({
     paginationModel.page,
     paginationModel.pageSize,
     setSnackbar,
+    queryOptions
   ]);
 
   const handleChangePagination = (model: GridPaginationModel) => {
@@ -279,13 +285,18 @@ export const MerchantListingTable = ({
   }, [deleteRow, editRow, showDelete, showUpdate]);
 
   const onSave = () => {
+    const requestPayload = {
+      size: -1,
+      page: 0,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
     getMerchantList(
-      {
-        size: -1,
-        page: 0,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-      },
+  requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -309,6 +320,25 @@ export const MerchantListingTable = ({
     );
   };
 
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, delay);
+    };
+  };
+
+  const handleFilterChange = debounce((props) => {
+    if (props === "clearFilter") {
+      return setQueryOptions({});
+    }
+    if (props.value?.toString()?.length >= 1) {
+      setQueryOptions(props);
+    }
+  }, 500);
+
   const hasLoading = isLoading || isDeleteLoading;
   return (
     <>
@@ -317,6 +347,7 @@ export const MerchantListingTable = ({
         {tableData?.result?.length && (
           <>
             <Table
+             handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
@@ -324,7 +355,7 @@ export const MerchantListingTable = ({
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               onRowClick={onRowClick}
               isRowSelectable={() => false}
-              disableColumnMenu
+              // disableColumnMenu
               rows={tableData.result}
               columns={columns}
               exportFileName="Üye İşyeri Listesi"

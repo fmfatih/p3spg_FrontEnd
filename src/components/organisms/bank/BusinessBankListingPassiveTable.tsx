@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import {
   GridColDef,
   GridRowId,
@@ -19,6 +22,7 @@ import React from "react";
 import { DeleteMerchantVPosRequest, useMerchantVPosDelete } from "../../../hooks";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
 import { downloadExcel } from "../../../util/downloadExcel";
+import { useUserInfo } from "../../../store/User.state";
 
 function RenderStatus(props: GridRenderCellParams<any, string>) {
   const { value } = props;
@@ -33,9 +37,11 @@ type BusinessBankListingProps = {
 export const BusinessBankListingPassiveTable = ({
   onRowClick,
 }: BusinessBankListingProps) => {
+  const [userInfo] = useUserInfo();
   const theme = useTheme();
   const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const [queryOptions, setQueryOptions] = React.useState({});
   const [tableData, setTableData] =
     useState<PagingResponse<Array<IMerchantVPos>>>();
   const [paginationModel, setPaginationModel] = React.useState({
@@ -50,14 +56,20 @@ export const BusinessBankListingPassiveTable = ({
   const setSnackbar = useSetSnackBar();
 
   useEffect(() => {
+    const requestPayload = {
+      size: paginationModel.pageSize,
+      page: paginationModel.page,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+      status: "PASSIVE",
+      merchantId: userInfo ? Number(userInfo.merchantId) : undefined
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
     getMerchantVPosList(
-      {
-        size: paginationModel.pageSize,
-        page: paginationModel.page,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-        status: "PASSIVE",
-      },
+    requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -84,6 +96,7 @@ export const BusinessBankListingPassiveTable = ({
     paginationModel.page,
     paginationModel.pageSize,
     setSnackbar,
+    queryOptions
   ]);
 
   const deleteRow = React.useCallback(
@@ -204,14 +217,19 @@ export const BusinessBankListingPassiveTable = ({
   }, [deleteRow, showDelete]);
 
   const onSave = () => {
+    const requestPayload = {
+      size: -1,
+      page: 0,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+      status: "PASSIVE",
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
     getMerchantVPosList(
-      {
-        size: -1,
-        page: 0,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-        status: "PASSIVE",
-      },
+      requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -235,6 +253,25 @@ export const BusinessBankListingPassiveTable = ({
     );
   };
 
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, delay);
+    };
+  };
+
+  const handleFilterChange = debounce((props) => {
+    if (props === "clearFilter") {
+      return setQueryOptions({});
+    }
+    if (props.value?.toString()?.length >= 1) {
+      setQueryOptions(props);
+    }
+  }, 500);
+
   const hasLoading = isLoading || isDeleteLoading;
   return (
     <>
@@ -243,6 +280,7 @@ export const BusinessBankListingPassiveTable = ({
         {tableData?.result && (
           <>
             <Table
+             handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
@@ -250,7 +288,7 @@ export const BusinessBankListingPassiveTable = ({
               onRowClick={onRowClick}
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               isRowSelectable={() => false}
-              disableColumnMenu
+              // disableColumnMenu
               rows={tableData.result.filter(
                 (item) => item.status === "PASSIVE"
               )}

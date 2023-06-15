@@ -8,6 +8,7 @@ export type GetResourceListRequest = {
   size?: number;
   orderByDesc?: boolean;
   orderBy?: string
+  [key: string]: string | number | boolean | undefined;
 }
 
 export type IResource  = {
@@ -28,21 +29,32 @@ export type IResource  = {
 }
 export type GetResourceListResponse = BasePagingResponse<Array<IResource>>
 
-async function getResourceList({page= 0, size= 15, orderByDesc= true, orderBy = "CreateDate"}: GetResourceListRequest): Promise<GetResourceListResponse> {
-  const data = {
-    page,
-    size,
-    orderByDesc,
-    orderBy
-  };
+// async function getResourceList({page= 0, size= 15, orderByDesc= true, orderBy = "CreateDate"}: GetResourceListRequest): Promise<GetResourceListResponse> {
+//   const data = {
+//     page,
+//     size,
+//     orderByDesc,
+//     orderBy
+//   };
 
+//   try {
+//     return (await axiosInstance.post("/Resource/List", data))
+//       .data;
+//   } catch (ex) {
+//     throw ((ex as AxiosError).response?.data as any).error;
+//   }
+// }
+
+async function getResourceList(
+  data: GetResourceListRequest
+): Promise<GetResourceListResponse> {
   try {
-    return (await axiosInstance.post("/Resource/List", data))
-      .data;
+    return (await axiosInstance.post("/Resource/List", data)).data;
   } catch (ex) {
     throw ((ex as AxiosError).response?.data as any).error;
   }
 }
+
 
 export function useGetResourceList() {
   return useMutation<GetResourceListResponse, Error, GetResourceListRequest>((variables) =>

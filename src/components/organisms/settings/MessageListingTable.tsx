@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useMemo, useState } from "react";
 import { Stack, useMediaQuery, useTheme } from "@mui/material";
 import {
@@ -29,6 +32,7 @@ export const MessageListingTable = ({
   const theme = useTheme();
   const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const [queryOptions, setQueryOptions] = React.useState({});
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
@@ -58,13 +62,17 @@ export const MessageListingTable = ({
   ]);
 
   useEffect(() => {
+    const requestPayload = {
+      size: paginationModel.pageSize,
+      page: paginationModel.page,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+    };
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
     getResourceList(
-      {
-        size: paginationModel.pageSize,
-        page: paginationModel.page,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-      },
+      requestPayload,
       {
         onSuccess: (data) => {
           if (!data.isSuccess) {
@@ -89,6 +97,7 @@ export const MessageListingTable = ({
     paginationModel.page,
     paginationModel.pageSize,
     setSnackbar,
+    queryOptions
   ]);
 
   const handleChangePagination = (model: GridPaginationModel) => {
@@ -194,13 +203,19 @@ export const MessageListingTable = ({
   }, [deleteRow, showDelete]);
 
   const onSave = () => {
+    const requestPayload = {
+      size: -1,
+      page: 0,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+
     getResourceList(
-      {
-        size: -1,
-        page: 0,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-      },
+      requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -224,6 +239,25 @@ export const MessageListingTable = ({
     );
   };
 
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, delay);
+    };
+  };
+
+  const handleFilterChange = debounce((props) => {
+    if (props === "clearFilter") {
+      return setQueryOptions({});
+    }
+    if (props?.value?.toString()?.length >= 1) {
+      setQueryOptions(props);
+    }
+  }, 500);
+
   const hasLoading = isLoading || isDeleteLoading;
   return (
     <>
@@ -232,6 +266,7 @@ export const MessageListingTable = ({
         {tableData?.result?.length && (
           <>
             <Table
+              handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
@@ -239,7 +274,7 @@ export const MessageListingTable = ({
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               onRowClick={!!showUpdate ? onRowClick : () => null}
               isRowSelectable={() => false}
-              disableColumnMenu
+              // disableColumnMenu
               rows={tableData.result}
               columns={columns}
               exportFileName="Mesaj Listesi"

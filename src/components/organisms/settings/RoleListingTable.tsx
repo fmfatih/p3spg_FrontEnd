@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useMemo, useState } from "react";
 import { Stack, useMediaQuery, useTheme } from "@mui/material";
 import {
@@ -25,6 +28,7 @@ export const RoleListingTable = ({
   const theme = useTheme();
   const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const [queryOptions, setQueryOptions] = React.useState({});
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
@@ -53,13 +57,18 @@ export const RoleListingTable = ({
   ]);
 
   useEffect(() => {
+    const requestPayload = {
+      size: paginationModel.pageSize,
+      page: paginationModel.page,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+    };
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+
     getRoleList(
-      {
-        size: paginationModel.pageSize,
-        page: paginationModel.page,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-      },
+requestPayload,
       {
         onSuccess: (data) => {
           if (!data.isSuccess) {
@@ -84,6 +93,7 @@ export const RoleListingTable = ({
     paginationModel.page,
     paginationModel.pageSize,
     setSnackbar,
+    queryOptions
   ]);
 
   const handleChangePagination = (model: GridPaginationModel) => {
@@ -189,13 +199,19 @@ export const RoleListingTable = ({
   }, [deleteRow, showDelete]);
 
   const onSave = () => {
-    getRoleList(
-      {
-        size: -1,
+    const requestPayload = {
+      size: -1,
         page: 0,
         orderBy: "CreateDate",
         orderByDesc: true,
-      },
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+
+    getRoleList(
+    requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -219,6 +235,25 @@ export const RoleListingTable = ({
     );
   };
 
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, delay);
+    };
+  };
+
+  const handleFilterChange = debounce((props) => {
+    if (props === "clearFilter") {
+      return setQueryOptions({});
+    }
+    if (props.value?.toString()?.length >= 1) {
+      setQueryOptions(props);
+    }
+  }, 500);
+
   const hasLoading = isLoading || isDeleteLoading;
   return (
     <>
@@ -227,13 +262,14 @@ export const RoleListingTable = ({
         {tableData?.result?.length && (
           <>
             <Table
+              handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
               rowCount={tableData.totalItems}
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               isRowSelectable={() => false}
-              disableColumnMenu
+              // disableColumnMenu
               onRowClick={!!showUpdate ? onRowClick : () => null}
               rows={tableData.result}
               columns={columns}

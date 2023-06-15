@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import {
   GridColDef,
   GridRowId,
@@ -36,6 +39,7 @@ export const BankListingPassiveTable = ({
   const theme = useTheme();
   const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const [queryOptions, setQueryOptions] = React.useState({});
   const [tableData, setTableData] =
     useState<PagingResponse<Array<IMemberVPos>>>();
   const [paginationModel, setPaginationModel] = React.useState({
@@ -50,14 +54,22 @@ export const BankListingPassiveTable = ({
   const setSnackbar = useSetSnackBar();
 
   useEffect(() => {
+
+    const requestPayload = {
+      size: paginationModel.pageSize,
+      page: paginationModel.page,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+      status: "PASSIVE",
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+
+
     getMemberVPosList(
-      {
-        size: paginationModel.pageSize,
-        page: paginationModel.page,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-        status: "PASSIVE",
-      },
+    requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -84,6 +96,7 @@ export const BankListingPassiveTable = ({
     paginationModel.page,
     paginationModel.pageSize,
     setSnackbar,
+    queryOptions
   ]);
 
   const deleteRow = React.useCallback(
@@ -204,14 +217,20 @@ export const BankListingPassiveTable = ({
   }, [deleteRow, showDelete]);
 
   const onSave = () => {
+
+    const requestPayload = {
+      size: -1,
+      page: 0,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+      status: "PASSIVE",
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
     getMemberVPosList(
-      {
-        size: -1,
-        page: 0,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-        status: "PASSIVE",
-      },
+   requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -235,6 +254,25 @@ export const BankListingPassiveTable = ({
     );
   };
 
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, delay);
+    };
+  };
+
+  const handleFilterChange = debounce((props) => {
+    if (props === "clearFilter") {
+      return setQueryOptions({});
+    }
+    if (props.value?.toString()?.length >= 1) {
+      setQueryOptions(props);
+    }
+  }, 500);
+
   const hasLoading = isLoading || isDeleteLoading;
   return (
     <>
@@ -243,6 +281,7 @@ export const BankListingPassiveTable = ({
         {tableData?.result && (
           <>
             <Table
+               handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
@@ -250,7 +289,7 @@ export const BankListingPassiveTable = ({
               onRowClick={onRowClick}
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               isRowSelectable={() => false}
-              disableColumnMenu
+              // disableColumnMenu
               rows={tableData.result.filter(
                 (item) => item.status === "PASSIVE"
               )}

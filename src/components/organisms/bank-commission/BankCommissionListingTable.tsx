@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useMemo, useState } from "react";
 import { Stack, useMediaQuery, useTheme } from "@mui/material";
 import {
@@ -44,6 +47,7 @@ export const BankCommissionListingTable = ({
   const theme = useTheme();
   const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const [queryOptions, setQueryOptions] = React.useState({});
   const [tableData, setTableData] =
     useState<PagingResponse<Array<ICommissionParameter>>>();
   const [paginationModel, setPaginationModel] = React.useState({
@@ -60,13 +64,18 @@ export const BankCommissionListingTable = ({
     useDeleteCommissionParameter();
 
   useEffect(() => {
-    getCommissionParameterList(
-      {
-        size: paginationModel.pageSize,
+    const requestPayload = {
+      size: paginationModel.pageSize,
         page: paginationModel.page,
         orderBy: "CreateDate",
         orderByDesc: true,
-      },
+    };
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+
+    getCommissionParameterList(
+  requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -93,6 +102,7 @@ export const BankCommissionListingTable = ({
     paginationModel.page,
     paginationModel.pageSize,
     setSnackbar,
+    queryOptions
   ]);
 
   const handleChangePagination = (model: GridPaginationModel) => {
@@ -336,13 +346,18 @@ export const BankCommissionListingTable = ({
   }, [deleteRow, editRow, showDelete, showUpdate]);
 
   const onSave = () => {
+    const requestPayload = {
+      size: -1,
+      page: 0,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
     getCommissionParameterList(
-      {
-        size: -1,
-        page: 0,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-      },
+   requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -365,6 +380,24 @@ export const BankCommissionListingTable = ({
       }
     );
   };
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, delay);
+    };
+  };
+
+  const handleFilterChange = debounce((props) => {
+    if (props === "clearFilter") {
+      return setQueryOptions({});
+    }
+    if (props.value?.toString()?.length >= 1) {
+      setQueryOptions(props);
+    }
+  }, 500);
 
   const hasLoading = isLoading || isDeleteLoading;
   return (
@@ -374,6 +407,7 @@ export const BankCommissionListingTable = ({
         {tableData?.result?.length && (
           <>
             <Table
+             handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
@@ -381,7 +415,7 @@ export const BankCommissionListingTable = ({
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               onRowClick={onRowClick}
               isRowSelectable={() => false}
-              disableColumnMenu
+              // disableColumnMenu
               rows={tableData.result}
               columns={columns}
               exportFileName="Banka Komisyon Listesi"

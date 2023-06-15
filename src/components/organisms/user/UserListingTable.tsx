@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useMemo, useState } from "react";
 import { Stack, useMediaQuery, useTheme } from "@mui/material";
@@ -29,9 +32,10 @@ function RenderStatus(props: GridRenderCellParams<any, string>) {
 
 export const UserListingTable = () => {
   const theme = useTheme();
-  const {showDelete, showUpdate} = useAuthorization();
+  const { showDelete, showUpdate } = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const { mutate: forgotPassword } = useForgotPassword();
+  const [queryOptions, setQueryOptions] = React.useState({});
   const [tableData, setTableData] = useState<PagingResponse<Array<IUser>>>();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
@@ -45,39 +49,43 @@ export const UserListingTable = () => {
   const { mutate: userDelete, isLoading: isDeleteLoading } = useDeleteUser();
 
   useEffect(() => {
-    getUserList(
-      {
-        size: paginationModel.pageSize,
-        page: paginationModel.page,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-      },
-      {
-        onSuccess: (data) => {
-          if (data.isSuccess) {
-            setTableData(data?.data);
-          } else {
-            setSnackbar({
-              severity: "error",
-              description: data.message,
-              isOpen: true,
-            });
-          }
-        },
-        onError: () => {
+    const requestPayload = {
+      size: paginationModel.pageSize,
+      page: paginationModel.page,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+
+    getUserList(requestPayload, {
+      onSuccess: (data) => {
+        if (data.isSuccess) {
+          setTableData(data?.data);
+        } else {
           setSnackbar({
             severity: "error",
-            description: "İşlem sırasında bir hata oluştu",
+            description: data.message,
             isOpen: true,
           });
-        },
-      }
-    );
+        }
+      },
+      onError: () => {
+        setSnackbar({
+          severity: "error",
+          description: "İşlem sırasında bir hata oluştu",
+          isOpen: true,
+        });
+      },
+    });
   }, [
     getUserList,
     paginationModel.page,
     paginationModel.pageSize,
     setSnackbar,
+    queryOptions,
   ]);
 
   const handleResetPassword = React.useCallback(
@@ -187,25 +195,31 @@ export const UserListingTable = () => {
         type: "actions",
         width: 80,
         getActions: (params) => {
-          return(
-            [
-              !!showUpdate ? <GridActionsCellItem
+          return [
+            !!showUpdate ? (
+              <GridActionsCellItem
                 label="Düzenle"
                 onClick={editRow(params.row)}
                 showInMenu
-              /> : <></>,
-              !!showDelete ? <GridActionsCellItem
+              />
+            ) : (
+              <></>
+            ),
+            !!showDelete ? (
+              <GridActionsCellItem
                 label="Sil"
                 onClick={deleteRow(params.row)}
                 showInMenu
-              /> : <></>,
-              <GridActionsCellItem
-                label="Parolayı Sıfırla"
-                onClick={handleResetPassword(params.row)}
-                showInMenu
-              />,
-            ]
-          )
+              />
+            ) : (
+              <></>
+            ),
+            <GridActionsCellItem
+              label="Parolayı Sıfırla"
+              onClick={handleResetPassword(params.row)}
+              showInMenu
+            />,
+          ];
         },
       },
       { field: "fullName", headerName: "Adı Soyadı", width: 350 },
@@ -221,38 +235,58 @@ export const UserListingTable = () => {
     ];
   }, [deleteRow, editRow, handleResetPassword, showDelete, showUpdate]);
 
-
-  
   const onSave = () => {
-    getUserList(
-      {
-        size: -1,
-        page: 0,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-      },
-      {
-        onSuccess: (data) => {
-          if (data.isSuccess) {
-            downloadExcel(data?.data?.result || [], "Kullanıcı Listesi");
-          } else {
-            setSnackbar({
-              severity: "error",
-              description: data.message,
-              isOpen: true,
-            });
-          }
-        },
-        onError: () => {
+    const requestPayload = {
+      size: -1,
+      page: 0,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+
+    getUserList(requestPayload, {
+      onSuccess: (data) => {
+        if (data.isSuccess) {
+          downloadExcel(data?.data?.result || [], "Kullanıcı Listesi");
+        } else {
           setSnackbar({
             severity: "error",
-            description: "İşlem sırasında bir hata oluştu",
+            description: data.message,
             isOpen: true,
           });
-        },
-      }
-    );
+        }
+      },
+      onError: () => {
+        setSnackbar({
+          severity: "error",
+          description: "İşlem sırasında bir hata oluştu",
+          isOpen: true,
+        });
+      },
+    });
   };
+
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, delay);
+    };
+  };
+
+  const handleFilterChange = debounce((props) => {
+    if (props === "clearFilter") {
+      return setQueryOptions({});
+    }
+    if (props.value?.toString()?.length >= 1) {
+      setQueryOptions(props);
+    }
+  }, 500);
 
   const hasLoading = isLoading || isDeleteLoading;
   return (
@@ -262,13 +296,14 @@ export const UserListingTable = () => {
         {tableData && tableData.result && tableData.result.length > 0 && (
           <>
             <Table
+              handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
               rowCount={tableData.totalItems}
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               isRowSelectable={() => false}
-              disableColumnMenu
+              // disableColumnMenu
               rows={tableData.result}
               columns={columns}
               exportFileName="Kullanıcı Listesi"

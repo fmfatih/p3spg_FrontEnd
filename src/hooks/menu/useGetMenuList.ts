@@ -8,6 +8,7 @@ export type GetMenuListRequest = {
   size?: number;
   orderByDesc?: boolean;
   orderBy?: string;
+  [key: string]: string | number | boolean | undefined;
 }
 
 export type IMenu = {

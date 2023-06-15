@@ -40,6 +40,7 @@ export type GetCommissionParameterListRequest = {
   size: number;
   orderByDesc: boolean;
   orderBy: string;
+  [key: string]: string | number | boolean | undefined;
 };
 
 async function getCommissionParameterList(

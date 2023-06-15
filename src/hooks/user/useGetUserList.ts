@@ -44,6 +44,7 @@ export type GetUserListRequest = {
   size: number;
   orderByDesc: boolean;
   orderBy: string;
+  [key: string]: string | number | boolean | undefined;
 };
 
 async function getUserList(

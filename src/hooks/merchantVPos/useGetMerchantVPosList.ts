@@ -10,6 +10,7 @@ export type GetMerchantVPosListRequest = {
   orderBy?: string;
   status: "ACTIVE" | "PASSIVE";
   merchantId?: string | number;  
+  [key: string]: string | number | boolean | undefined;
 };
 
 export type IMerchantVPos = {
@@ -41,24 +42,39 @@ export type IMerchantVPos = {
 
 export type IGetMerchantVPosListResponse = BasePagingResponse<Array<IMerchantVPos>>;
 
-async function getMerchantVPosList({
-  status,
-  page,
-  size,
-  orderByDesc = true,
-  orderBy = "CreateDate",
-  merchantId,
-}: GetMerchantVPosListRequest): Promise<IGetMerchantVPosListResponse> {
-  const data = {
-    page,
-    size,
-    orderByDesc,
-    orderBy,
-    status,
-    merchantId
-  };
+// async function getMerchantVPosList({
+//   status,
+//   page,
+//   size,
+//   orderByDesc = true,
+//   orderBy = "CreateDate",
+//   merchantId,
+// }: GetMerchantVPosListRequest): Promise<IGetMerchantVPosListResponse> {
+//   const data = {
+//     page,
+//     size,
+//     orderByDesc,
+//     orderBy,
+//     status,
+//     merchantId
+//   };
+//   try {
+//     if ((page === 0 || page) && size)
+//       return (await axiosInstance.post("/MerchantVPos/List", data)).data;
+//     else
+//       return (
+//         await axiosInstance.post("/MerchantVPos/ListWithoutPagination", data)
+//       ).data;
+//   } catch (ex) {
+//     throw ((ex as AxiosError).response?.data as any).error;
+//   }
+// }
+
+async function getMerchantVPosList(
+  data: GetMerchantVPosListRequest
+): Promise<IGetMerchantVPosListResponse> {
   try {
-    if ((page === 0 || page) && size)
+    if ((data.page === 0 || data.page) && data.size)
       return (await axiosInstance.post("/MerchantVPos/List", data)).data;
     else
       return (
@@ -68,6 +84,7 @@ async function getMerchantVPosList({
     throw ((ex as AxiosError).response?.data as any).error;
   }
 }
+
 
 export function useGetMerchantVPosList() {
   return useMutation<

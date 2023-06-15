@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import {
   GridColDef,
   GridRowId,
@@ -40,6 +43,7 @@ export const BusinessBankListingActiveTable = ({
   const theme = useTheme();
   const {showDelete, showUpdate} = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const [queryOptions, setQueryOptions] = React.useState({});
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
@@ -58,15 +62,20 @@ export const BusinessBankListingActiveTable = ({
   const setSnackbar = useSetSnackBar();
 
   useEffect(() => {
+    const requestPayload = {
+      size: paginationModel.pageSize,
+      page: paginationModel.page,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+      status: "ACTIVE",
+      merchantId: userInfo ? Number(userInfo.merchantId) : undefined
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
     getMerchantVPosList(
-      {
-        size: paginationModel.pageSize,
-        page: paginationModel.page,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-        status: "ACTIVE",
-        merchantId: userInfo ? Number(userInfo.merchantId) : undefined
-      },
+      requestPayload,
       {
         onSuccess: (data) => {
           if (!data.isSuccess) {
@@ -91,6 +100,7 @@ export const BusinessBankListingActiveTable = ({
     paginationModel.page,
     paginationModel.pageSize,
     setSnackbar,
+    queryOptions
   ]);
 
   const editRow = React.useCallback(
@@ -180,7 +190,7 @@ export const BusinessBankListingActiveTable = ({
         width: 220,
       },
       { field: "merchantName", headerName: "Üye İşyeri Adı", width: 200 },
-      { field: "merchantId", headerName: "Üye İşyeri Numarası", width: 200 },
+      { field: "merchantId", headerName: "Üye İşyeri Numarası", width: 200, disableColumnMenu: userInfo?.merchantId !== 0 },
       { field: "updateDate", headerName: "Son Güncelleme Tarihi", width: 300 },
       {
         renderCell: RenderStatus,
@@ -262,14 +272,19 @@ export const BusinessBankListingActiveTable = ({
   };
 
   const onSave = () => {
+    const requestPayload = {
+      size: -1,
+      page: 0,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+      status: "ACTIVE",
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
     getMerchantVPosList(
-      {
-        size: -1,
-        page: 0,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-        status: "ACTIVE",
-      },
+ requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -292,6 +307,24 @@ export const BusinessBankListingActiveTable = ({
       }
     );
   };
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, delay);
+    };
+  };
+
+  const handleFilterChange = debounce((props) => {
+    if (props === "clearFilter") {
+      return setQueryOptions({});
+    }
+    if (props.value?.toString()?.length >= 1) {
+      setQueryOptions(props);
+    }
+  }, 500);
 
   const hasLoading = isLoading || isDeleteLoading;
   return (
@@ -302,6 +335,7 @@ export const BusinessBankListingActiveTable = ({
         {tableData?.data?.result && !hasLoading && (
           <>
             <Table
+             handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
@@ -309,7 +343,7 @@ export const BusinessBankListingActiveTable = ({
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               onRowClick={onRowClick}
               isRowSelectable={() => false}
-              disableColumnMenu
+              // disableColumnMenu
               rows={tableData?.data?.result.filter(
                 (item) => item.status === "ACTIVE"
               )}
