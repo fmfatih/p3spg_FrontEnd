@@ -71,6 +71,7 @@ export const BankCommissionListingProfileTable = ({
         page: paginationModel.page,
         orderBy: "CreateDate",
         orderByDesc: true,
+        status: "ACTIVE",
     };
     if (queryOptions?.field && queryOptions?.value !== undefined) {
       requestPayload[queryOptions.field] = queryOptions.value;
@@ -117,6 +118,7 @@ export const BankCommissionListingProfileTable = ({
         page: paginationModel.page,
         orderBy: "CreateDate",
         orderByDesc: true,
+        status: "ACTIVE",
       },
       {
         onSuccess: (data) => {
@@ -175,6 +177,7 @@ export const BankCommissionListingProfileTable = ({
             page: paginationModel.page,
             orderBy: "CreateDate",
             orderByDesc: true,
+            status: "ACTIVE",
           });
           setSnackbar({
             severity: "success",
@@ -233,6 +236,7 @@ export const BankCommissionListingProfileTable = ({
       page: 0,
       orderBy: "CreateDate",
       orderByDesc: true,
+      status: "ACTIVE",
     };
 
     if (queryOptions?.field && queryOptions?.value !== undefined) {

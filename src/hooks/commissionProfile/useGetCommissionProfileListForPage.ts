@@ -19,6 +19,7 @@ export type  GetCommissionProfileListForPageRequest = {
   size: number;
   orderByDesc: boolean;
   orderBy: string;
+  status:string;
   [key: string]: string | number | boolean | undefined;
 };
 
