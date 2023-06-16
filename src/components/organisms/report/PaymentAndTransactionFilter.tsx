@@ -89,7 +89,7 @@ export const PaymentAndTransactionFilter = () => {
   );
   const { data: rawAcquirerBankList } = useGetAcquirerBankList();
   const { mutate: getMemberVPosList, data: rawMemberVPosList } =
-  useGetMemberVPosList();
+    useGetMemberVPosList();
   const { mutate: getMerchantVPosList, isLoading } = useGetMerchantVPosList();
   const setSnackbar = useSetSnackBar();
 
@@ -112,21 +112,17 @@ export const PaymentAndTransactionFilter = () => {
       }
     );
   }, [rawTransactionStatusList?.data]);
-console.log(userInfo.merchantId);
-
-  
 
   const payment3DTrxSettingsList = useMemo(() => {
-    return rawPayment3DTrxSettingsList?.data?.filter((resourceType) => resourceType.status === "ACTIVE").map(
-      (resourceType: { value: string; key: string }) => {
+    return rawPayment3DTrxSettingsList?.data
+      ?.filter((resourceType) => resourceType.status === "ACTIVE")
+      .map((resourceType: { value: string; key: string }) => {
         return {
           label: resourceType.value,
           value: `${resourceType.key}`,
         };
-      }
-    );
+      });
   }, [rawPayment3DTrxSettingsList?.data]);
-
 
   const acquirerBankList = useMemo(() => {
     return rawAcquirerBankList?.data?.map(
@@ -139,26 +135,28 @@ console.log(userInfo.merchantId);
     );
   }, [rawAcquirerBankList?.data]);
 
-
   useEffect(() => {
     if (userInfo.merchantId === 0) {
-      getMemberVPosList({
-        orderBy: "CreateDate",
-        orderByDesc: true,
-        status: "ACTIVE",
-      }, {
-        onSuccess: (data) => {
-          const bankList = data?.data?.result?.map(
-            (bank: { bankCode: string; bankName: string }) => {
-              return {
-                label: `${bank.bankName}`,
-                value: bank.bankCode,
-              };
-            }
-          );
-          setBankList(bankList);
+      getMemberVPosList(
+        {
+          orderBy: "CreateDate",
+          orderByDesc: true,
+          status: "ACTIVE",
+        },
+        {
+          onSuccess: (data) => {
+            const bankList = data?.data?.result?.map(
+              (bank: { bankCode: string; bankName: string }) => {
+                return {
+                  label: `${bank.bankName}`,
+                  value: bank.bankCode,
+                };
+              }
+            );
+            setBankList(bankList);
+          },
         }
-      });
+      );
     } else {
       getMerchantVPosList(
         {
@@ -169,32 +167,30 @@ console.log(userInfo.merchantId);
           status: "ACTIVE",
         },
         {
-          
-          onSuccess: (data) => {       
+          onSuccess: (data) => {
             const bankList = data?.data?.result
-            .filter((bank: { merchantId: number }) => {
-              return bank.merchantId === Number(userInfo.merchantId);
-            })
+              .filter((bank: { merchantId: number }) => {
+                return bank.merchantId === Number(userInfo.merchantId);
+              })
               .map(
-                (bank: { bankCode: string; bankName: string, merchantId: number }) => {
+                (bank: {
+                  bankCode: string;
+                  bankName: string;
+                  merchantId: number;
+                }) => {
                   return {
                     label: `${bank.bankName}`,
                     value: bank.bankCode,
                   };
                 }
               );
-           
+
             setBankList(bankList);
-  
           },
         }
       );
     }
   }, [getMerchantVPosList, getMemberVPosList, userInfo.merchantId]);
-  
-
-
-  
 
   const onSubmit = (data: PaymentAndTransactionValuesType) => {
     setTableData(undefined);
@@ -307,46 +303,51 @@ console.log(userInfo.merchantId);
             isOpen: true,
             description: data.message,
           });
-          GetPaymentAndTransaction({
-            size: paginationModel.pageSize,
-            page: paginationModel.page,
-            orderBy: "CreateDate",
-            orderByDesc: true,
-            startDate: dayjs(getValues("startDate")).format(
-              "YYYY-MM-DD HH:mm:ss"
-            ),
-            endDate: dayjs(getValues("endDate")).format("YYYY-MM-DD HH:mm:ss"),
-            orderId: getValues("orderId"),
-            cardNumber: getValues("cardNumber"),
-            authCode: getValues("authCode"),
-            status: getValues("status"),
-            transactionType: getValues("transactionType"),
-            bankCode: getValues("bankCode"),
-          }, {
-            onSuccess: (data) => {
-              if (data.isSuccess) {
-                setTableData(data.data);
-                setSnackbar({
-                  severity: "success",
-                  isOpen: true,
-                  description: data.message,
-                });
-              } else {
+          GetPaymentAndTransaction(
+            {
+              size: paginationModel.pageSize,
+              page: paginationModel.page,
+              orderBy: "CreateDate",
+              orderByDesc: true,
+              startDate: dayjs(getValues("startDate")).format(
+                "YYYY-MM-DD HH:mm:ss"
+              ),
+              endDate: dayjs(getValues("endDate")).format(
+                "YYYY-MM-DD HH:mm:ss"
+              ),
+              orderId: getValues("orderId"),
+              cardNumber: getValues("cardNumber"),
+              authCode: getValues("authCode"),
+              status: getValues("status"),
+              transactionType: getValues("transactionType"),
+              bankCode: getValues("bankCode"),
+            },
+            {
+              onSuccess: (data) => {
+                if (data.isSuccess) {
+                  setTableData(data.data);
+                  setSnackbar({
+                    severity: "success",
+                    isOpen: true,
+                    description: data.message,
+                  });
+                } else {
+                  setSnackbar({
+                    severity: "error",
+                    description: data.message,
+                    isOpen: true,
+                  });
+                }
+              },
+              onError: () => {
                 setSnackbar({
                   severity: "error",
-                  description: data.message,
+                  description: "İşlem sırasında bir hata oluştu",
                   isOpen: true,
                 });
-              }
-            },
-            onError: () => {
-              setSnackbar({
-                severity: "error",
-                description: "İşlem sırasında bir hata oluştu",
-                isOpen: true,
-              });
-            },
-          });
+              },
+            }
+          );
         } else {
           setSnackbar({
             severity: "error",
@@ -379,46 +380,51 @@ console.log(userInfo.merchantId);
     RefundPaymentAndTransaction(req, {
       onSuccess: (data: any) => {
         if (data.isSuccess) {
-          GetPaymentAndTransaction({
-            size: paginationModel.pageSize,
-            page: paginationModel.page,
-            orderBy: "CreateDate",
-            orderByDesc: true,
-            startDate: dayjs(getValues("startDate")).format(
-              "YYYY-MM-DD HH:mm:ss"
-            ),
-            endDate: dayjs(getValues("endDate")).format("YYYY-MM-DD HH:mm:ss"),
-            orderId: getValues("orderId"),
-            cardNumber: getValues("cardNumber"),
-            authCode: getValues("authCode"),
-            status: getValues("status"),
-            transactionType: getValues("transactionType"),
-            bankCode: getValues("bankCode"),
-          }, {
-            onSuccess: (data) => {
-              if (data.isSuccess) {
-                setTableData(data.data);
-                setSnackbar({
-                  severity: "success",
-                  isOpen: true,
-                  description: data.message,
-                });
-              } else {
+          GetPaymentAndTransaction(
+            {
+              size: paginationModel.pageSize,
+              page: paginationModel.page,
+              orderBy: "CreateDate",
+              orderByDesc: true,
+              startDate: dayjs(getValues("startDate")).format(
+                "YYYY-MM-DD HH:mm:ss"
+              ),
+              endDate: dayjs(getValues("endDate")).format(
+                "YYYY-MM-DD HH:mm:ss"
+              ),
+              orderId: getValues("orderId"),
+              cardNumber: getValues("cardNumber"),
+              authCode: getValues("authCode"),
+              status: getValues("status"),
+              transactionType: getValues("transactionType"),
+              bankCode: getValues("bankCode"),
+            },
+            {
+              onSuccess: (data) => {
+                if (data.isSuccess) {
+                  setTableData(data.data);
+                  setSnackbar({
+                    severity: "success",
+                    isOpen: true,
+                    description: data.message,
+                  });
+                } else {
+                  setSnackbar({
+                    severity: "error",
+                    description: data.message,
+                    isOpen: true,
+                  });
+                }
+              },
+              onError: () => {
                 setSnackbar({
                   severity: "error",
-                  description: data.message,
+                  description: "İşlem sırasında bir hata oluştu",
                   isOpen: true,
                 });
-              }
-            },
-            onError: () => {
-              setSnackbar({
-                severity: "error",
-                description: "İşlem sırasında bir hata oluştu",
-                isOpen: true,
-              });
-            },
-          });
+              },
+            }
+          );
           setSnackbar({
             severity: "success",
             isOpen: true,
@@ -440,12 +446,10 @@ console.log(userInfo.merchantId);
         });
       },
     });
-  
+
     handleCloseRefundModal();
   };
 
-
-  
   const columns: GridColDef[] = useMemo(() => {
     return [
       {
@@ -482,7 +486,7 @@ console.log(userInfo.merchantId);
       { field: "systemDateFormatted", headerName: "İşlem Tarihi", width: 200 },
       { field: "webUrl", headerName: "WEB Url", width: 200 },
       { field: "installmentCount", headerName: "Taksit Sayısı", width: 200 },
-  
+
       {
         field: "totalAmount",
         headerName: "Toplam Tutar",
@@ -521,14 +525,32 @@ console.log(userInfo.merchantId);
       { field: "requestIp", headerName: "İstek IP", width: 200 },
       { field: "description", headerName: "Açıklama", width: 200 },
       { field: "currency", headerName: "Para Birimi Kodu", width: 200 },
-      { field: "cardHolderName", headerName: "İşlem Yapılan Kart Bilgisi", width: 200 },
+      {
+        field: "cardHolderName",
+        headerName: "İşlem Yapılan Kart Bilgisi",
+        width: 200,
+      },
       { field: "failUrl", headerName: "Başarısız İşleme Ait URL", width: 200 },
       { field: "okUrl", headerName: "Başarılı İşleme Ait URL", width: 200 },
-      { field: "bankblocked", headerName: "Banka Blokesi", width: 200,  valueFormatter: (params) => params.value ? "Evet" : "Hayır",},
+      {
+        field: "bankblocked",
+        headerName: "Banka Blokesi",
+        width: 200,
+        valueFormatter: (params) => (params.value ? "Evet" : "Hayır"),
+      },
       { field: "bankblockedday", headerName: "Banka Bloke Günü", width: 200 },
       { field: "bankcommission", headerName: "Banka Komisyonu", width: 200 },
-      { field: "merchantblocked", headerName: "Üye İşyeri Blokesi", width: 200,valueFormatter: (params) => params.value ? "Evet" : "Hayır", },
-      { field: "merchantblockedday", headerName: "Üye İşyeri Bloke Günü", width: 200 },
+      {
+        field: "merchantblocked",
+        headerName: "Üye İşyeri Blokesi",
+        width: 200,
+        valueFormatter: (params) => (params.value ? "Evet" : "Hayır"),
+      },
+      {
+        field: "merchantblockedday",
+        headerName: "Üye İşyeri Bloke Günü",
+        width: 200,
+      },
       {
         field: "merchantcommision",
         headerName: "Üye İşyeri Komisyonu",
@@ -555,8 +577,7 @@ console.log(userInfo.merchantId);
         field: "commissionFlag",
         headerName: "Komisyon Yansıtıldı mı?",
         width: 200,
-        valueFormatter: (params) => params.value ? "Evet" : "Hayır",
-
+        valueFormatter: (params) => (params.value ? "Evet" : "Hayır"),
       },
       // {
       //   field: "customeradditionalcommission",
@@ -573,7 +594,12 @@ console.log(userInfo.merchantId);
       { field: "cardType", headerName: "Kart Tipi", width: 200 },
       { field: "cardTypeDesc", headerName: "Kart Tipi Açıklama", width: 200 },
       { field: "authCode", headerName: "Otorizasyon Kodu", width: 200 },
-      { field: "endOfDayFlag", headerName: "Gün Sonu", width: 200 , valueFormatter: (params) => params.value ? "Evet" : "Hayır", },
+      {
+        field: "endOfDayFlag",
+        headerName: "Gün Sonu",
+        width: 200,
+        valueFormatter: (params) => (params.value ? "Evet" : "Hayır"),
+      },
       { field: "endOfDayId", headerName: "Gün Sonu ID", width: 200 },
       { field: "endOfDayDate", headerName: "Gün Sonu Tarihi", width: 200 },
       { field: "cardBankCode", headerName: "Kartın Banka Kodu", width: 200 },
@@ -582,8 +608,16 @@ console.log(userInfo.merchantId);
       { field: "bankResponseCode", headerName: "Banka Cevap Kodu", width: 200 },
       { field: "responseMessage", headerName: "Cevap Açıklaması", width: 200 },
       { field: "systemDateFormatted", headerName: "Sistem Tarihi", width: 200 },
-      { field: "createDateFormatted", headerName: "İşlemin Başlama Tarihi", width: 200 },
-      { field: "updateDateFormatted", headerName: "İşlem Bitiş Tarihi", width: 200 },
+      {
+        field: "createDateFormatted",
+        headerName: "İşlemin Başlama Tarihi",
+        width: 200,
+      },
+      {
+        field: "updateDateFormatted",
+        headerName: "İşlem Bitiş Tarihi",
+        width: 200,
+      },
       { field: "id", headerName: "ID", width: 200 },
       { field: "systemDate", headerName: "Sistem Tarihi", width: 200 },
       { field: "createDate", headerName: "Oluşturma Tarihi", width: 200 },
@@ -597,36 +631,17 @@ console.log(userInfo.merchantId);
       // { field: "deleteUserId", headerName: "Silinen Kullanıcı ID", width: 200 },
       // { field: "deleteUserName", headerName: "Silinen Kullanıcı Adı Soyadı", width: 200 },
 
-  
-    
-     
-
       // { field: "cardHolderName", headerName: "Kart Sahibi", width: 200 },
 
       // { field: "merchantVkn", headerName: "Üye İşyeri VKN", width: 180 },
-  
-  
+
       // {
       //   field: "updateDateFormatted",
       //   headerName: "İşlemin Gerçekleşme Zamanı",
       //   width: 250,
       // },
 
-   
-    
-
-     
-
-  
-
-  
- 
- 
-  
       // { field: "cardTypeDesc", headerName: "Kart Tipi", width: 200 },
-
-   
- 
     ];
   }, [deleteRow, showDelete]);
 
@@ -789,7 +804,7 @@ console.log(userInfo.merchantId);
               spacing={3}
               direction={isDesktop ? "row" : "column"}
               width={isDesktop ? "100%" : "auto"}
-                maxWidth={1308}
+              maxWidth={1308}
             >
               <FormControl sx={{ flex: 1 }}>
                 <InputControl

@@ -83,6 +83,9 @@ export const BankRedirectAddForm = () => {
       : null;
   });
 
+
+  
+
   const [selectedMerchantVPosBankCode, setSelectedMerchantVPosBankCode] =
     useState(null as any);
   const [selectedIssuerBankCodeValues, setSelectedIssuerBankCodeValues] =
@@ -172,6 +175,10 @@ export const BankRedirectAddForm = () => {
     }
 }, [rawMerchantList?.data, userInfo.merchantId]);
 
+
+
+
+
   const memberVPosList = useMemo(() => {
     return rawMemberVPosList?.data?.map(
       (memberVPos: { bankName: string; bankCode:string}) => {
@@ -183,7 +190,7 @@ export const BankRedirectAddForm = () => {
     );
   }, [rawMemberVPosList?.data]);
   
-  console.log(rawMemberVPosList);
+
   
 
   const cardTypeList = useMemo(() => {
@@ -196,6 +203,8 @@ export const BankRedirectAddForm = () => {
       }
     );
   }, [rawCardTypeList?.data]);
+
+
 
   const onSubmit = (data: BankAddRedirectFormValuesType) => {
     if (vPosRouting && vPosRouting.id > 0) {
@@ -276,6 +285,8 @@ export const BankRedirectAddForm = () => {
     }
   };
 
+
+  
   useEffect(() => {
     if (!!vPosRouting && JSON.stringify(vPosRouting) !== "{}") {
       reset({
@@ -300,6 +311,11 @@ export const BankRedirectAddForm = () => {
       setSelectedMerchantVPosBankCode({
         label: vPosRouting?.merchantVposBankName,
         value: vPosRouting?.merchantVposBankCode,
+      });
+
+      setSelectedMerchant({
+        label: vPosRouting?.merchantName || "", 
+        value: vPosRouting?.merchantId || 0,
       });
       // setSelectedMemberVPos({
       //   label: vPosRouting?.merchantVposBankName,
@@ -327,6 +343,7 @@ export const BankRedirectAddForm = () => {
         },
       ]);
     }
+    
   }, [vPosRouting, reset]);
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -334,7 +351,7 @@ export const BankRedirectAddForm = () => {
 
   const handleBack = () => navigate("/dashboard");
 
-console.log(issuerBankList);
+
 
   return (
     <>
@@ -409,7 +426,7 @@ console.log(issuerBankList);
                             }}
                             id="merchantId"
                             options={merchantList}
-                            defaultValue={selectedMerchant}
+                            value={selectedMerchant}
                             getOptionLabel={(option: {
                               label: string;
                               value: number;

@@ -47,7 +47,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { default as dayjs } from "dayjs";
 import { useUserInfo } from "../../../store/User.state";
 
-
 type MerchantAddFormCompanyStepProps = {
   onNext: () => void;
   merchant?: IMerchant;
@@ -92,7 +91,7 @@ export const MerchantAddFormCompanyStep = ({
   );
   const { mutate: getTaxAdministrationList, isLoading: isTaxListLoading } =
     useGetTaxAdministrationList();
-  const { control, reset, handleSubmit, setValue, getValues,watch} =
+  const { control, reset, handleSubmit, setValue, getValues, watch } =
     useForm<FirstStepFormValuesType>({
       resolver: zodResolver(firstStepFormSchema),
       defaultValues: firstStepInitialValues,
@@ -168,29 +167,28 @@ export const MerchantAddFormCompanyStep = ({
   // }, [rawMerchantList?.data]);
 
   const merchantList = useMemo(() => {
- 
     if (userInfo.merchantId == 0) {
-        return rawMerchantList?.data?.map(
-            (rawPosType: { merchantName: string; merchantId: number }) => {
-                return {
-                    label: rawPosType.merchantName,
-                    value: rawPosType.merchantId,
-                };
-            }
-        );
+      return rawMerchantList?.data?.map(
+        (rawPosType: { merchantName: string; merchantId: number }) => {
+          return {
+            label: rawPosType.merchantName,
+            value: rawPosType.merchantId,
+          };
+        }
+      );
     } else {
-        return rawMerchantList?.data
-            ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
-                return rawPosType.merchantId === Number(userInfo.merchantId);
-            })
-            .map((filteredMerchant) => {
-                return {
-                    label: filteredMerchant.merchantName,
-                    value: filteredMerchant.merchantId,
-                };
-            });
+      return rawMerchantList?.data
+        ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
+          return rawPosType.merchantId === Number(userInfo.merchantId);
+        })
+        .map((filteredMerchant) => {
+          return {
+            label: filteredMerchant.merchantName,
+            value: filteredMerchant.merchantId,
+          };
+        });
     }
-}, [rawMerchantList?.data, userInfo.merchantId]);
+  }, [rawMerchantList?.data, userInfo.merchantId]);
 
   const commissionProfileList = useMemo(() => {
     return rawCommissionProfileList?.data?.map(
@@ -204,15 +202,15 @@ export const MerchantAddFormCompanyStep = ({
   }, [rawCommissionProfileList?.data]);
 
   const cityList = useMemo(() => {
-    return rawCityList?.data?.map((city: { name: string; cityCode:string }) => {
-      return {
-        label: city.name,
-        value: city.cityCode,
-      };
-    });
+    return rawCityList?.data?.map(
+      (city: { name: string; cityCode: string }) => {
+        return {
+          label: city.name,
+          value: city.cityCode,
+        };
+      }
+    );
   }, [rawCityList?.data]);
-
-  
 
   const merchantCategoryList = useMemo(() => {
     return rawMerchantCategoryList?.data?.map(
@@ -290,13 +288,11 @@ export const MerchantAddFormCompanyStep = ({
           onSuccess(data) {
             const merchantId = data.data.merchantId;
             setMerchantId(merchantId);
-            setAllData({   ...request,...allData, merchantId: merchantId});
-            console.log(allData);
-            console.log(request);
-            
+            setAllData({ ...request, ...allData, merchantId: merchantId });
+
             if (data.isSuccess) {
               onNext();
-              
+
               setSnackbar({
                 severity: "success",
                 isOpen: true,
@@ -353,10 +349,8 @@ export const MerchantAddFormCompanyStep = ({
     }
   };
 
-  const city=watch("city")
-const mcc=watch("mcc")
-
-  
+  const city = watch("city");
+  const mcc = watch("mcc");
 
   useEffect(() => {
     if (!!merchant && JSON.stringify(merchant) !== "{}") {
@@ -383,8 +377,6 @@ const mcc=watch("mcc")
         );
       }
 
-
-
       reset({
         merchantType: `${merchant.merchantType}`,
         parentMerchantId: merchant.parentMerchantId,
@@ -401,7 +393,7 @@ const mcc=watch("mcc")
         mcc: merchant.mcc,
         openingDate: dayjs(merchant.openingDate),
         aggreementDate: dayjs(merchant.aggreementDate),
-        postList:merchant.pos,
+        postList: merchant.pos,
         posList: {
           vpos: merchant?.vpos,
           pos: merchant?.pos,
@@ -424,8 +416,10 @@ const mcc=watch("mcc")
   useEffect(() => {
     if (merchant && merchant.taxOfficeCode) {
       const cityCode = merchant.taxOfficeCode.substring(0, 2);
-      const cityRelatedToTaxOfficeCode = cityList?.find(city => city.value === cityCode);
-      
+      const cityRelatedToTaxOfficeCode = cityList?.find(
+        (city) => city.value === cityCode
+      );
+
       setSelectedCity(cityRelatedToTaxOfficeCode);
     }
   }, [merchant, cityList]);
@@ -465,7 +459,6 @@ const mcc=watch("mcc")
                     control={control}
                     defaultValue={merchantTypes[0]?.value}
                     items={merchantTypes}
-               
                   />
                 )}
               </Box>
@@ -778,42 +771,44 @@ const mcc=watch("mcc")
               spacing={3}
               direction={isDesktop ? "row" : "column"}
             >
-<FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-  {merchantCategoryList && (
-    <Controller
-      control={control}
-      name="mcc"
-      defaultValue=""
-      rules={{ required: true }} // Bu satırı ekledik, böylece alanın doldurulması zorunlu olur.
-      render={({ field: { onChange, value }, fieldState }) => {
-        const selectedMerchantCategory =
-          merchantCategoryList.find((option) => option.value === value);
+              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+                {merchantCategoryList && (
+                  <Controller
+                    control={control}
+                    name="mcc"
+                    defaultValue=""
+                    rules={{ required: true }} // Bu satırı ekledik, böylece alanın doldurulması zorunlu olur.
+                    render={({ field: { onChange, value }, fieldState }) => {
+                      const selectedMerchantCategory =
+                        merchantCategoryList.find(
+                          (option) => option.value === value
+                        );
 
-        return (
-          <>
-            <Autocomplete
-              sx={{ mr: isDesktop ? 3 : 0 }}
-              options={merchantCategoryList}
-              getOptionLabel={(option) => option.label}
-              value={selectedMerchantCategory || null}
-              onChange={(_, newValue) => {
-                onChange(newValue ? newValue.value : "");
-                if (newValue) setSelectedMcc(newValue);
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="MCC"
-                  error={fieldState.invalid}
-                />
-              )}
-            />
-          </>
-        );
-      }}
-    />
-  )}
-</FormControl>
+                      return (
+                        <>
+                          <Autocomplete
+                            sx={{ mr: isDesktop ? 3 : 0 }}
+                            options={merchantCategoryList}
+                            getOptionLabel={(option) => option.label}
+                            value={selectedMerchantCategory || null}
+                            onChange={(_, newValue) => {
+                              onChange(newValue ? newValue.value : "");
+                              if (newValue) setSelectedMcc(newValue);
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                label="MCC"
+                                error={fieldState.invalid}
+                              />
+                            )}
+                          />
+                        </>
+                      );
+                    }}
+                  />
+                )}
+              </FormControl>
 
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <DatePickerControl

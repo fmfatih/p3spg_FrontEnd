@@ -69,9 +69,8 @@ export const BankPaymentComponent = () => {
     useGetBankPayment();
 
   const { mutate: getMemberVPosList, data: rawMemberVPosList } =
-  useGetMemberVPosList();
+    useGetMemberVPosList();
 
-  
   const [selectedMerchantVPosBankCode, setSelectedMerchantVPosBankCode] =
     useState(null as any);
 
@@ -83,12 +82,9 @@ export const BankPaymentComponent = () => {
     setValue("endDate", dayjs());
   }, [setValue]);
 
-
-
-
   const memberVPosList = useMemo(() => {
     return rawMemberVPosList?.data?.map(
-      (memberVPos: { bankName: string; bankCode:string}) => {
+      (memberVPos: { bankName: string; bankCode: string }) => {
         return {
           label: `${memberVPos.bankName}`,
           value: memberVPos.bankCode,
@@ -97,25 +93,20 @@ export const BankPaymentComponent = () => {
     );
   }, [rawMemberVPosList?.data]);
 
-
-  
-
   const onSubmit = (data: BankPaymentValuesType) => {
     setTableData(undefined);
     const req: GetBankPaymentRequest = {
       date: data?.date ? dayjs(data.date).format("YYYY-MM-DD") : "",
-     bankCode: data.bankCode, // Üye işyeri ID
-     page: paginationModel.page,
-     size: paginationModel.pageSize,
-     orderByDesc: true, // Sipariş sırası
-     orderBy: "CreateDate", // Siparişe göre
-    //  status: data.status, // Durum
+      bankCode: data.bankCode, // Üye işyeri ID
+      page: paginationModel.page,
+      size: paginationModel.pageSize,
+      orderByDesc: true, // Sipariş sırası
+      orderBy: "CreateDate", // Siparişe göre
+      //  status: data.status, // Durum
     };
 
     GetBankPayment(req, {
       onSuccess: (data) => {
-        console.log(data);
-        
         if (data.isSuccess) {
           setTableData(data.data);
           setSnackbar({
@@ -155,26 +146,27 @@ export const BankPaymentComponent = () => {
     const handleOpenModal = () => {
       setIsModalOpen(true);
     };
-  
+
     const handleCloseModal = () => {
       setIsModalOpen(false);
     };
     return (
       <>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleOpenModal}
-        text="Detay"
-        sx={{flex:1,height:20,py:4}}
-      >
-      </Button>
-      <BankPaymentModal transaction={transaction} isOpen={isModalOpen} handleClose={handleCloseModal} />
-    </>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleOpenModal}
+          text="Detay"
+          sx={{ flex: 1, height: 20, py: 4 }}
+        ></Button>
+        <BankPaymentModal
+          transaction={transaction}
+          isOpen={isModalOpen}
+          handleClose={handleCloseModal}
+        />
+      </>
     );
   }
-
-
 
   const deleteRow = React.useCallback(
     (transaction: any) => () => {
@@ -182,9 +174,6 @@ export const BankPaymentComponent = () => {
     },
     []
   );
-
-
- 
 
   const columns: GridColDef[] = useMemo(() => {
     return [
@@ -242,21 +231,20 @@ export const BankPaymentComponent = () => {
           }
           return `${params.value} TL`;
         },
-      },{
-        field: 'endOfDayDate',
-        headerName: 'Gün Sonu Tarih',
+      },
+      {
+        field: "endOfDayDate",
+        headerName: "Gün Sonu Tarih",
         width: 200,
         valueFormatter: (params: GridValueFormatterParams<string>) => {
           const date = new Date(params.value);
-          const day = date.getDate().toString().padStart(2, '0');
-          const month = (date.getMonth() + 1).toString().padStart(2, '0'); // +1 çünkü aylar 0'dan başlar
+          const day = date.getDate().toString().padStart(2, "0");
+          const month = (date.getMonth() + 1).toString().padStart(2, "0"); // +1 çünkü aylar 0'dan başlar
           const year = date.getFullYear();
-      
+
           return `${day}-${month}-${year}`;
         },
       },
-
- 
     ];
   }, [deleteRow, showDelete]);
 
@@ -339,8 +327,7 @@ export const BankPaymentComponent = () => {
     );
   };
 
-  const hasLoading =
-    isGetBankPaymentLoading
+  const hasLoading = isGetBankPaymentLoading;
 
   return (
     <>
@@ -354,8 +341,8 @@ export const BankPaymentComponent = () => {
               width={isDesktop ? 800 : "auto"}
             >
               <FormControl sx={{ flex: isDesktop ? 1 : "auto" }}>
-              <DatePickerControl
-                  sx={{ flex:1,ml:isDesktop?0:0}}
+                <DatePickerControl
+                  sx={{ flex: 1, ml: isDesktop ? 0 : 0 }}
                   id="date"
                   control={control}
                   label="Gün Sonu tarihi"
@@ -364,48 +351,43 @@ export const BankPaymentComponent = () => {
               </FormControl>
 
               <FormControl sx={{ flex: 1 }}>
-  {memberVPosList ? (
-    <Controller
-      control={control}
-      name="bankCode"
-      render={({ field }) => { // Add this line
-        return (
-          <>
-            <Autocomplete
-              sx={{ mr: isDesktop ? 3 : 0 }}
-              onChange={(event, selectedValue) => {
-                setSelectedMerchantVPosBankCode(selectedValue);
-                field.onChange(selectedValue?.value); // Add this line
-              }}
-              id="bankCode"
-              options={memberVPosList}
-              value={selectedMerchantVPosBankCode}
-              getOptionLabel={(option: {
-                label: string;
-                value: string;
-              }) => option.label}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Banka"
-                />
-              )}
-            />
-          </>
-        );
-      }}
-    />
-  ) : null}
-</FormControl>
-
+                {memberVPosList ? (
+                  <Controller
+                    control={control}
+                    name="bankCode"
+                    render={({ field }) => {
+                      // Add this line
+                      return (
+                        <>
+                          <Autocomplete
+                            sx={{ mr: isDesktop ? 3 : 0 }}
+                            onChange={(event, selectedValue) => {
+                              setSelectedMerchantVPosBankCode(selectedValue);
+                              field.onChange(selectedValue?.value); // Add this line
+                            }}
+                            id="bankCode"
+                            options={memberVPosList}
+                            value={selectedMerchantVPosBankCode}
+                            getOptionLabel={(option: {
+                              label: string;
+                              value: string;
+                            }) => option.label}
+                            renderInput={(params) => (
+                              <TextField {...params} label="Banka" />
+                            )}
+                          />
+                        </>
+                      );
+                    }}
+                  />
+                ) : null}
+              </FormControl>
             </Stack>
             <Stack
               spacing={3}
               direction={isDesktop ? "row" : "column"}
               width={isDesktop ? 800 : "auto"}
-            >
-   
-            </Stack>
+            ></Stack>
 
             <Stack
               direction="row"
@@ -416,7 +398,6 @@ export const BankPaymentComponent = () => {
                 onClick={handleSubmit(onSubmit)}
                 variant="contained"
                 text={"ARA"}
-         
               />
             </Stack>
           </Stack>

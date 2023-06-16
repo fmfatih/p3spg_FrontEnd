@@ -106,7 +106,7 @@ export const BusinessBankListingActiveTable = ({
   const editRow = React.useCallback(
     (merchantVPos: IMerchantVPos) => () => {
       navigate("/vpos-management/vpos-bankdefinition", { state: merchantVPos });
-      console.log(merchantVPos);
+   
       
     },
     [navigate]

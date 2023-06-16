@@ -1,4 +1,4 @@
-import { useAddCommissionProfile, useAuthorization } from "../../../hooks";
+import { ICommissionProfileForPage, useAddCommissionProfile, useAuthorization, useUpdateCommissionProfile } from "../../../hooks";
 import { FormControl, useMediaQuery, useTheme } from "@mui/material";
 import { Stack } from "@mui/system";
 import { Button, Loading } from "../../atoms";
@@ -10,12 +10,15 @@ import {
   BankAddProfileFormSchemaFormValuesType,
 } from "./_formTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export const BankAddCommissionProfileForm = () => {
   const navigate = useNavigate();
   const {showCreate} = useAuthorization();
   const theme = useTheme();
+  const commissionProfile = useLocation()
+  .state as unknown as ICommissionProfileForPage;
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const { control, reset, handleSubmit } =
     useForm<BankAddProfileFormSchemaFormValuesType>({
@@ -23,7 +26,11 @@ export const BankAddCommissionProfileForm = () => {
     });
   const setSnackbar = useSetSnackBar();
   const { mutate: addCommissionProfile, isLoading } = useAddCommissionProfile();
+  const { mutate: updateCommissionProfile, isLoading: updateLoading } = useUpdateCommissionProfile()
 
+
+
+  
   const onSubmit = ({
     description,
     name,
@@ -35,36 +42,81 @@ export const BankAddCommissionProfileForm = () => {
       name,
     };
 
-    addCommissionProfile(request, {
-      onSuccess(data) {
-        if (data.isSuccess) {
-          reset({
-            name: "",
-            code: "",
-            description: "",
-          });
-          setSnackbar({
-            severity: "success",
-            isOpen: true,
-            description: data.message,
-          });
-        } else {
-          setSnackbar({
-            severity: "error",
-            isOpen: true,
-            description: data.message,
-          });
+    if (commissionProfile && Number(commissionProfile?.id) > 0) {
+      updateCommissionProfile(
+        {
+          ...request,
+          id: commissionProfile.id,
+        },
+        {
+          onSuccess: (data) => {
+            if (data.isSuccess) {
+              navigate('/commission-management/commission-codedefinition');
+              setSnackbar({
+                severity: 'success',
+                isOpen: true,
+                description: data.message,
+              });
+            } else {
+              setSnackbar({
+                severity: 'error',
+                description: data.message,
+                isOpen: true,
+              });
+            }
+          },
+          onError: () => {
+            setSnackbar({
+              severity: 'error',
+              description: 'İşlem sırasında bir hata oluştu',
+              isOpen: true,
+            });
+          },
         }
-      },
-      onError: () => {
-        setSnackbar({
-          severity: "error",
-          isOpen: true,
-          description: "İşlem sırasında bir hata oluştu",
-        });
-      },
-    });
+      );
+    } else {
+      addCommissionProfile(request, {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            navigate('/commission-management/commission-codedefinition');
+            reset({
+              name: '',
+              code: '',
+              description: '',
+            });
+            setSnackbar({
+              severity: 'success',
+              isOpen: true,
+              description: data.message,
+            });
+          } else {
+            setSnackbar({
+              severity: 'error',
+              description: data.message,
+              isOpen: true,
+            });
+          }
+        },
+        onError: () => {
+          setSnackbar({
+            severity: 'error',
+            description: 'İşlem sırasında bir hata oluştu',
+            isOpen: true,
+          });
+        },
+      });
+    }
   };
+
+  useEffect(() => {
+    if (!!commissionProfile && JSON.stringify(commissionProfile) !== "{}") {
+      reset({
+        description: commissionProfile.description,
+        name: commissionProfile.name,
+        code: commissionProfile.code,
+      });
+    }
+  }, [commissionProfile, reset]);
 
   const handleBack = () => navigate("/dashboard");
 
@@ -120,13 +172,15 @@ export const BankAddCommissionProfileForm = () => {
           direction="row"
           justifyContent="flex-end"
         >
-          {!!showCreate && (
-            <Button
-              onClick={handleSubmit(onSubmit)}
-              variant="contained"
-              text={"Kaydet"}
-            />
-          )}
+{!showCreate && (
+  <Button
+    onClick={handleSubmit(onSubmit)}
+    variant="contained"
+    text={commissionProfile && commissionProfile.id > 0 ? "Güncelle" : "Kaydet"}
+  />
+)}
+
+
           <Button onClick={handleBack} sx={{ mx: 2 }} text={"Iptal"} />
         </Stack>
       </Stack>

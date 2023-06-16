@@ -4,7 +4,7 @@ export const BankAddCommissionProfile = () => {
   return (
     <AdminTemplate
       headerProps={{
-        headerTitle: 'Üye İş yeri Komisyon Profil Tanımlama',
+        headerTitle: 'Komisyon Profil Kodu Tanımlama',
         hideAddButton: true,
         hideDownloadButton: true,
         hideSearchBar: true

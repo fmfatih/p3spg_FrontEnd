@@ -84,7 +84,7 @@ export const MerchantAddFormPartnerStep = ({
     };
 
     setAllData({ ...allData, ...request });
-console.log(allData);
+
 
     if ((merchant && merchant?.id > 0 && allData?.officialFullName) || (allData && allData?.officialFullName)) {
       updateMerchantPartner(

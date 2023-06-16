@@ -32,7 +32,7 @@ async function updateCommissionProfile(
   data: IUpdateCommissionProfileRequest
 ): Promise<any> {
   try {
-    return (await axiosInstance.put("/CommissionParameter/Update", data)).data;
+    return (await axiosInstance.put("/CommissionProfile/Update", data)).data;
   } catch (ex) {
     throw ((ex as AxiosError).response?.data as any).error;
   }

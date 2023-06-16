@@ -29,8 +29,10 @@ import {
   PaymentWithLinkedList,
   BusinessBankListing,
   MerchantEndOfDay,
-  BankPayment
+  BankPayment,
+  BankCommissionProfileList,
 } from "../pages";
+
 
 
 
@@ -93,6 +95,10 @@ export const router = createBrowserRouter([
   },
   {
     path: "/commission-management/commission-codedefinition",
+    element: <BankCommissionProfileList />,
+  },
+  {
+    path: "/commission-management/commission-codedefinition-detail",
     element: <BankAddCommissionProfile />,
   },
   {

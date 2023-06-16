@@ -17,6 +17,7 @@ export type GetVPosRoutingListRequest = {
 export type IVPosRouting = {
   memberId: number;
   merchantId: number;
+  merchantName:string,
   issuerCardBankCodes: Array<string>;
   issuerCardBankName: string;
   issuerCardType: string;

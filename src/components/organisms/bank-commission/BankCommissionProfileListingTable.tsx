@@ -15,10 +15,11 @@ import { DeleteConfirmModal, Table } from "../../molecules";
 import { Loading } from "../../atoms";
 import {
   DeleteCommissionParameterRequest,
-  ICommissionParameter,
+  ICommissionProfileForPage,
   useDeleteCommissionProfile,
   useGetCommissionProfileList,
   PagingResponse,
+  useGetCommissionProfileListForPage,
   useAuthorization,
 } from "../../../hooks";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -26,6 +27,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
 import { useNavigate } from "react-router-dom";
 import { downloadExcel } from "../../../util/downloadExcel";
+
 
 function RenderCheckBar(props: GridRenderCellParams<any, string>) {
   const { value } = props;
@@ -38,7 +40,7 @@ function RenderCheckBar(props: GridRenderCellParams<any, string>) {
 }
 
 type BankCommissionListingTableProps = {
-  onRowClick?: (data: { id: GridRowId; row: ICommissionParameter }) => void;
+  onRowClick?: (data: { id: GridRowId; row: ICommissionProfileForPage }) => void;
 };
 
 export const BankCommissionListingProfileTable = ({
@@ -49,13 +51,13 @@ export const BankCommissionListingProfileTable = ({
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [queryOptions, setQueryOptions] = React.useState({});
   const [tableData, setTableData] =
-    useState<PagingResponse<Array<ICommissionParameter>>>();
+    useState<PagingResponse<Array<ICommissionProfileForPage>>>();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
   });
-  const { mutate: getCommissionProfileList, isLoading } =
-    useGetCommissionProfileList();
+  const { mutate: getCommissionProfileListForPage, isLoading } =
+  useGetCommissionProfileListForPage();
   const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState(0);
@@ -74,7 +76,7 @@ export const BankCommissionListingProfileTable = ({
       requestPayload[queryOptions.field] = queryOptions.value;
     }
 
-    getCommissionProfileList(
+    getCommissionProfileListForPage(
   requestPayload,
       {
         onSuccess: (data) => {
@@ -98,7 +100,7 @@ export const BankCommissionListingProfileTable = ({
       }
     );
   }, [
-    getCommissionProfileList,
+    getCommissionProfileListForPage,
     paginationModel.page,
     paginationModel.pageSize,
     setSnackbar,
@@ -109,7 +111,7 @@ export const BankCommissionListingProfileTable = ({
     setPaginationModel(model);
     setTableData(undefined);
 
-    getCommissionProfileList(
+    getCommissionProfileListForPage(
       {
         size: paginationModel.pageSize,
         page: paginationModel.page,
@@ -140,9 +142,9 @@ export const BankCommissionListingProfileTable = ({
   };
 
   const editRow = React.useCallback(
-    (commissionParameter: ICommissionParameter) => () => {
-      navigate("/commission-management/commission-definition", {
-        state: commissionParameter,
+    (commissionProfile: ICommissionProfileForPage) => () => {
+      navigate("/commission-management/commission-codedefinition-detail", {
+        state: commissionProfile,
       });
     },
     [navigate]
@@ -168,7 +170,7 @@ export const BankCommissionListingProfileTable = ({
     commissionProfileDelete(deleteRequest, {
       onSuccess: (data: any) => {
         if (data.isSuccess) {
-          getCommissionProfileList({
+          getCommissionProfileListForPage({
             size: paginationModel.pageSize,
             page: paginationModel.page,
             orderBy: "CreateDate",
@@ -218,130 +220,10 @@ export const BankCommissionListingProfileTable = ({
           /> : <></>,
         ],
       },
-      { field: "profileCode", headerName: "Profil", width: 200 },
-      { field: "merchantId", headerName: "Üye İşyeri Kodu", width: 150 },
-      { field: "merchantName", headerName: "Üye İşyeri Adı", width: 380 },
-      { field: "txnType", headerName: "İşlem Tipi", width: 200 },
-      {
-        field: "onus",
-        headerName: "Onus",
-        width: 100,
-        renderCell: RenderCheckBar,
-      },
-      {
-        field: "international",
-        headerName: "International",
-        width: 130,
-        renderCell: RenderCheckBar,
-      },
-      {
-        field: "amex",
-        headerName: "Amex",
-        width: 100,
-        renderCell: RenderCheckBar,
-      },
-      { field: "installment", headerName: "Taksit Sayısı", width: 150 },
-      { field: "bankcode", headerName: "Banka Kodu", width: 150 },
-      { field: "bankName", headerName: "Banka Adı", width: 350 },
-      { field: "bankblocked", headerName: "Banka Blokesi", width: 150 },
-      { field: "bankblockedday", headerName: "Banka Bloke Gün", width: 150 },
-      {
-        field: "bankcommission",
-        headerName: "Banka Komisyon",
-        width: 150,
-        valueFormatter: (params: GridValueFormatterParams<number>) => {
-          if (params.value == null) {
-            return "";
-          }
-          return `${params.value} %`;
-        },
-      },
-      { field: "merchantblocked", headerName: "İşyeri Blokesi", width: 150 },
-      {
-        field: "merchantblockedday",
-        headerName: "İşyeri Bloke Gün",
-        width: 150,
-      },
-      {
-        field: "merchantcommission",
-        headerName: "İşyeri Komisyon",
-        width: 150,
-        valueFormatter: (params: GridValueFormatterParams<number>) => {
-          if (params.value == null) {
-            return "";
-          }
-          return `${params.value} %`;
-        },
-      },
-      {
-        field: "merchantadditionalcommission",
-        headerName: "Üye İşyeri Ücreti",
-        width: 150,
-        valueFormatter: (params: GridValueFormatterParams<number>) => {
-          if (params.value == null) {
-            return "";
-          }
-          return `${params.value} TL`;
-        },
-      },
-      {
-        field: "customercommission",
-        headerName: "Müşteri Komisyonu",
-        width: 150,
-        valueFormatter: (params: GridValueFormatterParams<number>) => {
-          if (params.value == null) {
-            return "";
-          }
-          return `${params.value} %`;
-        },
-      },
-      {
-        field: "customeradditionalcommission",
-        headerName: "Müşteri Ücreti",
-        width: 200,
-        valueFormatter: (params: GridValueFormatterParams<number>) => {
-          if (params.value == null) {
-            return "";
-          }
-          return `${params.value} TL`;
-        },
-      },
-      { field: "cardType", headerName: "Kart Tipi", width: 150 },
-      {
-        field: "minAmount",
-        headerName: "En Düşük Tutar",
-        width: 200,
-        valueFormatter: (params: GridValueFormatterParams<number>) => {
-          if (params.value == null) {
-            return "";
-          }
-          return `${params.value} TL`;
-        },
-      },
-      {
-        field: "maxAmount",
-        headerName: "En Yüksek Tutar",
-        width: 200,
-        valueFormatter: (params: GridValueFormatterParams<number>) => {
-          if (params.value == null) {
-            return "";
-          }
-          return `${params.value} TL`;
-        },
-      },
-      { field: "status", headerName: "Durum", width: 200 },
-      { field: "systemDate", headerName: "Düzenlenme Tarihi", width: 200 },
-      {
-        field: "createUserName",
-        headerName: "Düzenleyen Kullanıcı",
-        width: 200,
-      },
-      { field: "updateDate", headerName: "Güncellenme Tarihi", width: 200 },
-      {
-        field: "updateUserName",
-        headerName: "Güncelleyen Kullanıcı",
-        width: 200,
-      },
+      { field: "name", headerName: "Komisyon Adı", width: 200 },
+      { field: "code", headerName: "Komisyon Kodu", width: 200 },
+      { field: "description", headerName: "Açıklama", width: 200 },
+
     ];
   }, [deleteRow, editRow, showDelete, showUpdate]);
 
@@ -356,12 +238,12 @@ export const BankCommissionListingProfileTable = ({
     if (queryOptions?.field && queryOptions?.value !== undefined) {
       requestPayload[queryOptions.field] = queryOptions.value;
     }
-    getCommissionProfileList(
+    getCommissionProfileListForPage(
    requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            downloadExcel(data?.data?.result || [], "Banka Komisyon Listesi");
+            downloadExcel(data?.data?.result || [], " Komisyon Profil Kodu Listesi");
           } else {
             setSnackbar({
               severity: "error",
@@ -404,21 +286,21 @@ export const BankCommissionListingProfileTable = ({
     <>
       {hasLoading && <Loading />}
       <Stack flex={1} p={2} justifyContent="space-between">
-        {tableData?.result?.length && (
+        {tableData && (
           <>
             <Table
              handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
-              rowCount={tableData.totalItems}
+              rowCount={tableData.length}
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               onRowClick={onRowClick}
               isRowSelectable={() => false}
               // disableColumnMenu
-              rows={tableData.result}
+              rows={tableData}
               columns={columns}
-              exportFileName="Banka Komisyon Listesi"
+              exportFileName="Komisyon Profil Kodu Listesi"
               onSave={() => onSave()}
             />
             <DeleteConfirmModal

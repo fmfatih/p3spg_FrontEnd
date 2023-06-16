@@ -45,14 +45,9 @@ const isWideScreen = useMediaQuery(theme.breakpoints.up('lg'));
 
   return (
     <AdminTemplate
-      headerProps={{ headerTitle: "Dashboard", hideAddButton: true }}
+      headerProps={{ headerTitle: "Ana Ekran", hideAddButton: true }}
     >
      
-
-
-
-
-
      <Stack p={isDesktop ? 3 : 0} mb={isDesktop ? 0 : 2} maxWidth={isLargeScreen ? '1200px' : (isDesktop ? '700px' : '100%')}>
   <DashboardWidget
     onDateClick={handleTransaction}
