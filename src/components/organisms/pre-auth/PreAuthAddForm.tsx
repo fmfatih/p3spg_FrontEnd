@@ -32,11 +32,13 @@ import {
   initialPreAuthState,
 } from "./_formTypes";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
+import { useUserInfo } from "../../../store/User.state";
 
 export const PreAuthAddForm = () => {
   const [html, setHtml] = useState();
   const [isHtmlOpen, setIsHtmlOpen] = useState(false);
   const {showCreate} = useAuthorization();
+  const [userInfo] = useUserInfo();
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const { control, handleSubmit } =
@@ -54,16 +56,41 @@ export const PreAuthAddForm = () => {
   const { mutate: paymentPreAuth } = usePaymentPreAuth();
   const [selectedMerchantId, setSelectedMerchantId] = useState(0);
 
+  // const merchantList = useMemo(() => {
+  //   return rawMerchantList?.data?.map(
+  //     (merchant: { merchantName: string; merchantId: number }) => {
+  //       return {
+  //         label: `${merchant.merchantName}`,
+  //         value: merchant.merchantId,
+  //       };
+  //     }
+  //   );
+  // }, [rawMerchantList?.data]);
+
   const merchantList = useMemo(() => {
-    return rawMerchantList?.data?.map(
-      (merchant: { merchantName: string; merchantId: number }) => {
-        return {
-          label: `${merchant.merchantName}`,
-          value: merchant.merchantId,
-        };
-      }
-    );
-  }, [rawMerchantList?.data]);
+ 
+    if (userInfo.merchantId == 0) {
+        return rawMerchantList?.data?.map(
+            (rawPosType: { merchantName: string; merchantId: number }) => {
+                return {
+                    label: rawPosType.merchantName,
+                    value: rawPosType.merchantId,
+                };
+            }
+        );
+    } else {
+        return rawMerchantList?.data
+            ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
+                return rawPosType.merchantId === Number(userInfo.merchantId);
+            })
+            .map((filteredMerchant) => {
+                return {
+                    label: filteredMerchant.merchantName,
+                    value: filteredMerchant.merchantId,
+                };
+            });
+    }
+}, [rawMerchantList?.data, userInfo?.merchantId]);
 
   const installmentCounts = useMemo(() => {
     return rawInstallmentSettingsList?.data?.map(
