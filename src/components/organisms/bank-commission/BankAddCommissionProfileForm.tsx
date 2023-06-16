@@ -144,6 +144,7 @@ export const BankAddCommissionProfileForm = () => {
                     id="code"
                     control={control}
                     label="Komisyon Kodu"
+                    isDisabled={commissionProfile && commissionProfile.id > 0}
                   />
                 </FormControl>
               </Stack>

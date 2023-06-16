@@ -94,16 +94,41 @@ export const MerchantEndOfDayComponent = () => {
       : null
   );
 
+  // const merchantList = useMemo(() => {
+  //   return rawMerchantList?.data?.map(
+  //     (rawPosType: { merchantName: string; merchantId: number }) => {
+  //       return {
+  //         label: rawPosType.merchantName,
+  //         value: rawPosType.merchantId,
+  //       };
+  //     }
+  //   );
+  // }, [rawMerchantList?.data]);
+
   const merchantList = useMemo(() => {
-    return rawMerchantList?.data?.map(
-      (rawPosType: { merchantName: string; merchantId: number }) => {
-        return {
-          label: rawPosType.merchantName,
-          value: rawPosType.merchantId,
-        };
-      }
-    );
-  }, [rawMerchantList?.data]);
+ 
+    if (userInfo.merchantId == 0) {
+        return rawMerchantList?.data?.map(
+            (rawPosType: { merchantName: string; merchantId: number }) => {
+                return {
+                    label: rawPosType.merchantName,
+                    value: rawPosType.merchantId,
+                };
+            }
+        );
+    } else {
+        return rawMerchantList?.data
+            ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
+                return rawPosType.merchantId === Number(userInfo.merchantId);
+            })
+            .map((filteredMerchant) => {
+                return {
+                    label: filteredMerchant.merchantName,
+                    value: filteredMerchant.merchantId,
+                };
+            });
+    }
+}, [rawMerchantList?.data, userInfo?.merchantId]);
 
   const onSubmit = (data: MerchantPaymentValuesType) => {
     setTableData(undefined);

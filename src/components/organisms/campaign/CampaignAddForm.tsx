@@ -23,6 +23,7 @@ import {
   NumericFormatInputControl,
 } from "../../molecules";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
+import { useUserInfo } from "../../../store/User.state";
 
 export const CampaignAddForm = () => {
   const theme = useTheme();
@@ -31,6 +32,7 @@ export const CampaignAddForm = () => {
   const { mutate: CampaignAdd } =
     useCampaignAdd();
   const navigate = useNavigate();
+  const [userInfo] = useUserInfo();
   const { data: rawMerchantList } = useGetAllMerchantList();
   const { data: rawAcquirerBankList } = useGetAcquirerBankList();
   const { data: rawCardBinList } = useGetCardBinList({});
@@ -43,16 +45,43 @@ export const CampaignAddForm = () => {
 
   const [selectedMerchantId] = useState(0 as any);
   const [selectedBins, setSelectedBins] = useState([] as any);
+
+  // const merchantList = useMemo(() => {
+  //   return rawMerchantList?.data?.map(
+  //     (rawPosType: { merchantName: string; merchantId: number }) => {
+  //       return {
+  //         label: rawPosType.merchantName,
+  //         value: rawPosType.merchantId,
+  //       };
+  //     }
+  //   );
+  // }, [rawMerchantList?.data]);
+
   const merchantList = useMemo(() => {
-    return rawMerchantList?.data?.map(
-      (rawPosType: { merchantName: string; merchantId: number }) => {
-        return {
-          label: rawPosType.merchantName,
-          value: rawPosType.merchantId,
-        };
-      }
-    );
-  }, [rawMerchantList?.data]);
+ 
+    if (userInfo.merchantId == 0) {
+        return rawMerchantList?.data?.map(
+            (rawPosType: { merchantName: string; merchantId: number }) => {
+                return {
+                    label: rawPosType.merchantName,
+                    value: rawPosType.merchantId,
+                };
+            }
+        );
+    } else {
+        return rawMerchantList?.data
+            ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
+                return rawPosType.merchantId === Number(userInfo.merchantId);
+            })
+            .map((filteredMerchant) => {
+                return {
+                    label: filteredMerchant.merchantName,
+                    value: filteredMerchant.merchantId,
+                };
+            });
+    }
+}, [rawMerchantList?.data, userInfo?.merchantId]);
+
   const acquirerBankList = useMemo(() => {
     return rawAcquirerBankList?.data?.map(
       (bank: { bankCode: string; bankName: string }) => {
