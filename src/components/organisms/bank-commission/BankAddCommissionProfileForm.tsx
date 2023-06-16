@@ -118,7 +118,7 @@ export const BankAddCommissionProfileForm = () => {
     }
   }, [commissionProfile, reset]);
 
-  const handleBack = () => navigate("/dashboard");
+  const handleBack = () => navigate("/commission-management/commission-codedefinition");
 
   return (
     <>
