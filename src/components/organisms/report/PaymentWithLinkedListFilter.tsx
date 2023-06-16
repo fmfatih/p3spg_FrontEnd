@@ -20,6 +20,7 @@ import { Button, Loading } from "../../atoms";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SelectControl, Table, DeleteConfirmModal } from "../../molecules";
 import { downloadExcel } from "../../../util/downloadExcel";
+import { useUserInfo } from "../../../store/User.state";
 
 import {
   useGetAllMerchantList,
@@ -42,6 +43,7 @@ export const PaymentWithLinkedListFilter = () => {
   const { showDelete, showUpdate } = useAuthorization();
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("lg"));
+  const [userInfo] = useUserInfo();
   const { data: rawMerchantList } = useGetAllMerchantList();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
@@ -72,16 +74,41 @@ export const PaymentWithLinkedListFilter = () => {
   const merchantID = watch("merchantID");
   const status = watch("status");
 
+  // const merchantList = useMemo(() => {
+  //   return rawMerchantList?.data?.map(
+  //     (rawPosType: { merchantName: string; merchantId: number }) => {
+  //       return {
+  //         label: rawPosType.merchantName,
+  //         value: rawPosType.merchantId,
+  //       };
+  //     }
+  //   );
+  // }, [rawMerchantList?.data]);
+
   const merchantList = useMemo(() => {
-    return rawMerchantList?.data?.map(
-      (rawPosType: { merchantName: string; merchantId: number }) => {
-        return {
-          label: rawPosType.merchantName,
-          value: rawPosType.merchantId,
-        };
-      }
-    );
-  }, [rawMerchantList?.data]);
+ 
+    if (userInfo.merchantId == 0) {
+        return rawMerchantList?.data?.map(
+            (rawPosType: { merchantName: string; merchantId: number }) => {
+                return {
+                    label: rawPosType.merchantName,
+                    value: rawPosType.merchantId,
+                };
+            }
+        );
+    } else {
+        return rawMerchantList?.data
+            ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
+                return rawPosType.merchantId === Number(userInfo.merchantId);
+            })
+            .map((filteredMerchant) => {
+                return {
+                    label: filteredMerchant.merchantName,
+                    value: filteredMerchant.merchantId,
+                };
+            });
+    }
+}, [rawMerchantList?.data, userInfo?.merchantId]);
 
   const paymentstatusList = useMemo(() => {
     return rawLinkedPaymentStatusList?.data?.map(
