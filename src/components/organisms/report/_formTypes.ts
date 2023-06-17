@@ -10,6 +10,7 @@ export const paymentAndTransactionFormSchema = zod.object({
   status: zod.string(),
   bankCode: zod.string(),
   refundAmount: zod.string(),
+  merchantId:zod.number()
 });
 
 export type PaymentAndTransactionValuesType = zod.infer<
@@ -27,6 +28,7 @@ export const paymentAndTransactionInitialValues: PaymentAndTransactionValuesType
     status: "",
     bankCode: "",
     refundAmount: "",
+    merchantId:0
   };
 
 

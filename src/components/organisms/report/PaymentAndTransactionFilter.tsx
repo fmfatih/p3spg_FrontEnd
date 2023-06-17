@@ -21,6 +21,7 @@ import {
   useAuthorization,
   useGetMerchantVPosList,
   useGetMemberVPosList,
+  useGetAllMerchantList,
 } from "../../../hooks";
 import {
   GridColDef,
@@ -87,12 +88,12 @@ export const PaymentAndTransactionFilter = () => {
   const { data: rawPayment3DTrxSettingsList } = useGetPayment3DTrxSettingsList(
     {}
   );
+  const { data: rawMerchantList } = useGetAllMerchantList();
   const { data: rawAcquirerBankList } = useGetAcquirerBankList();
   const { mutate: getMemberVPosList, data: rawMemberVPosList } =
     useGetMemberVPosList();
   const { mutate: getMerchantVPosList, isLoading } = useGetMerchantVPosList();
   const setSnackbar = useSetSnackBar();
-
   useEffect(() => {
     setValue("startDate", dayjs().add(-1, "day"));
     setValue("endDate", dayjs());
@@ -134,6 +135,30 @@ export const PaymentAndTransactionFilter = () => {
       }
     );
   }, [rawAcquirerBankList?.data]);
+
+  const merchantList = useMemo(() => {
+    if (userInfo.merchantId == 0) {
+      return rawMerchantList?.data?.map(
+        (rawPosType: { merchantName: string; merchantId: number }) => {
+          return {
+            label: rawPosType.merchantName,
+            value: rawPosType.merchantId,
+          };
+        }
+      );
+    } else {
+      return rawMerchantList?.data
+        ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
+          return rawPosType.merchantId === Number(userInfo.merchantId);
+        })
+        .map((filteredMerchant) => {
+          return {
+            label: filteredMerchant.merchantName,
+            value: filteredMerchant.merchantId,
+          };
+        });
+    }
+  }, [rawMerchantList?.data, userInfo?.merchantId]);
 
   useEffect(() => {
     if (userInfo.merchantId === 0) {
@@ -210,6 +235,7 @@ export const PaymentAndTransactionFilter = () => {
       size: paginationModel.pageSize,
       page: paginationModel.page,
       orderBy: "CreateDate",
+      merchantId: data.merchantId || 0,
     };
 
     GetPaymentAndTransaction(req, {
@@ -321,6 +347,7 @@ export const PaymentAndTransactionFilter = () => {
               status: getValues("status"),
               transactionType: getValues("transactionType"),
               bankCode: getValues("bankCode"),
+              merchantId: getValues("merchantId") || 0,
             },
             {
               onSuccess: (data) => {
@@ -398,6 +425,7 @@ export const PaymentAndTransactionFilter = () => {
               status: getValues("status"),
               transactionType: getValues("transactionType"),
               bankCode: getValues("bankCode"),
+              merchantId: getValues("merchantId") || 0,
             },
             {
               onSuccess: (data) => {
@@ -887,6 +915,43 @@ export const PaymentAndTransactionFilter = () => {
                 )}
               </FormControl>
             </Stack>
+
+            <Stack
+              spacing={3}
+              direction={isDesktop ? "row" : "column"}
+              width={isDesktop ? "100%" : "auto"}
+              maxWidth={1308}
+            >
+              <FormControl sx={{ flex: 1 }}>
+                {merchantList && (
+                  <Controller
+                    control={control}
+                    name="merchantId" // name'i "merchant" yerine "merchantId" olarak değiştiriyoruz
+                    render={({ field }) => (
+                      <Autocomplete
+                        id="merchant"
+                        options={merchantList}
+                        getOptionLabel={(option: {
+                          label: string;
+                          value: number;
+                        }) => option.label}
+                        onChange={(event, newValue) => {
+                          // form'daki "merchantId" alanını güncelliyoruz
+                          field.onChange(newValue ? newValue.value : "");
+                        }}
+                        renderInput={(params) => (
+                          <TextField {...params} label="Üye İşyeri" />
+                        )}
+                      />
+                    )}
+                  />
+                )}
+              </FormControl>
+              <div style={{ flex: 1 }} /> {/* empty space filler */}
+              <div style={{ flex: 1 }} /> {/* empty space filler */}
+              <div style={{ flex: 1 }} /> {/* empty space filler */}
+            </Stack>
+
             <Stack
               direction="row"
               justifyContent="flex-end"

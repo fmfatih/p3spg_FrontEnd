@@ -164,14 +164,39 @@ export const UserAddForm = () => {
       });
   }, [rawRoles?.data, userType]);
 
+  // const userTypeList = useMemo(() => {
+  //   return userTypes?.data?.map((userType: { key: string; value: string }) => {
+  //     return {
+  //       label: userType.key,
+  //       value: Number(userType.value),
+  //     };
+  //   });
+  // }, [userTypes?.data]);
+
+
+
   const userTypeList = useMemo(() => {
-    return userTypes?.data?.map((userType: { key: string; value: string }) => {
-      return {
-        label: userType.key,
-        value: Number(userType.value),
-      };
-    });
-  }, [userTypes?.data]);
+    if (userInfo.merchantId != 0) {
+      return userTypes?.data?.filter((userType: { key: string; value: string }) => Number(userType.value) !== 1)
+        .map((userType: { key: string; value: string }) => {
+          return {
+            label: userType.key,
+            value: Number(userType.value),
+          };
+        });
+    } else {
+      return userTypes?.data?.map((userType: { key: string; value: string }) => {
+        return {
+          label: userType.key,
+          value: Number(userType.value),
+        };
+      });
+    }
+  }, [userTypes?.data, userInfo?.merchantId]);
+  
+
+
+
 
   const onSubmit = ({
     email,
@@ -274,6 +299,9 @@ export const UserAddForm = () => {
   }, [userType, isDisabled]);
 
   const handleBack = () => navigate("/dashboard");
+
+console.log(userTypeList);
+
 
   return (
     <>

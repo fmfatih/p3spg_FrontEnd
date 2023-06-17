@@ -290,19 +290,19 @@ export const BankCommissionListingProfileTable = ({
     <>
       {hasLoading && <Loading />}
       <Stack flex={1} p={2} justifyContent="space-between">
-        {tableData && (
+        {tableData?.result && (
           <>
             <Table
              handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
-              rowCount={tableData.length}
+              rowCount={tableData?.totalItems}
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               onRowClick={onRowClick}
               isRowSelectable={() => false}
               // disableColumnMenu
-              rows={tableData}
+              rows={tableData?.result}
               columns={columns}
               exportFileName="Komisyon Profil Kodu Listesi"
               onSave={() => onSave()}
