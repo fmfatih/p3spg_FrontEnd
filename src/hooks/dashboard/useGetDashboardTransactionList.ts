@@ -12,6 +12,7 @@ export type IDashboardTransaction = {
   value: string;
   description: string;
   bankCode?: string;
+  merchantId:number
 };
 
 export type GetDashboardTransactionListResponse = BaseResponse<Array<IDashboardTransaction>>;

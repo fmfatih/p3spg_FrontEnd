@@ -65,14 +65,27 @@ export const MenuAddModal = ({
     }
   }, [reset, menu]);
 
+  // const menuList = useMemo(() => {
+  //   return rawMenuList?.data?.map((menu: { name: string; id: number }) => {
+  //     return {
+  //       label: menu.name,
+  //       value: `${menu.id}`,
+  //     };
+  //   });
+  // }, [rawMenuList?.data]);
+
   const menuList = useMemo(() => {
-    return rawMenuList?.data?.map((menu: { name: string; id: number }) => {
-      return {
-        label: menu.name,
-        value: `${menu.id}`,
-      };
-    });
+    return rawMenuList?.data?.filter((menu: { name: string; id: number, parentId: number }) => menu.parentId === 0)
+      .map((menu: { name: string; id: number }) => {
+        return {
+          label: menu.name,
+          value: `${menu.id}`,
+        };
+      });
   }, [rawMenuList?.data]);
+
+
+  
 
   const menuTypeList = useMemo(() => {
     return rawMenuTypeList?.data?.map(

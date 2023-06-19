@@ -187,6 +187,7 @@ export const Table = ({ handleFilterChange, ...props }: TableProps) => {
         toolbarExport: "İndir",
         toolbarExportCSV: "Excel olarak indir",
         toolbarExportPrint: "Yazdır",
+        noRowsLabel: "Veri bulunamadı", 
         toolbarFilters: "Ara",
         MuiTablePagination: {
           labelRowsPerPage: "Sayfa Başına Satır",

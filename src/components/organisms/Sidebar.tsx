@@ -51,8 +51,13 @@ export const Sidebar = ({onCloseMenu}: SidebarProps) => {
           px: 2,
           pt: isDesktop ? 3 : 0,
           height: isDesktop ? "100vh" : 'auto',
-          overflow: "hidden",
+          overflow: "auto",
           justifyContent: "space-between",
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
         }}
       >
         <Stack>

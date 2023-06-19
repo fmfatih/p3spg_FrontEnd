@@ -8,7 +8,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { Stack } from "@mui/system";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { Button } from "../atoms";
 import { PieChart } from "react-minimal-pie-chart";
@@ -16,6 +16,7 @@ import {
   IDashboardTransaction,
   useGetDashboardTransactionDetail,
 } from "../../hooks";
+import { useUserInfo } from "../../store/User.state";
 
 const Dates = [
   { label: "Günlük", value: "DAILY" },
@@ -66,6 +67,7 @@ export const DashboardWidget = ({
   onDateClick,
   widgetTitle,
 }: DashboardWidgetProps) => {
+  const [userInfo] = useUserInfo();
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [isOpen, setIsOpen] = useState(false);
@@ -82,8 +84,18 @@ export const DashboardWidget = ({
         bankCode: item.bankCode,
       });
   };
+  const filteredItems = useMemo(() => {
+    if (userInfo.merchantId == 0) {
+      return items;
+    } else {
+      return items.filter((item) => item.merchantId == userInfo.merchantId);
+    }
+  }, [items, userInfo?.merchantId]);
+
   const isDesktopH = window.innerWidth >= 1500;
-  const isMediumScreen = useMediaQuery('(min-width: 900px) and (max-width: 1024px)');
+  const isMediumScreen = useMediaQuery(
+    "(min-width: 900px) and (max-width: 1024px)"
+  );
   return (
     <>
       <Stack
@@ -137,20 +149,31 @@ export const DashboardWidget = ({
           flexWrap="wrap"
           width={isDesktop ? "100%" : "auto"}
           mt={3}
-          direction={ "row" }
+          direction={"row"}
         >
-          {items.map((item, index) => (
+          {filteredItems.length > 0 ? (
+            filteredItems.map((item, index) => (
+              <Stack m={1}>
+                <TransactionItem
+                  key={`${index}-${item.key}-${item.description}-${item.value}`}
+                  bankCode={item.bankCode}
+                  description={item.description}
+                  value={item.value}
+                  key2={`${item.key} TL`}
+                  onDetailClick={() => handleOpenDetail(item)}
+                />
+              </Stack>
+            ))
+          ) : (
             <Stack m={1}>
               <TransactionItem
-                key={`${index}-${item.key}-${item.description}-${item.value}`}
-                bankCode={item.bankCode}
-                description={item.description}
-                value={item.value}
-                key2={`${item.key} TL`}
-                onDetailClick={() => handleOpenDetail(item)}
+                key={`no-transaction`}
+                bankCode={""}
+                value={0}
+                key2={`0 TL`}
               />
             </Stack>
-          ))}
+          )}
         </Stack>
       </Stack>
       {isOpen && (
@@ -214,7 +237,12 @@ export const DashboardWidget = ({
                     direction="row"
                     justifyContent="space-between"
                   >
-                    <Stack flex={1} spacing={2} alignItems="center" direction="row">
+                    <Stack
+                      flex={1}
+                      spacing={2}
+                      alignItems="center"
+                      direction="row"
+                    >
                       <Box
                         bgcolor={
                           transaction.description === "Satış"
