@@ -191,7 +191,7 @@ export const MerchantAddFormCompanyStep = ({
   }, [rawMerchantList?.data, userInfo.merchantId]);
 
   const commissionProfileList = useMemo(() => {
-    return rawCommissionProfileList?.data?.map(
+    return rawCommissionProfileList?.data?.result?.map(
       (rawPosType: { name: string; code: string }) => {
         return {
           label: rawPosType.name,
@@ -199,7 +199,7 @@ export const MerchantAddFormCompanyStep = ({
         };
       }
     );
-  }, [rawCommissionProfileList?.data]);
+  }, [rawCommissionProfileList?.data?.result]);
 
   const cityList = useMemo(() => {
     return rawCityList?.data?.map(

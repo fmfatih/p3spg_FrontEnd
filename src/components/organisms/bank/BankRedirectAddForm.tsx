@@ -129,7 +129,7 @@ export const BankRedirectAddForm = () => {
   }, [rawAcquirerBankList?.data]);
 
   const commissionProfileList = useMemo(() => {
-    return rawCommissionProfileList?.data?.map(
+    return rawCommissionProfileList?.data?.result?.map(
       (commissionProfule: { name: string; code: string }) => {
         return {
           label: `${commissionProfule.name}`,
@@ -137,7 +137,7 @@ export const BankRedirectAddForm = () => {
         };
       }
     );
-  }, [rawCommissionProfileList?.data]);
+  }, [rawCommissionProfileList?.data?.result]);
 
   // const merchantList = useMemo(() => {
   //   return rawMerchantList?.data?.map(

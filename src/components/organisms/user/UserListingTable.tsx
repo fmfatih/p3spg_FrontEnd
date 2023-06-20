@@ -250,7 +250,22 @@ export const UserListingTable = () => {
     getUserList(requestPayload, {
       onSuccess: (data) => {
         if (data.isSuccess) {
-          downloadExcel(data?.data?.result || [], "Kullanıcı Listesi");
+          function fieldValue(data) {
+            return data.map((item) => {
+              return {
+               "Ad Soyad": item?.fullName,
+                "Durum": item?.status,
+                "Email": item?.email,
+                "Telefon": item?.phoneNumber,
+                "Üye İşyeri Numarası": item?.merchantId,
+                "Üye İşyeri Adı": item?.merchantName,
+                "Kullanıcı Tipi": item?.userType,
+                "Kullanıcı Rolü": item?.roles,
+              };
+            });
+          }
+          const refactoredData = fieldValue(data?.data?.result);
+          downloadExcel(refactoredData || [], "Kullanıcı Listesi");
         } else {
           setSnackbar({
             severity: "error",

@@ -11,7 +11,8 @@ export const bankAddFormSchema = zod
     commissionFlag:zod.boolean(),
     international: zod.boolean(),
     amex: zod.boolean(),
-    bankcode: zod.string(),
+    bankcode: zod.string()
+    .min(1, { message: "Please enter your bankcode" }),
     installment: zod
       .string()
       .min(1, { message: "Please enter your phone number" }),
@@ -37,7 +38,7 @@ export const bankAddFormSchema = zod
     maxAmount: zod
       .string()
       .min(1, { message: "Please enter your phone number" }),
-    cardType: zod.string(),
+      cardType: zod.string(),
     txnType: zod.string().min(1, { message: "Please enter your phone number" }),
   })
   .refine(
@@ -52,7 +53,20 @@ export const bankAddFormSchema = zod
       message: "Please enter your phone number",
       path: ["bankcode"],
     }
-  );
+  )
+  .refine(
+    (data) => {
+      if (data.international) {
+        return true; //
+      } else {
+        return data.cardType && data.cardType.length >= 1;
+      }
+    },
+    {
+      message: "Please enter your phone number",
+      path: ["cardType"],
+    }
+  )
 
 export type BankAddFormSchemaFormValuesType = zod.infer<
   typeof bankAddFormSchema

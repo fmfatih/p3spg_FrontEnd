@@ -82,7 +82,7 @@ export const BankCommissionListingProfileTable = ({
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            setTableData(data?.data);
+            setTableData(data?.data?.result);
           } else {
             setSnackbar({
               severity: "error",
@@ -123,7 +123,7 @@ export const BankCommissionListingProfileTable = ({
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            setTableData(data?.data);
+            setTableData(data?.data?.result);
           } else {
             setSnackbar({
               severity: "error",
@@ -247,7 +247,7 @@ export const BankCommissionListingProfileTable = ({
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            downloadExcel(data?.data?.result || [], " Komisyon Profil Kodu Listesi");
+            downloadExcel(data?.data?.result?.result || [], " Komisyon Profil Kodu Listesi");
           } else {
             setSnackbar({
               severity: "error",
@@ -290,7 +290,7 @@ export const BankCommissionListingProfileTable = ({
     <>
       {hasLoading && <Loading />}
       <Stack flex={1} p={2} justifyContent="space-between">
-        {tableData?.result && (
+        {tableData && (
           <>
             <Table
              handleFilterChange={handleFilterChange}
@@ -302,7 +302,7 @@ export const BankCommissionListingProfileTable = ({
               onRowClick={onRowClick}
               isRowSelectable={() => false}
               // disableColumnMenu
-              rows={tableData?.result}
+              rows={tableData}
               columns={columns}
               exportFileName="Komisyon Profil Kodu Listesi"
               onSave={() => onSave()}

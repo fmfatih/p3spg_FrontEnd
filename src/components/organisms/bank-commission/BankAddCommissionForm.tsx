@@ -9,6 +9,7 @@ import {
   useGetPayment3DTrxSettingsList,
   useUpdateCommissionParameter,
   useAuthorization,
+  useGetMemberVPosList,
 } from "../../../hooks";
 import {
   Box,
@@ -55,7 +56,7 @@ export const BankAddCommissionForm = () => {
   const { data: rawCommissionProfileList } = useGetCommissionProfileList({});
   const { data: rawMerchantList } = useGetAllMerchantList();
   const { data: rawCardTypeList } = useGetCardTypeList({});
-  const { data: rawAcquirerBankList } = useGetAcquirerBankList();
+  // const { data: rawAcquirerBankList } = useGetAcquirerBankList();
   const { data: rawPayment3DTrxSettingsList } = useGetPayment3DTrxSettingsList(
     {}
   );
@@ -67,6 +68,8 @@ export const BankAddCommissionForm = () => {
   const navigate = useNavigate();
   const bankBlockedValue = watch("bankblocked");
   const merchantBlockedValue = watch("merchantblocked");
+  const { mutate: getMemberVPosList, data: rawMemberVPosList } =
+  useGetMemberVPosList();
 
   const [selectedMerchant, setSelectedMerchant] = useState(null as any);
   const [selectedSubMerchant, setSelectedSubMerchant] = useState(null as any);
@@ -81,6 +84,25 @@ export const BankAddCommissionForm = () => {
   //     }
   //   );
   // }, [rawMerchantList?.data]);
+
+  useEffect(() => {
+    getMemberVPosList({
+      orderBy: "CreateDate",
+      orderByDesc: true,
+      status: "ACTIVE",
+    });
+  }, [getMemberVPosList]);
+
+  const memberVPosList = useMemo(() => {
+    return rawMemberVPosList?.data?.map(
+      (memberVPos: { bankName: string; bankCode: string }) => {
+        return {
+          label: `${memberVPos.bankName}`,
+          value: memberVPos.bankCode,
+        };
+      }
+    );
+  }, [rawMemberVPosList?.data]);
 
   const merchantList = useMemo(() => {
  
@@ -119,7 +141,9 @@ export const BankAddCommissionForm = () => {
   }, [rawInstallmentSettingsList?.data]);
 
   const commissionProfileList = useMemo(() => {
-    return rawCommissionProfileList?.data?.map(
+    
+  console.log(rawCommissionProfileList?.data.result);
+    return rawCommissionProfileList?.data?.result.map(
       (commissionProfule: { name: string; code: string }) => {
         return {
           label: `${commissionProfule.name}`,
@@ -127,7 +151,9 @@ export const BankAddCommissionForm = () => {
         };
       }
     );
-  }, [rawCommissionProfileList?.data]);
+  }, [rawCommissionProfileList?.data?.result]);
+
+  
 
   const cardTypeList = useMemo(() => {
     return rawCardTypeList?.data?.map(
@@ -140,16 +166,16 @@ export const BankAddCommissionForm = () => {
     );
   }, [rawCardTypeList?.data]);
 
-  const acquirerBankList = useMemo(() => {
-    return rawAcquirerBankList?.data?.map(
-      (bank: { bankCode: string; bankName: string }) => {
-        return {
-          label: `${bank.bankName}`,
-          value: bank.bankCode,
-        };
-      }
-    );
-  }, [rawAcquirerBankList?.data]);
+  // const acquirerBankList = useMemo(() => {
+  //   return rawAcquirerBankList?.data?.map(
+  //     (bank: { bankCode: string; bankName: string }) => {
+  //       return {
+  //         label: `${bank.bankName}`,
+  //         value: bank.bankCode,
+  //       };
+  //     }
+  //   );
+  // }, [rawAcquirerBankList?.data]);
 
   const payment3DTrxSettingsList = useMemo(() => {
     return rawPayment3DTrxSettingsList?.data?.map(
@@ -338,13 +364,13 @@ export const BankAddCommissionForm = () => {
               spacing={3}
               direction={isDesktop ? "row" : "column"}
             >
-         <FormControl sx={{ flex: 1 }}>
+<FormControl sx={{ flex: 1 }}>
   {commissionProfileList && (
     <Controller
       name="profileCode"
       control={control}
       defaultValue=""
-      render={({ field: { onChange, value } }) => {
+      render={({ field: { onChange, value }, fieldState }) => {
         const selectedProfile = commissionProfileList.find(
           (option) => option.value === value
         );
@@ -360,7 +386,11 @@ export const BankAddCommissionForm = () => {
               onChange(newValue ? newValue.value : "");
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Profil Kodu" />
+              <TextField 
+                {...params} 
+                label="Profil Kodu" 
+                error={fieldState.invalid}
+              />
             )}
           />
         );
@@ -370,13 +400,15 @@ export const BankAddCommissionForm = () => {
 </FormControl>
 
 
+
 <FormControl sx={{ flex: 1 }}>
   {payment3DTrxSettingsList && (
     <Controller
       name="txnType"
       control={control}
       defaultValue=""
-      render={({ field: { onChange, value } }) => {
+
+      render={({ field: { onChange, value }, fieldState }) => { 
         const selectedTrxType = payment3DTrxSettingsList.find(
           (option) => option.value === value
         );
@@ -392,7 +424,11 @@ export const BankAddCommissionForm = () => {
               onChange(newValue ? newValue.value : "");
             }}
             renderInput={(params) => (
-              <TextField {...params} label="İşlem Tipi" />
+              <TextField 
+                {...params} 
+                label="İşlem Tipi" 
+                error={fieldState.invalid} 
+              />
             )}
           />
         );
@@ -500,11 +536,10 @@ export const BankAddCommissionForm = () => {
       name="cardType"
       control={control}
       defaultValue=""
-      render={({ field: { onChange, value } }) => {
+      render={({ field: { onChange, value }, fieldState: { invalid } }) => { 
         const selectedCardType = cardTypeList.find(
           (option) => option.value === value
         );
-
         return (
           <Autocomplete
             id="cardType"
@@ -516,7 +551,7 @@ export const BankAddCommissionForm = () => {
               onChange(newValue ? newValue.value : "");
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Kart Tipi" disabled={internationalState}/>
+              <TextField {...params} label="Kart Tipi" disabled={internationalState}   error={invalid && !internationalState} />
             )}
             disabled={internationalState}
           />
@@ -533,13 +568,13 @@ export const BankAddCommissionForm = () => {
               spacing={3}
               direction={isDesktop ? "row" : "column"}
             >
-             <FormControl sx={{ flex: 1 }}>
+<FormControl sx={{ flex: 1 }}>
   {installmentCounts && (
     <Controller
       name="installment"
       control={control}
       defaultValue=""
-      render={({ field: { onChange, value } }) => {
+      render={({ field: { onChange, value }, fieldState }) => { 
         const selectedInstallment = installmentCounts.find(
           (option) => option.value === value
         );
@@ -555,7 +590,11 @@ export const BankAddCommissionForm = () => {
               onChange(newValue ? newValue.value : "");
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Taksit Sayısı" />
+              <TextField 
+                {...params} 
+                label="Taksit Sayısı" 
+                error={fieldState.invalid} 
+              />
             )}
           />
         );
@@ -564,21 +603,23 @@ export const BankAddCommissionForm = () => {
   )}
 </FormControl>
 
-              <FormControl sx={{ flex: 1 }}>
-  {acquirerBankList && (
+
+<FormControl sx={{ flex: 1 }}>
+  {memberVPosList && (
     <Controller
       name="bankcode"
       control={control}
       defaultValue=""
-      render={({ field: { onChange, value } }) => {
-        const selectedBank = acquirerBankList.find(
+  
+      render={({ field: { onChange, value }, fieldState }) => { 
+        const selectedBank = memberVPosList.find(
           (option) => option.value === value
         );
 
         return (
           <Autocomplete
             id="bankcode"
-            options={acquirerBankList}
+            options={memberVPosList}
             getOptionSelected={(option, value) => option.value === value}
             getOptionLabel={(option) => option.label}
             value={selectedBank || null}
@@ -586,7 +627,7 @@ export const BankAddCommissionForm = () => {
               onChange(newValue ? newValue.value : "");
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Banka" />
+              <TextField {...params} label="Banka" error={fieldState.invalid} />
             )}
           />
         );
@@ -594,6 +635,7 @@ export const BankAddCommissionForm = () => {
     />
   )}
 </FormControl>
+
             </Stack>
             <Stack mb={3} spacing={3}>
               <Stack

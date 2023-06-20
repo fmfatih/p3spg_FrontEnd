@@ -10,7 +10,7 @@ export type GetCommissionProfileListRequest = {
   orderBy?: string
 }
 
-async function getCommissionProfileList({page= 0, size= 15, orderByDesc= true, orderBy = "CreatedDate"}: GetCommissionProfileListRequest): Promise<any> {
+async function getCommissionProfileList({page= 0, size= 15, orderByDesc= true, orderBy = "CreateDate"}: GetCommissionProfileListRequest): Promise<any> {
   const data = {
     page,
     size,
