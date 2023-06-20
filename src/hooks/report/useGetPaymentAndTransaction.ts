@@ -19,6 +19,7 @@ export type GetPaymentAndTransactionRequest = {
   bankCode?: string;
   txnType?: string;
   merchantId?:number
+  [key: string]: string | number | boolean | undefined;
 };
 
 export type GetPaymentAndTransactionResponse = BasePagingResponse<Array<any>>;

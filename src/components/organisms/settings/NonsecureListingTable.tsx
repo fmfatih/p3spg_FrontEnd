@@ -29,6 +29,7 @@ export const NonsecureListingTable = ({
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const {showDelete, showUpdate} = useAuthorization();
+  const [queryOptions, setQueryOptions] = React.useState({});
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 25,
@@ -41,6 +42,8 @@ export const NonsecureListingTable = ({
   const { mutate: parameterDelete, isLoading: isDeleteLoading } =
     useDeleteNonsecure();
 
+   
+    
   useEffect(() => {
     if (!isModalOpen) {
       getParameterList({
@@ -58,13 +61,19 @@ export const NonsecureListingTable = ({
   ]);
 
   useEffect(() => {
+    const requestPayload = {
+      size: paginationModel.pageSize,
+      page: paginationModel.page,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+
     getParameterList(
-      {
-        size: paginationModel.pageSize,
-        page: paginationModel.page,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-      },
+ requestPayload,
       {
         onSuccess: (data) => {
           if (!data.isSuccess) {
@@ -89,6 +98,7 @@ export const NonsecureListingTable = ({
     paginationModel.page,
     paginationModel.pageSize,
     setSnackbar,
+    queryOptions
   ]);
 
   const handleChangePagination = (model: GridPaginationModel) => {
@@ -176,13 +186,21 @@ export const NonsecureListingTable = ({
         field: "Aksiyonlar",
         type: "actions",
         width: 80,
-        getActions: (params) => [
-          !!showDelete ? <GridActionsCellItem
-            label="Sil"
-            onClick={deleteRow(params.row)}
-            showInMenu
-          /> : null,
-        ],
+        // getActions: (params) => [
+        //   !!showDelete ? <GridActionsCellItem
+        //     label="Sil"
+        //     onClick={deleteRow(params.row)}
+        //     showInMenu
+        //   /> : null,
+        // ],
+        getActions: (params) => 
+        !!showDelete 
+          ? [<GridActionsCellItem
+              label="Sil"
+              onClick={() => deleteRow(params.row)}
+              showInMenu
+            />]
+          : [],
       },
       { field: "merchantId", headerName: "Üye İşyeri Kodu", width: 170 },
       { field: "merchantName", headerName: "Üye İşyeri Adı", width: 350 },
@@ -198,13 +216,18 @@ export const NonsecureListingTable = ({
   }, [deleteRow, showDelete]);
 
   const onSave = () => {
+    const requestPayload = {
+      size: -1,
+      page: 0,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
     getParameterList(
-      {
-        size: -1,
-        page: 0,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-      },
+ requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -228,23 +251,43 @@ export const NonsecureListingTable = ({
     );
   };
 
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, delay);
+    };
+  };
+
+  const handleFilterChange = debounce((props) => {
+    if (props === "clearFilter") {
+      return setQueryOptions({});
+    }
+    if (props.value?.toString()?.length >= 1) {
+      setQueryOptions(props);
+    }
+  }, 500);
+
   const hasLoading = isLoading || isDeleteLoading;
   return (
     <>
       {hasLoading && <Loading />}
       <Stack flex={1} p={2}>
-        {tableData?.result?.length && (
+        {tableData?.result  && (
           <>
             <Table
+             handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
-              rowCount={tableData.totalItems}
+              rowCount={tableData?.totalItems}
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               isRowSelectable={() => false}
-              disableColumnMenu
+              // disableColumnMenu
               onRowClick={!!showUpdate ? onRowClick : () => null}
-              rows={tableData.result}
+              rows={tableData?.result}
               columns={columns}
               exportFileName="Non Secure Listesi"
               onSave={() => onSave()}

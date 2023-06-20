@@ -29,6 +29,7 @@ export const ParameterListingTable = ({
 }: ParameterListingTableProps) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const [queryOptions, setQueryOptions] = React.useState({});
   const {showDelete, showUpdate} = useAuthorization();
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
@@ -71,14 +72,20 @@ export const ParameterListingTable = ({
   ]);
 
   useEffect(() => {
+    const requestPayload = {
+      size: paginationModel.pageSize,
+      page: paginationModel.page,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+
     getParameterList(
-      {
-        size: paginationModel.pageSize,
-        page: paginationModel.page,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-      },
-      {
+requestPayload
+      ,{
         onSuccess: (data) => {
           if (!data.isSuccess) {
             setSnackbar({
@@ -102,6 +109,7 @@ export const ParameterListingTable = ({
     paginationModel.page,
     paginationModel.pageSize,
     setSnackbar,
+    queryOptions
   ]);
 
   const handleChangePagination = (model: GridPaginationModel) => {
@@ -181,18 +189,26 @@ export const ParameterListingTable = ({
         field: "actions",
         type: "actions",
         width: 80,
-        getActions: (params) => [
-          /*  <GridActionsCellItem
-            onClick={editRow(params.row)}
-            label="Düzenle"
-            showInMenu
-          />, */
-          !!showDelete ? <GridActionsCellItem
-            label="Sil"
-            onClick={deleteRow(params.row)}
-            showInMenu
-          /> : null,
-        ],
+        // getActions: (params) => [
+        //   /*  <GridActionsCellItem
+        //     onClick={editRow(params.row)}
+        //     label="Düzenle"
+        //     showInMenu
+        //   />, */
+        //   !!showDelete ? <GridActionsCellItem
+        //     label="Sil"
+        //     onClick={deleteRow(params.row)}
+        //     showInMenu
+        //   /> : null,
+        // ],
+        getActions: (params) => 
+        !!showDelete 
+          ? [<GridActionsCellItem
+              label="Sil"
+              onClick={() => deleteRow(params.row)}
+              showInMenu
+            />]
+          : [],
       },
       { field: "id", headerName: "Parametre ID", flex: 1 },
       { field: "groupCode", headerName: "Group Kodu", flex: 1 },
@@ -202,13 +218,18 @@ export const ParameterListingTable = ({
   }, [deleteRow, showDelete]);
 
   const onSave = () => {
+    const requestPayload = {
+      size: -1,
+      page: 0,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
     getParameterList(
-      {
-        size: -1,
-        page: 0,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-      },
+  requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -232,6 +253,24 @@ export const ParameterListingTable = ({
     );
   };
 
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, delay);
+    };
+  };
+
+  const handleFilterChange = debounce((props) => {
+    if (props === "clearFilter") {
+      return setQueryOptions({});
+    }
+    if (props.value?.toString()?.length >= 1) {
+      setQueryOptions(props);
+    }
+  }, 500);
   const hasLoading = isLoading || isDeleteLoading;
   return (
     <>
@@ -240,13 +279,14 @@ export const ParameterListingTable = ({
         {tableData?.result?.length && (
           <>
             <Table
+             handleFilterChange={handleFilterChange}
               paginationModel={paginationModel}
               onPaginationModelChange={handleChangePagination}
               paginationMode="server"
               rowCount={tableData.totalItems}
               sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
               isRowSelectable={() => false}
-              disableColumnMenu
+              // disableColumnMenu
               onRowClick={!!showUpdate ? onRowClick : () => null}
               rows={tableData.result}
               columns={columns}

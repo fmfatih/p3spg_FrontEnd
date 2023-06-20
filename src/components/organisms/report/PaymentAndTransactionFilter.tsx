@@ -61,6 +61,7 @@ export const PaymentAndTransactionFilter = () => {
   const { showDelete, showUpdate } = useAuthorization();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [userInfo] = useUserInfo();
+  const [queryOptions, setQueryOptions] = React.useState({});
   const { control, handleSubmit, setValue, getValues } =
     useForm<PaymentAndTransactionValuesType>({
       resolver: zodResolver(paymentAndTransactionFormSchema),
@@ -89,7 +90,7 @@ export const PaymentAndTransactionFilter = () => {
     {}
   );
   const { data: rawMerchantList } = useGetAllMerchantList();
-  const { data: rawAcquirerBankList } = useGetAcquirerBankList();
+  // const { data: rawAcquirerBankList } = useGetAcquirerBankList();
   const { mutate: getMemberVPosList, data: rawMemberVPosList } =
     useGetMemberVPosList();
   const { mutate: getMerchantVPosList, isLoading } = useGetMerchantVPosList();
@@ -125,16 +126,16 @@ export const PaymentAndTransactionFilter = () => {
       });
   }, [rawPayment3DTrxSettingsList?.data]);
 
-  const acquirerBankList = useMemo(() => {
-    return rawAcquirerBankList?.data?.map(
-      (bank: { bankCode: string; bankName: string }) => {
-        return {
-          label: `${bank.bankName}`,
-          value: bank.bankCode,
-        };
-      }
-    );
-  }, [rawAcquirerBankList?.data]);
+  // const acquirerBankList = useMemo(() => {
+  //   return rawAcquirerBankList?.data?.map(
+  //     (bank: { bankCode: string; bankName: string }) => {
+  //       return {
+  //         label: `${bank.bankName}`,
+  //         value: bank.bankCode,
+  //       };
+  //     }
+  //   );
+  // }, [rawAcquirerBankList?.data]);
 
   const merchantList = useMemo(() => {
     if (userInfo.merchantId == 0) {
@@ -149,7 +150,7 @@ export const PaymentAndTransactionFilter = () => {
     } else {
       return rawMerchantList?.data
         ?.filter((rawPosType: { merchantName: string; merchantId: number }) => {
-          return rawPosType.merchantId === Number(userInfo.merchantId);
+          return rawPosType.merchantId == Number(userInfo.merchantId);
         })
         .map((filteredMerchant) => {
           return {
@@ -161,7 +162,8 @@ export const PaymentAndTransactionFilter = () => {
   }, [rawMerchantList?.data, userInfo?.merchantId]);
 
   useEffect(() => {
-    if (userInfo.merchantId === 0) {
+    if (userInfo?.merchantId == 0) {
+      console.log("HİT");
       getMemberVPosList(
         {
           orderBy: "CreateDate",
@@ -170,7 +172,7 @@ export const PaymentAndTransactionFilter = () => {
         },
         {
           onSuccess: (data) => {
-            const bankList = data?.data?.result?.map(
+            const bankList = data?.data?.map(
               (bank: { bankCode: string; bankName: string }) => {
                 return {
                   label: `${bank.bankName}`,
@@ -195,7 +197,7 @@ export const PaymentAndTransactionFilter = () => {
           onSuccess: (data) => {
             const bankList = data?.data?.result
               .filter((bank: { merchantId: number }) => {
-                return bank.merchantId === Number(userInfo.merchantId);
+                return bank.merchantId == Number(userInfo.merchantId);
               })
               .map(
                 (bank: {
@@ -216,6 +218,12 @@ export const PaymentAndTransactionFilter = () => {
       );
     }
   }, [getMerchantVPosList, getMemberVPosList, userInfo.merchantId]);
+
+  
+
+  console.log(userInfo.merchantId);
+
+  console.log(bankList);
 
   const onSubmit = (data: PaymentAndTransactionValuesType) => {
     setTableData(undefined);
@@ -238,6 +246,9 @@ export const PaymentAndTransactionFilter = () => {
       merchantId: data.merchantId || 0,
     };
 
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      req[queryOptions.field] = queryOptions.value;
+    }
     GetPaymentAndTransaction(req, {
       onSuccess: (data) => {
         if (data.isSuccess) {
@@ -721,15 +732,24 @@ export const PaymentAndTransactionFilter = () => {
   };
 
   const onSave = () => {
+
+
+    const requestPayload = {
+      size: -1,
+      page: 0,
+      orderBy: "CreateDate",
+      orderByDesc: true,
+      startDate: dayjs(getValues("startDate")).format("YYYY-MM-DD HH:mm:ss"),
+      endDate: dayjs(getValues("endDate")).format("YYYY-MM-DD HH:mm:ss"),
+    };
+
+    if (queryOptions?.field && queryOptions?.value !== undefined) {
+      requestPayload[queryOptions.field] = queryOptions.value;
+    }
+
+
     GetPaymentAndTransaction(
-      {
-        size: -1,
-        page: 0,
-        orderBy: "CreateDate",
-        orderByDesc: true,
-        startDate: dayjs(getValues("startDate")).format("YYYY-MM-DD HH:mm:ss"),
-        endDate: dayjs(getValues("endDate")).format("YYYY-MM-DD HH:mm:ss"),
-      },
+     requestPayload,
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
@@ -752,6 +772,27 @@ export const PaymentAndTransactionFilter = () => {
       }
     );
   };
+
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(null, args);
+      }, delay);
+    };
+  };
+
+  const handleFilterChange = debounce((props) => {
+    if (props === "clearFilter") {
+      return setQueryOptions({});
+    }
+    if (props.value?.toString()?.length >= 1) {
+      setQueryOptions(props);
+    }
+  }, 500);
+
+  console.log(bankList);
 
   const hasLoading =
     isGetPaymentAndTransactionLoading ||
@@ -969,13 +1010,14 @@ export const PaymentAndTransactionFilter = () => {
             {tableData?.result && (
               <>
                 <Table
+                 handleFilterChange={handleFilterChange}
                   paginationModel={paginationModel}
                   onPaginationModelChange={handleChangePagination}
                   paginationMode="server"
                   rowCount={tableData.totalItems}
                   sx={{ width: isDesktop ? 1308 : window.innerWidth - 50 }}
                   isRowSelectable={() => false}
-                  disableColumnMenu
+                  // disableColumnMenu
                   rows={tableData.result}
                   autoHeight={!isDesktop}
                   columns={columns}
