@@ -31,6 +31,7 @@ import {
   MerchantEndOfDay,
   BankPayment,
   BankCommissionProfileList,
+  DocumentAdd,
 } from "../pages";
 
 
@@ -60,6 +61,10 @@ export const router = createBrowserRouter([
   {
     path: "/merchant-management/merchant-identification",
     element: <MerchantAdd />,
+  },
+  {
+    path: "/merchant-management/document-add",
+    element: <DocumentAdd />,
   },
   {
     path: "/merchant-management/merchant-bankdefinition",

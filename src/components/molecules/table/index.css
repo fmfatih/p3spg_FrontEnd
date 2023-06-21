@@ -5,3 +5,9 @@
 .MuiDataGrid-row:nth-child(odd) {
   background-color: #F3FAFD;
 }
+
+
+
+.pasive-row {
+  background-color: rgb(219, 94, 94) !important;
+}

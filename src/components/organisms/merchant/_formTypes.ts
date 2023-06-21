@@ -331,3 +331,22 @@ export const merchantAuthInitialValues: MerchantAuthFormValuesType = {
   merchantId: "",
   bankCodes: {},
 };
+
+
+
+
+export const documentFormSchema = zod.object({
+  merchantId: zod
+    .string()
+    .min(1, { message: "Please enter your phone number" }),
+
+});
+
+export type DocumentFormValuesType = zod.infer<
+  typeof documentFormSchema
+>;
+
+export const documentInitialValues: DocumentFormValuesType = {
+  merchantId: "",
+
+};

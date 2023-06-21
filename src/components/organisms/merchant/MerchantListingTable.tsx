@@ -360,6 +360,8 @@ export const MerchantListingTable = ({
               columns={columns}
               exportFileName="Üye İşyeri Listesi"
               onSave={() => onSave()}
+              getRowClassName={(params) => params.row.status === 'ACTIVE' ? '' : 'pasive-row'}
+              
             />
             <DeleteConfirmModal
               isOpen={isDeleteModalOpen}
