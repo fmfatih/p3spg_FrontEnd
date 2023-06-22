@@ -210,6 +210,11 @@ export const BankRedirectListingTable = () => {
         },
       },
       {
+        field: "profileCode",
+        headerName: "Çalışma Gurubu",
+        width: 200,
+      },
+      {
         field: "issuerCardBankName",
         headerName: "Yönlendirelecek Kartın Bankası",
         width: 350,

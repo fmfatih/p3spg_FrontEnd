@@ -37,3 +37,4 @@ export * from "./nonsecure";
 export * from './userMenu';
 export * from './_types'
 export * from './useAuthorization';
+export * from  './document'

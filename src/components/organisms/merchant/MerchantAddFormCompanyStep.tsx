@@ -286,11 +286,11 @@ export const MerchantAddFormCompanyStep = ({
         },
         {
           onSuccess(data) {
-            const merchantId = data.data.merchantId;
-            setMerchantId(merchantId);
-            setAllData({ ...request, ...allData, merchantId: merchantId });
-
             if (data.isSuccess) {
+              const merchantId = data.data.merchantId;
+              setMerchantId(merchantId);
+              setAllData({ ...request, ...allData, merchantId: merchantId });
+
               onNext();
 
               setSnackbar({
@@ -310,7 +310,7 @@ export const MerchantAddFormCompanyStep = ({
             setSnackbar({
               severity: "error",
               isOpen: true,
-              description: "İşlem sırasında bir hata oluştu",
+              description: "İşlem sırasında bir hata oluştuasdasdasdasd",
             });
           },
         }

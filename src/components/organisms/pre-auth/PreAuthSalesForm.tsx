@@ -21,6 +21,7 @@ import {
   FormatInputControl,
   SelectControl,
   NumericFormatInputControl,
+  BaseModal
 } from "../../molecules";
 import {
   addPreAuthFormSchema,
@@ -146,27 +147,36 @@ export const PreAuthSalesForm = () => {
 
     paymentSales(request, {
       onSuccess: (data) => {
+        console.info(data);
         if(formValues.use3D === "3D") {
           setHtml(data);
           setIsHtmlOpen(true);
           setTimeout(() => {
-            const form = document.querySelector('[name="downloadForm"]') as unknown as HTMLFormElement;
+            const formNames = ['threeDSServerWebFlowStartForm', 'downloadForm', 'ddcoll'];
+            let form;
+            formNames.forEach(element => {
+              let item = document.querySelector(`[name="${element}"]`) as unknown as HTMLFormElement;
+              if(item) {
+                form = item;
+                return;
+              }
+            });
             form && form.submit();
           }, 1000);
-        };
-
-        if (data.isSuccess) {
-          setSnackbar({
-            severity: "success",
-            isOpen: true,
-            description: data.message,
-          });
         } else {
-          setSnackbar({
-            severity: "error",
-            description: data.message,
-            isOpen: true,
-          });
+          if (data.isSuccess) {
+            setSnackbar({
+              severity: "success",
+              isOpen: true,
+              description: data.message,
+            });
+          } else {
+            setSnackbar({
+              severity: "error",
+              description: data.message,
+              isOpen: true,
+            });
+          }
         }
       },
       onError: () => {
@@ -392,8 +402,8 @@ export const PreAuthSalesForm = () => {
           </Stack>
         </Stack>
       </Stack>
-      {html && (
-        <div dangerouslySetInnerHTML={{__html: html}}></div>
+      {html && isHtmlOpen && (
+                 <div dangerouslySetInnerHTML={{__html: html}}></div>
       )}
     </>
   );
