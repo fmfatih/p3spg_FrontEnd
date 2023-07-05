@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { useGetAllMerchantList, useGetDocumentDocumentSettings, useGetMerchantTypeList, useGetPosTypeList } from '../../../hooks';
+import { useDocumentAdd, useGetAllMerchantList, useGetDocumentDocumentSettings, useGetMerchantTypeList, useGetPosTypeList } from '../../../hooks';
 import { useUserInfo } from "../../../store/User.state";
 import React, { useEffect, useMemo, useState } from 'react'
 import { useForm, Controller,useFieldArray } from "react-hook-form";
@@ -18,6 +18,8 @@ import {
     DatePickerControl,
   } from "../../molecules";
 import { DocumentUpload } from '../../upload';
+import { useLocation } from 'react-router-dom';
+
 
 
 
@@ -29,36 +31,43 @@ export const DocumentAddForm = () => {
 // const { data: rawPosTypes, isLoading: isPosTypeLoading } = useGetPosTypeList(
 //     {}
 //   );
+const merchant = useLocation().state as unknown as IMerchant | undefined;
   const { mutate: getDocumentDocumentSettings, isLoading } = useGetDocumentDocumentSettings();
-
+  const { mutate: documentAdd} = useDocumentAdd();
     const [userInfo] = useUserInfo();
     const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
     const [loading, setLoading] = useState(false);
 const [imagePreview, setImagePreview] = useState(null);
+const [selectedMerchant, setSelectedMerchant] = useState(null);
     // const { handleSubmit, control, setValue, getValues } =
     // useForm<DocumentFormValuesType>({
     //   resolver: zodResolver(documentFormSchema),
     // });
 
-    const { handleSubmit, control, setValue, getValues,watch } = useForm<DocumentFormValuesType & { documents: Array<{ label: string; file: File }> }>({
+    const { handleSubmit, control, setValue, getValues,watch } = useForm<DocumentFormValuesType & { documents: Array<{ label: string; file: File;documentInfoId:number; }> }>({
       resolver: zodResolver(documentFormSchema),
       defaultValues: {
+        files: [],
         companyType: 0,
         posType: 0,
-        // diğer form alanları için varsayılan değerler buraya eklenebilir
       },
     });
+    const [selectResponse,setSelectResponse]=useState([])
 
     const { fields, append,remove } = useFieldArray({
       control,
       name: 'documents',
     });
-
-    console.log(fields);
-    
+   
+  console.log(merchant);
+  
+    const merchantId=watch('merchantId')
     const companyType = Number(watch('companyType'));
     const posType = Number(watch('posType'));
-
+    
+    useEffect(() => {
+      setSelectedMerchant(merchantId); 
+    }, [merchantId]);
     
     useEffect(() => {
       if (companyType && posType) {
@@ -69,6 +78,10 @@ const [imagePreview, setImagePreview] = useState(null);
     
         getDocumentDocumentSettings(req, {
           onSuccess: (response) => {
+            console.log(response);
+            
+            setSelectResponse(response)
+            
             remove();
               if (response?.data && Array.isArray(response.data)) {
                 
@@ -79,12 +92,16 @@ const [imagePreview, setImagePreview] = useState(null);
                           const tempOBJ: any = {
                               key: "documentType",
                               label: item.documentType,
+                              documentInfoId:item.id,
                               type: "string",
                               value: "",
                           };
                           append(tempOBJ);
+                          console.log(tempOBJ);
+                          
                       }
                   });
+                  
               }
           },
       });
@@ -175,29 +192,87 @@ const merchantTypes = useMemo(() => {
   });
 }, []);
 
+const onSubmit = async (data) => {
+  setLoading(true);
 
-      
+  const dto = data.files.map(item => ({
+    companyType: Number(data.companyType),
+    posType: Number(data.posType),
+    merchantId: merchantId.value,
+    idNumber: data.idNumber,
+    documentInfoId: item.documentInfoId
+  }));
+console.log(data);
 
-      const onSubmit = async (data) => {
-        setLoading(true);
-        const fileBase64 = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(data.files[0]); // Veriyi 'files' alanından alıyoruz
-          setLoading(false);
-        });
-      
-        const request = {
-          file: fileBase64,
-          merchantType: data.merchantType,
-          merchantId: data.merchantId,
-          posList: data.posList
-        };
-      
-        // request'ı kullanarak API çağrısı yapabilirsiniz
-      };
-      
+  const formData = new FormData();
+
+  data.files.forEach((item, index) => {
+    formData.append(`files`, item.file);
+  });
+
+  formData.append('dto', JSON.stringify(dto));
+
+  documentAdd(formData, {
+    onSuccess: (data) => {
+      setLoading(false);
+      setSnackbar({
+        severity: "success",
+        isOpen: true,
+        description: "Dosyalar başarıyla yüklendi",
+      });
+    },
+    onError: (error) => {
+      setLoading(false);
+      setSnackbar({
+        severity: "error",
+        isOpen: true,
+        description: "Dosya yüklenirken bir hata oluştu",
+      });
+    }
+  });
+};
+
+
+
+
+
+// const onSubmit = async (data) => {
+//   setLoading(true);
+
+//   const files = watch('files'); // dosyaları durumdan alıyoruz
+
+//   const request = {
+//     files: data.files,
+//     // companyType: Number(data.companyType),
+//     // merchantId: data.merchantId.value,
+//     // posType: Number(data.posType)
+//     companyType: 1,
+//     posType: 1,
+//     taxNumber: "1121213352",
+//     idNumber: "2",
+//     documentInfoId: 1
+//   };
+
+//   documentAdd(request, {
+//     onSuccess: (data) => {
+//       setLoading(false);
+//       setSnackbar({
+//         severity: "success",
+//         isOpen: true,
+//         description: "Dosyalar başarıyla yüklendi",
+//       });
+//       // navigate("/merchant-management/merchant-list");
+//     },
+//     onError: (error) => {
+//       setLoading(false);
+//       setSnackbar({
+//         severity: "error",
+//         isOpen: true,
+//         description: "Dosya yüklenirken bir hata oluştu",
+//       });
+//     }
+//   });
+// };
       
 
   return (
@@ -224,7 +299,7 @@ const merchantTypes = useMemo(() => {
                         setValue("merchantId", selectedValue);
                       }}
                       options={merchantList}
-                      //defaultValue={selectedMerchant}
+                      defaultValue={selectedMerchant}
                       getOptionLabel={(option: {
                         label: string;
                         value: number;
@@ -303,6 +378,9 @@ const merchantTypes = useMemo(() => {
           <DocumentUpload
             control={control}
             label={field.label}
+            documentInfoId={field.documentInfoId}
+            setValue={setValue} 
+             getValues={getValues} 
           />
         </Box>
       );

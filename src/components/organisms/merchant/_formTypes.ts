@@ -317,10 +317,9 @@ export const partnerStepInitialValues: PartnerStepFormValuesType = {
 };
 
 export const merchantAuthFormSchema = zod.object({
-  merchantId: zod
-    .string()
-    .min(1, { message: "Please enter your phone number" }),
+  merchantId: zod.any(),
   bankCodes: zod.any(),
+  defaultBank: zod.any(),
 });
 
 export type MerchantAuthFormValuesType = zod.infer<
@@ -329,24 +328,22 @@ export type MerchantAuthFormValuesType = zod.infer<
 
 export const merchantAuthInitialValues: MerchantAuthFormValuesType = {
   merchantId: "",
-  bankCodes: {},
+  bankCodes: [],
+  defaultBank: [],
 };
 
-
-
-
 export const documentFormSchema = zod.object({
-  merchantId: zod
-    .string()
-    .min(1, { message: "Please enter your phone number" }),
+  merchantId: zod.any(),
+  posType:zod.any(),
+  companyType:zod.any(),
+  files:zod.any()
 
 });
 
-export type DocumentFormValuesType = zod.infer<
-  typeof documentFormSchema
->;
+export type DocumentFormValuesType = zod.infer<typeof documentFormSchema>;
 
 export const documentInitialValues: DocumentFormValuesType = {
   merchantId: "",
-
+  posType:0,
+  companyType:0
 };

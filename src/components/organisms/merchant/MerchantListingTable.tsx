@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Stack, useMediaQuery, useTheme } from "@mui/material";
+import {  Stack, useMediaQuery, useTheme } from "@mui/material";
 import {
   GridColDef,
   GridActionsCellItem,
@@ -8,7 +8,7 @@ import {
   GridPaginationModel,
 } from "@mui/x-data-grid";
 import { DeleteConfirmModal, Table } from "../../molecules";
-import { Loading, StatusBar } from "../../atoms";
+import { Loading, StatusBar,Button } from "../../atoms";
 import {
   DeleteMerchantRequest,
   IMerchant,
@@ -189,6 +189,15 @@ export const MerchantListingTable = ({
 
     handleCloseDeleteModal();
   };
+  const documentSaw = React.useCallback(
+    (merchant: IMerchant) => () => {
+      navigate("/merchant-management/document-add", {
+        state: merchant,
+      });
+    },
+    [navigate]
+  );
+
   const columns: GridColDef[] = useMemo(() => {
     return [
       {
@@ -208,6 +217,19 @@ export const MerchantListingTable = ({
               showInMenu
             /> : <></>,
           ];
+        },
+      },
+      {
+        field: "document",
+        headerName: "Döküman",
+        width: 150,
+        renderCell: (params) => {
+          return (
+            <Button     variant="contained"
+            text="Döküman" onClick={documentSaw(params.row.merchantId)}/>
+        
+      
+          );
         },
       },
       { field: "merchantId", headerName: "İşyeri No", width: 200 },
