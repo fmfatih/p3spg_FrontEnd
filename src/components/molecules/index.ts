@@ -9,3 +9,5 @@ export * from "./MechantPaymentModal";
 export * from "./BankPaymentModal"
 
 export * from './DashboardWidget';
+export * from './DocumentDetailModal'
+export * from './DocumentViewingModal'

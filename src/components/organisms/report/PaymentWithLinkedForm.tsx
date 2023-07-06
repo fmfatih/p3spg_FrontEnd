@@ -172,8 +172,8 @@ export const PaymentWithLinkedForm = () => {
       installmentCount: formValues.installmentCount,
       description: formValues.description,
       currency: formValues.currency,
-      userEmail: formValues.userEmail || "",
-      userPhoneNumber: formValues.userPhoneNumber || "",
+      receiverEmail: formValues.userEmail || "",
+      receiverPhoneNumber: formValues.userPhoneNumber || "",
       expireMinute: dayjs(formValues.endDate).diff(
         dayjs(formValues.startDate),
         "minutes"

@@ -10,8 +10,8 @@ export interface IPaymentWithLinkedRequest {
   installmentCount: string;
   description: string;
   currency: string;
-  userEmail: string;
-  userPhoneNumber: string;
+  receiverEmail: string;
+  receiverPhoneNumber: string;
   expireMinute: number;
   memberId: number;
 }

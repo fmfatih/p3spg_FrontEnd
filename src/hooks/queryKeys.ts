@@ -45,5 +45,6 @@ export enum QueryKeys {
   GetAllMerchantList = "GetAllMerchantList",
   GetAllRoleList = "GetAllRoleList",
   GetAllMenuList = "GetAllMenuList",
-  GetMerchantVposGetList="GetMerchantVposGetList"
+  GetMerchantVposGetList="GetMerchantVposGetList",
+  GetDocumentList="GetDocumentList"
 }

@@ -126,14 +126,14 @@ export const paymentWithLinkedFormSchema = zod
     endDate: zod.any(),
     url: zod.any(),
   })
-  .refine((data) => data.userEmail !== data.userPhoneNumber, {
-    message: "Passwords don't match",
-    path: ["userEmail"], // path of error
-  })
-  .refine((data) => data.userEmail !== data.userPhoneNumber, {
-    message: "Passwords don't match",
-    path: ["userPhoneNumber"], // path of error
-  });
+  // .refine((data) => data.userEmail !== data.userPhoneNumber, {
+  //   message: "Passwords don't match",
+  //   path: ["userEmail"], // path of error
+  // })
+  // .refine((data) => data.userEmail !== data.userPhoneNumber, {
+  //   message: "Passwords don't match",
+  //   path: ["userPhoneNumber"], // path of error
+  // });
 
 export type PaymentWithLinkedValuesType = zod.infer<
   typeof paymentWithLinkedFormSchema

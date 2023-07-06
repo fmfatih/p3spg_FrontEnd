@@ -7,7 +7,7 @@ import {
   GridRenderCellParams,
   GridPaginationModel,
 } from "@mui/x-data-grid";
-import { DeleteConfirmModal, Table } from "../../molecules";
+import { DeleteConfirmModal, DocumentDetailModal, Table } from "../../molecules";
 import { Loading, StatusBar,Button } from "../../atoms";
 import {
   DeleteMerchantRequest,
@@ -189,14 +189,42 @@ export const MerchantListingTable = ({
 
     handleCloseDeleteModal();
   };
-  const documentSaw = React.useCallback(
-    (merchant: IMerchant) => () => {
-      navigate("/merchant-management/document-add", {
-        state: merchant,
-      });
-    },
-    [navigate]
-  );
+  
+
+  // const documentSaw = React.useCallback(
+  //   (merchant: IMerchant) => () => {
+  //     navigate("/merchant-management/document-add", {
+  //       state: merchant,
+  //     });
+  //   },
+  //   [navigate]
+  // );
+  const RenderActionButton = ({merchantId}) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleOpenModal = () => {
+      setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+      setIsModalOpen(false);
+    };
+
+   
+    return (
+      <>
+        <Button
+            variant="contained"
+            color="primary"
+            onClick={handleOpenModal}
+            text="Döküman"
+            sx={{flex:1,height:20,py:4}}
+        >
+        </Button>
+        <DocumentDetailModal merchantId={merchantId} isOpen={isModalOpen} handleClose={handleCloseModal} />
+      </>
+    );
+}
 
   const columns: GridColDef[] = useMemo(() => {
     return [
@@ -215,21 +243,16 @@ export const MerchantListingTable = ({
               label="Sil"
               onClick={deleteRow(params.row)}
               showInMenu
-            /> : <></>,
+            /> : <></>
           ];
         },
       },
-      {
-        field: "document",
-        headerName: "Döküman",
+     {
+        field: "documentButton",
+        headerName: "Doküman",
         width: 150,
         renderCell: (params) => {
-          return (
-            <Button     variant="contained"
-            text="Döküman" onClick={documentSaw(params.row.merchantId)}/>
-        
-      
-          );
+          return <RenderActionButton merchantId={params.row.merchantId} />
         },
       },
       { field: "merchantId", headerName: "İşyeri No", width: 200 },
