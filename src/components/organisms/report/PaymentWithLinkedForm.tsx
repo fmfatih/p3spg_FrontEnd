@@ -277,35 +277,40 @@ export const PaymentWithLinkedForm = () => {
               spacing={3}
               direction={isDesktop ? "row" : "column"}
             >
-              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-                {merchantList && (
-                  <Controller
-                    control={control}
-                    name="merchantId"
-                    render={() => {
-                      return (
-                        <>
-                          <Autocomplete
-                            onChange={(event, selectedValue) => {
-                              //setSelectedMerchant(selectedValue);
-                              setValue("merchantId", selectedValue.value);
-                            }}
-                            id="merchantId"
-                            options={merchantList}
-                            getOptionLabel={(option: {
-                              label: string;
-                              value: number;
-                            }) => option.label}
-                            renderInput={(params) => (
-                              <TextField {...params} label="Üye İşyeri" />
-                            )}
-                          />
-                        </>
-                      );
-                    }}
-                  />
-                )}
-              </FormControl>
+<FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+  {merchantList && (
+    <Controller
+      control={control}
+      rules={{ required: true }}
+      name="merchantId"
+      render={({ field: { onChange, value }, fieldState: { error } }) => {
+        return (
+          <>
+            <Autocomplete
+              onChange={(event, selectedValue) => {
+                onChange(selectedValue ? selectedValue.value : "");
+              }}
+              id="merchantId"
+              options={merchantList}
+              getOptionLabel={(option: {
+                label: string;
+                value: number;
+              }) => option.label}
+              value={merchantList.find((option) => option.value === value) || null}
+              renderInput={(params) => (
+                <TextField 
+                  {...params} 
+                  label="Üye İşyeri" 
+                  error={!!error} 
+                />
+              )}
+            />
+          </>
+        );
+      }}
+    />
+  )}
+</FormControl>
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <InputControl
                   label="Ürün Adı"
@@ -344,38 +349,42 @@ export const PaymentWithLinkedForm = () => {
               spacing={3}
               direction={isDesktop ? "row" : "column"}
             >
-              <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-                {currencyCodeList && (
-                  <Controller
-                    name="currency"
-                    control={control}
-                    defaultValue=""
-                    render={({ field: { onChange, value } }) => {
-                      const selectedCurrency = currencyCodeList.find(
-                        (option) => option.value === value
-                      );
+             <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+      {currencyCodeList && (
+        <Controller
+          name="currency"
+          control={control}
+          defaultValue=""
+          render={({ field: { onChange, value }, fieldState }) => {
+            const selectedCurrency = currencyCodeList.find(
+              (option) => option.value === value
+            );
 
-                      return (
-                        <Autocomplete
-                          id="currency"
-                          options={currencyCodeList}
-                          getOptionSelected={(option, value) =>
-                            option.value === value
-                          }
-                          getOptionLabel={(option) => option.label}
-                          value={selectedCurrency || null}
-                          onChange={(_, newValue) => {
-                            onChange(newValue ? newValue.value : "");
-                          }}
-                          renderInput={(params) => (
-                            <TextField {...params} label="Para Birimi" />
-                          )}
-                        />
-                      );
-                    }}
+            return (
+              <Autocomplete
+                id="currency"
+                options={currencyCodeList}
+                getOptionSelected={(option, value) =>
+                  option.value === value
+                }
+                getOptionLabel={(option) => option.label}
+                value={selectedCurrency || null}
+                onChange={(_, newValue) => {
+                  onChange(newValue ? newValue.value : "");
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Para Birimi"
+                    error={!!fieldState.error}  // check if there is an error
                   />
                 )}
-              </FormControl>
+              />
+            );
+          }}
+        />
+      )}
+    </FormControl>
 
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 <NumericFormatInputControl
@@ -396,38 +405,42 @@ export const PaymentWithLinkedForm = () => {
               spacing={3}
               direction={isDesktop ? "row" : "column"}
             >
-              <FormControl sx={{ width: isDesktop ? "48.5%" : "100%" }}>
-                {installmentCounts && (
-                  <Controller
-                    name="installmentCount"
-                    control={control}
-                    defaultValue=""
-                    render={({ field: { onChange, value } }) => {
-                      const selectedInstallment = installmentCounts.find(
-                        (option) => option.value === value
-                      );
+             <FormControl sx={{ width: isDesktop ? "48.5%" : "100%" }}>
+  {installmentCounts && (
+    <Controller
+      name="installmentCount"
+      control={control}
+      defaultValue=""
+      render={({ field: { onChange, value }, fieldState }) => {
+        const selectedInstallment = installmentCounts.find(
+          (option) => option.value === value
+        );
 
-                      return (
-                        <Autocomplete
-                          id="installmentCount"
-                          options={installmentCounts}
-                          getOptionSelected={(option, value) =>
-                            option.value === value
-                          }
-                          getOptionLabel={(option) => option.label}
-                          value={selectedInstallment || null}
-                          onChange={(_, newValue) => {
-                            onChange(newValue ? newValue.value : "");
-                          }}
-                          renderInput={(params) => (
-                            <TextField {...params} label="Taksit Sayısı" />
-                          )}
-                        />
-                      );
-                    }}
-                  />
-                )}
-              </FormControl>
+        return (
+          <Autocomplete
+            id="installmentCount"
+            options={installmentCounts}
+            getOptionSelected={(option, value) =>
+              option.value === value
+            }
+            getOptionLabel={(option) => option.label}
+            value={selectedInstallment || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.value : "");
+            }}
+            renderInput={(params) => (
+              <TextField 
+                {...params} 
+                label="Taksit Sayısı" 
+                error={!!fieldState.error}  // check if there is an error
+              />
+            )}
+          />
+        );
+      }}
+    />
+  )}
+</FormControl>
             </Stack>
 
             <Stack

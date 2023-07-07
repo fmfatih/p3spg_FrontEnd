@@ -94,7 +94,7 @@ export const paymentWithLinkedFormSchema = zod
   .object({
     bankCode: zod.string().optional(),
     orderId: zod.string(),
-    merchantId: zod.number(),
+    merchantId: zod.number().positive(),
     amount: zod.string().min(1, { message: "Please enter your phone number" }),
     installmentCount: zod
       .string()
