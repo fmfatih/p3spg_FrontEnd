@@ -150,6 +150,7 @@ export function DocumentDetailModal({  isOpen, handleClose, merchantId }) {
               isOpen: true,
               description: data.message || "Dosya başarıyla güncellendi",
             });
+            getDocumentList({ id: merchantId });
           } else {
             setSnackbar({
               severity: "error",
@@ -262,6 +263,8 @@ export function DocumentDetailModal({  isOpen, handleClose, merchantId }) {
       { id: merchantId },
         {
           onSuccess: (data) => {
+            console.log(data);
+            
             if (data.isSuccess) {
               setTableData(data.data);
               setSnackbar({
@@ -289,42 +292,35 @@ export function DocumentDetailModal({  isOpen, handleClose, merchantId }) {
     }
   }, [isOpen,merchantId]);
 
-  // const onSave = () => {
-  //   GetMerchantPaymentDetail(
-  //     {
-  //       size: -1,
-  //       page: 0,
-  //       orderBy: "CreateDate",
-  //       orderByDesc: true,
-  //       merchantId: transaction?.merchantId,
-  //       date: dayjs(transaction?.endOfDayDate).format("YYYY-MM-DD"),
-  //     },
-  //     {
-  //       onSuccess: (data) => {
-  //         if (data.isSuccess) {
-  //           downloadExcel(
-  //             data?.data?.result || [],
-  //             "İşyeri Hak Ediş Raporları Detay"
-  //           );
-  //         } else {
-  //           setSnackbar({
-  //             severity: "error",
-  //             description: data.message,
-  //             isOpen: true,
-  //           });
-  //         }
-  //       },
-  //       onError: () => {
-  //         console.log(error);
-  //         setSnackbar({
-  //           severity: "error",
-  //           description: "İşlem sırasında bir hata oluştu",
-  //           isOpen: true,
-  //         });
-  //       },
-  //     }
-  //   );
-  // };
+  const onSave = () => {
+    getDocumentList(
+        { id: merchantId },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            downloadExcel(
+              data?.data || [],
+              "Döküman Listesi"
+            );
+          } else {
+            setSnackbar({
+              severity: "error",
+              description: data.message,
+              isOpen: true,
+            });
+          }
+        },
+        onError: () => {
+          console.log(error);
+          setSnackbar({
+            severity: "error",
+            description: "İşlem sırasında bir hata oluştu",
+            isOpen: true,
+          });
+        },
+      }
+    );
+  };
 
   return (
     <Modal
@@ -348,7 +344,7 @@ export function DocumentDetailModal({  isOpen, handleClose, merchantId }) {
           display: "relative",
         }}
       >
-        <h2 id="modal-modal-title">Döküman Detay</h2>
+        <h2 id="modal-modal-title">Doküman Listesi</h2>
 
         <Stack
           justifyContent="center"

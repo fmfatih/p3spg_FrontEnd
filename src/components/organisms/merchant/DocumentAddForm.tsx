@@ -403,7 +403,7 @@ export const DocumentAddForm = () => {
                               documentInfoId={field.documentInfoId}
                               setValue={setValue}
                               getValues={getValues}
-                              onDelete={handleDelete}
+                              // onDelete={handleDelete}
                             />
                           </Box>
                         );

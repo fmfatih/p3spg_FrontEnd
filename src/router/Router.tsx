@@ -32,6 +32,7 @@ import {
   BankPayment,
   BankCommissionProfileList,
   DocumentAdd,
+  BankAddBulkCommissionUpload,
 } from "../pages";
 
 
@@ -89,6 +90,10 @@ export const router = createBrowserRouter([
   {
     path: "/commission-management/commission-listing",
     element: <BankCommissionList />,
+  },
+  {
+    path: "/commission-management/bulk-commission-upload",
+    element: <BankAddBulkCommissionUpload/>,
   },
   {
     path: "/vpos-management/vpos-merchantbanklisting",
