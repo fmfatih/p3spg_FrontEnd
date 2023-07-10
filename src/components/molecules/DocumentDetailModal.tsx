@@ -216,7 +216,7 @@ export function DocumentDetailModal({  isOpen, handleClose, merchantId }) {
   const columns: GridColDef[] = useMemo(() => {
     return [
       {
-        field: "Aksiyonlarr",
+        field: "Aksiyonlar",
         type: "actions",
         width: 80,
         getActions: (params) => {      

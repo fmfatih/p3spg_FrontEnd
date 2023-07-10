@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation, useNavigate } from "react-router-dom";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useEffect, useRef, useState } from "react";
+import GetAppIcon from '@mui/icons-material/GetApp';
 
 export const BankAddBulkCommissionUploadForm = () => {
   const navigate = useNavigate();
@@ -37,6 +38,8 @@ export const BankAddBulkCommissionUploadForm = () => {
     const [loading, setLoading] = useState(false);
     const [file, setFile] = useState(null);
     const { mutate: commissionFilesUpload} = useAddCommissionParameterFiles();
+    
+
     
     const checkFileExtension = (file) => {
       const acceptedExtension = 'xlsx';
@@ -138,7 +141,7 @@ export const BankAddBulkCommissionUploadForm = () => {
       </Grid>
     </Box>
     {responseData?.data && (
-  <Card sx={{ minWidth: 275, marginTop: 4 }}>
+  <Card sx={{ minWidth: 275, marginTop: 4 , boxShadow: 2, borderRadius: 3 }}>
     <CardContent>
       <Typography variant="h3" component="div" color="primary" gutterBottom>
         İşlem Bilgileri
@@ -179,9 +182,11 @@ export const BankAddBulkCommissionUploadForm = () => {
   };
 
   const DownloadButton = () => {
-    const fileURL = process.env.PUBLIC_URL + "/files/Sanal-Pos-Toplu-Komisyon-Yükleme.xlsx"; 
+    const fileURL = "/files/Sanal-Pos-Toplu-Komisyon-Yükleme.xlsx"; 
+    console.log(fileURL);
+    
     return (
-        <Button variant="contained" text="KOMİSYON YÜKLEME DOSYASINI İNDİR" color="primary" href={fileURL} download        sx={{ height: '55px' }}>
+        <Button variant="contained" text="KOMİSYON YÜKLEME DOSYASINI İNDİR" color="primary"     startIcon={<GetAppIcon />} href={fileURL} download        sx={{ height: '55px' }}>
             Dosyayı İndir
         </Button>
     );

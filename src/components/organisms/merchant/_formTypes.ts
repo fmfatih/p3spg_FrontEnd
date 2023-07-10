@@ -336,14 +336,16 @@ export const documentFormSchema = zod.object({
   merchantId: zod.any(),
   posType:zod.any(),
   companyType:zod.any(),
-  files:zod.any()
+  files:zod.any(),
+  taxNumber:zod.any()
 
 });
 
 export type DocumentFormValuesType = zod.infer<typeof documentFormSchema>;
 
 export const documentInitialValues: DocumentFormValuesType = {
-  merchantId: "",
+  merchantId: 0,
   posType:0,
-  companyType:0
+  companyType:0,
+  taxNumber:""
 };

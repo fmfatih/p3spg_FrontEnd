@@ -4,7 +4,7 @@ export const BankAddBulkCommissionUpload = () => {
   return (
     <AdminTemplate
       headerProps={{
-        headerTitle: 'Toplu Komisyon Yükleme',
+        headerTitle: 'Toplu Komisyon Kodu Tanımı',
         hideAddButton: true,
         hideDownloadButton: true,
         hideSearchBar: true

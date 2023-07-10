@@ -79,6 +79,7 @@ export const DocumentUpload = ({label,documentInfoId, control, setValue,getValue
   return (
     <form>
       <TextField
+      sx={{width:"100%"}}
         type="file"
         id="file"
         label={label}

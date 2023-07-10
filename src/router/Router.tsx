@@ -92,7 +92,7 @@ export const router = createBrowserRouter([
     element: <BankCommissionList />,
   },
   {
-    path: "/commission-management/bulk-commission-upload",
+    path: "/commission-management/commission-alldefination",
     element: <BankAddBulkCommissionUpload/>,
   },
   {

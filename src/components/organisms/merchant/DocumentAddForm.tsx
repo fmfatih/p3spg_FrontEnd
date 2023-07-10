@@ -85,8 +85,11 @@ export const DocumentAddForm = () => {
   console.log(merchant);
 
   const merchantId = watch("merchantId");
+  const taxNumber = watch("vkn");
   const companyType = Number(watch("companyType"));
   const posType = Number(watch("posType"));
+
+
 
   useEffect(() => {
     setSelectedMerchant(merchantId);
@@ -203,10 +206,12 @@ export const DocumentAddForm = () => {
 
   const onSubmit = async (data) => {
     setLoading(true);
+console.log(data);
 
     const dto = data.files.map((item) => ({
       companyType: Number(data.companyType),
       posType: Number(data.posType),
+      taxNumber:taxNumber,
       merchantId: merchantId.value,
       idNumber: data.idNumber,
       documentInfoId: item.documentInfoId,
@@ -310,6 +315,7 @@ export const DocumentAddForm = () => {
                             <Autocomplete
                               sx={{ mr: isDesktop ? 2 : 0 }}
                               id="merchantId"
+                          
                               onChange={(event, selectedValue) => {
                                 setValue("merchantId", selectedValue);
                               }}
@@ -333,9 +339,11 @@ export const DocumentAddForm = () => {
                   <FormatInputControl
                     sx={{ flex: 1 }}
                     label="VKN"
+                    name="vkn"
+                    // disabled={merchantId}
                     control={control}
                     id="vkn"
-                    format="## ## ## ## ##"
+                    format="##########"
                     allowEmptyFormatting
                     mask="_"
                   />
@@ -396,7 +404,7 @@ export const DocumentAddForm = () => {
                     <Stack direction="row" flexWrap="wrap">
                       {fields?.map((field, index) => {
                         return (
-                          <Box key={field.id} my={1} mr={3} flex="100%">
+                          <Box key={field.id} my={1} mr={0} flex="100%">
                             <DocumentUpload
                               control={control}
                               label={field.label}

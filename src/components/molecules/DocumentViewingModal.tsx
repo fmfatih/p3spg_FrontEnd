@@ -13,12 +13,14 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useAuthorization, useDocumentDelete, useGetDocumentGetById, useGetDocumentList, useGetMerchantPaymentDetail } from "../../hooks";
 import { default as dayjs } from "dayjs";
 import { downloadExcel } from "../../util/downloadExcel";
+import { API_ADDRESS } from "../../config/server";
 
 export function DocumentViewingModal({  isOpen, handleClose, merchantId }) {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [tableData, setTableData] = useState([]);
+  const [filePath, setFilePath] = useState("");
   const {
     mutate:  getDocumentGetById,
   } = useGetDocumentGetById();
@@ -58,6 +60,12 @@ export function DocumentViewingModal({  isOpen, handleClose, merchantId }) {
   //   }
   // }, [isOpen,merchantId]);
 
+
+
+
+
+
+
   useEffect(() => {
     if (isOpen && merchantId) {
       getDocumentGetById(
@@ -65,19 +73,30 @@ export function DocumentViewingModal({  isOpen, handleClose, merchantId }) {
         {
           onSuccess: (data) => {
             if (data.isSuccess) {
-              // Dosya uzantısını burada alıyoruz
-              const fileExtension = data.data.fileName.split(".").pop().toLowerCase();
-  
-              // Eğer dosya tipi bir görüntü veya PDF ise, bu dosyayı bir modal içerisinde göstermek istiyoruz.
-              if (fileExtension === "png" || fileExtension === "jpg" || fileExtension === "pdf") {
-                setTableData({...data.data, fileExtension}); // fileExtension ekliyoruz
-              } 
-              // Eğer dosya tipi bir Excel dosyası ise, bu dosyayı kullanıcının bilgisayarına indirmek istiyoruz.
-              else if (fileExtension === "xlsx" || fileExtension === "xls") {
-                downloadExcel(data.data, data.data.fileName); // İndirme işlemi
-                handleClose(); // Modalı kapat
+              const docType = data.data.docType.toLowerCase();
+
+              let fileBase = API_ADDRESS.replace('/api', '');
+              if(fileBase.includes(':5001')) {
+                  fileBase = fileBase.replace(':5001', ':5002');
               }
-  
+              const newFilePath = `${fileBase}/${data.data.path}`;
+              setFilePath(newFilePath); 
+              
+        
+              if (docType === "png" || docType === "jpg" || docType === "pdf") {
+                setTableData({...data.data, docType}); 
+              } 
+           
+              else if (docType === "xlsx" || docType === "xls") {       
+                const link = document.createElement('a');
+                link.href = newFilePath;
+                link.setAttribute('download', 'file.xlsx');
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                handleClose();
+              }
               setSnackbar({
                 severity: "success",
                 isOpen: true,
@@ -102,6 +121,18 @@ export function DocumentViewingModal({  isOpen, handleClose, merchantId }) {
       );
     }
   }, [isOpen, merchantId]);
+
+  
+  
+  // let fileBase = API_ADDRESS.replace('/api', '');
+
+  // if(fileBase.includes(':5001')) {
+  //     fileBase = fileBase.replace(':5001', ':5002');
+  // }
+  
+  
+  // const filePath = `${fileBase}/${tableData.path}`;
+  // console.log(filePath);
   
   return (
 <Modal
@@ -128,21 +159,12 @@ export function DocumentViewingModal({  isOpen, handleClose, merchantId }) {
   >
     <h2 id="modal-modal-title" style={{color:"white"}}>Dokuman Ön izleme</h2>
 
-    {/* <Stack justifyContent="center" sx={{ width: 1, height: "100%", flexGrow: 1 }}>
-  {
-    (tableData.fileExtension === "png" || tableData.fileExtension === "jpg") ? (
-      <img src={tableData.fileURL} alt={tableData.fileName} />
-    ) : tableData.fileExtension === "pdf" ? (
-      <embed src={tableData.fileURL} type="application/pdf" width="100%" height="100%" />
-    ) : null
-  }
-</Stack> */}
 <Stack justifyContent="center" sx={{ width: 1, height: '100%', flexGrow: 1 }}>
   {
-    (tableData.fileExtension === "png" || tableData.fileExtension === "jpg") ? (
-      <img src={tableData.fileURL} alt={tableData.fileName} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-    ) : tableData.fileExtension === "pdf" ? (
-      <embed src={tableData.fileURL} type="application/pdf" style={{width: '100%', height: '100%'}} />
+    (tableData.docType === "png" || tableData.docType === "jpg" || tableData.docType === "jpeg" ) ? (
+      <img src={filePath} alt={tableData.fileName} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+    ) : tableData.docType === "pdf" ? (
+      <embed src={filePath} type="application/pdf" style={{width: '100%', height: '100%'}} />
     ) : null
   }
 </Stack>

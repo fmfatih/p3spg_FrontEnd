@@ -9,6 +9,7 @@ export interface IDocumentAddRequest {
   dto: {
     companyType: number;
     posType: number;
+    taxNumber:string;
     merchantId: number;
     idNumber: string;
     documentInfoId: number;
