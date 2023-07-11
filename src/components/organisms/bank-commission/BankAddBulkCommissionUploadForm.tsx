@@ -14,6 +14,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useEffect, useRef, useState } from "react";
 import GetAppIcon from '@mui/icons-material/GetApp';
+import ErrorIcon from '@mui/icons-material/Error';
 
 export const BankAddBulkCommissionUploadForm = () => {
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ export const BankAddBulkCommissionUploadForm = () => {
       setLoading(true);
 
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('files', file);
 
       commissionFilesUpload(formData, {
         onSuccess: (data) => {
@@ -107,6 +108,8 @@ export const BankAddBulkCommissionUploadForm = () => {
         },
       });
     }
+    console.log(responseData);
+    
     return (
       <>
 
@@ -158,12 +161,20 @@ export const BankAddBulkCommissionUploadForm = () => {
       <Typography variant="h5" gutterBottom>
         Hata Mesajları:
       </Typography>
-      {responseData?.errorMessages && responseData?.errorMessages?.length > 0 ? (
-  responseData?.errorMessages?.map((error, index) => (
-    <Typography key={index} variant="body2" color="error">
-      {error}
-    </Typography>
-  ))
+      {responseData && responseData.data.errorMessages ? (
+  <div>
+    <Box display="flex" alignItems="center" gap={1}>
+      <ErrorIcon color="error" fontSize="large" />
+      <Typography variant="body1" style={{ color: theme.palette.error.main, fontWeight: 'bold' }}>
+        Toplam {responseData.data.errorMessages.length} hata bulundu:
+      </Typography>
+    </Box>
+    {responseData.data.errorMessages.map((error, index) => (
+      <Typography key={index} ml={6} variant="body2" color="error" style={{fontSize: 'medium'}}>
+        {index + 1}. {error}
+      </Typography>
+    ))}
+  </div>
 ) : (
   <Box display="flex" alignItems="center" gap={1}>
     <CheckCircleIcon color="success" fontSize="large" />

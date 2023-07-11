@@ -5,7 +5,7 @@ import { axiosInstance } from "../../config/axios";
 
 
 export interface ICommissionFilesUploadRequest {
-  file: File[];
+  files: File[];
 }
 
 async function commissionFilesUpload(formData: FormData): Promise<any> {

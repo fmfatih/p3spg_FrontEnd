@@ -4,7 +4,7 @@ export const DocumentAdd = () => {
   return (
     <AdminTemplate
       headerProps={{
-        headerTitle: 'Döküman Yükle',
+        headerTitle: 'Doküman Ekleme',
         hideAddButton: true,
         hideDownloadButton: true,
         hideSearchBar: true

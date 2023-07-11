@@ -76,19 +76,21 @@ export const DocumentAddForm = () => {
     },
   });
   const [selectResponse, setSelectResponse] = useState([]);
+  const [allFile, setAllFile] = useState([]);
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "documents",
   });
 
-  console.log(merchant);
+  
 
   const merchantId = watch("merchantId");
-  const taxNumber = watch("vkn");
+  const taxNumber = watch("taxNumber");
   const companyType = Number(watch("companyType"));
   const posType = Number(watch("posType"));
 
+console.log(taxNumber);
 
 
   useEffect(() => {
@@ -104,12 +106,10 @@ export const DocumentAddForm = () => {
 
       getDocumentDocumentSettings(req, {
         onSuccess: (response) => {
-          console.log(response);
-
           setSelectResponse(response);
-
           remove();
           if (response?.data && Array.isArray(response.data)) {
+            const items = [];
             response.data.forEach((item) => {
               if (item?.documentType) {
                 const tempOBJ: any = {
@@ -118,11 +118,15 @@ export const DocumentAddForm = () => {
                   documentInfoId: item.id,
                   type: "string",
                   value: "",
+                  mandatory: item.mandatory
                 };
-                append(tempOBJ);
                 console.log(tempOBJ);
+                
+                append(tempOBJ);
+                items.push(tempOBJ)
               }
             });
+            setAllFile(items)
           }
         },
       });
@@ -135,6 +139,9 @@ export const DocumentAddForm = () => {
     companyType,
     posType,
   ]);
+
+  console.log(merchantId);
+  
 
   const merchantList = useMemo(() => {
     if (userInfo.merchantId == 0) {
@@ -206,13 +213,14 @@ export const DocumentAddForm = () => {
 
   const onSubmit = async (data) => {
     setLoading(true);
-console.log(data);
+
+    console.log(allFile, data.files);
 
     const dto = data.files.map((item) => ({
       companyType: Number(data.companyType),
       posType: Number(data.posType),
-      taxNumber:taxNumber,
-      merchantId: merchantId.value,
+      taxNumber:taxNumber || "",
+      merchantId: merchantId.value || 0,
       idNumber: data.idNumber,
       documentInfoId: item.documentInfoId,
     }));
@@ -222,6 +230,29 @@ console.log(data);
     data.files.forEach((item, index) => {
       formData.append(`files`, item.file);
     });
+
+    let hasAllFile = true;
+    allFile.forEach(element => {
+      if(element.mandatory) {
+        const file = data.files.find(file => file.documentInfoId === element.documentInfoId);
+
+        if(!file) {
+          hasAllFile = false;
+          return;
+        }
+      }
+    });
+    
+
+    if(!hasAllFile) {
+      setSnackbar({
+        severity: "error",
+        isOpen: true,
+        description: "* ile belirtilen zorunlu alanları doldurun.",
+      });
+      return;
+    }
+
 
     formData.append("dto", JSON.stringify(dto));
 
@@ -253,43 +284,7 @@ console.log(data);
     });
   };
 
-  // const onSubmit = async (data) => {
-  //   setLoading(true);
-
-  //   const files = watch('files'); // dosyaları durumdan alıyoruz
-
-  //   const request = {
-  //     files: data.files,
-  //     // companyType: Number(data.companyType),
-  //     // merchantId: data.merchantId.value,
-  //     // posType: Number(data.posType)
-  //     companyType: 1,
-  //     posType: 1,
-  //     taxNumber: "1121213352",
-  //     idNumber: "2",
-  //     documentInfoId: 1
-  //   };
-
-  //   documentAdd(request, {
-  //     onSuccess: (data) => {
-  //       setLoading(false);
-  //       setSnackbar({
-  //         severity: "success",
-  //         isOpen: true,
-  //         description: "Dosyalar başarıyla yüklendi",
-  //       });
-  //       // navigate("/merchant-management/merchant-list");
-  //     },
-  //     onError: (error) => {
-  //       setLoading(false);
-  //       setSnackbar({
-  //         severity: "error",
-  //         isOpen: true,
-  //         description: "Dosya yüklenirken bir hata oluştu",
-  //       });
-  //     }
-  //   });
-  // };
+ 
 
   return (
     <>
@@ -309,7 +304,7 @@ console.log(data);
                     <Controller
                       control={control}
                       name="merchantId"
-                      render={() => {
+                      render={({ field, fieldState }) => {
                         return (
                           <>
                             <Autocomplete
@@ -317,7 +312,9 @@ console.log(data);
                               id="merchantId"
                           
                               onChange={(event, selectedValue) => {
-                                setValue("merchantId", selectedValue);
+                                // setValue("merchantId", selectedValue);
+                                setValue("merchantId", selectedValue)
+                                field.onChange(selectedValue);
                               }}
                               options={merchantList}
                               defaultValue={selectedMerchant}
@@ -326,7 +323,7 @@ console.log(data);
                                 value: number;
                               }) => option.label}
                               renderInput={(params) => (
-                                <TextField {...params} label="Üye İşyeri" />
+                                <TextField {...params} label="Üye İşyeri"   error={fieldState.invalid}/>
                               )}
                             />
                           </>
@@ -339,10 +336,10 @@ console.log(data);
                   <FormatInputControl
                     sx={{ flex: 1 }}
                     label="VKN"
-                    name="vkn"
+                    name="taxNumber"
                     // disabled={merchantId}
                     control={control}
-                    id="vkn"
+                    id="taxNumber"
                     format="##########"
                     allowEmptyFormatting
                     mask="_"
@@ -382,24 +379,6 @@ console.log(data);
               </Stack>
               <Stack spacing={3}>
                 <Stack sx={{ width: isDesktop ? "800px" : "100%" }}>
-                  {/* {fields?.length ? (
-  <Stack direction="row" flexWrap="wrap">
-    {fields?.map((field, index) => {
-      return (
-        <Box key={field.id} my={1} mr={3} flex="44%">
-          <InputControl
-            defaultValue=""
-            sx={{ width: "100%" }}
-            id={`parameters.${index}.value`}
-            label={field.label} 
-            control={control}
-          />
-        </Box>
-      );
-    })}
-  </Stack>
-) : null} */}
-
                   {fields?.length ? (
                     <Stack direction="row" flexWrap="wrap">
                       {fields?.map((field, index) => {
@@ -408,6 +387,7 @@ console.log(data);
                             <DocumentUpload
                               control={control}
                               label={field.label}
+                              mandatory={field.mandatory}
                               documentInfoId={field.documentInfoId}
                               setValue={setValue}
                               getValues={getValues}
@@ -419,8 +399,6 @@ console.log(data);
                     </Stack>
                   ) : null}
                 </Stack>
-                {/* <DocumentUpload control={control}/> */}
-
                 <Stack
                   borderTop="1px solid #E6E9ED"
                   direction="row"

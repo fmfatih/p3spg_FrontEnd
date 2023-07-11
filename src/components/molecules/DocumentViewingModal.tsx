@@ -122,17 +122,7 @@ export function DocumentViewingModal({  isOpen, handleClose, merchantId }) {
     }
   }, [isOpen, merchantId]);
 
-  
-  
-  // let fileBase = API_ADDRESS.replace('/api', '');
 
-  // if(fileBase.includes(':5001')) {
-  //     fileBase = fileBase.replace(':5001', ':5002');
-  // }
-  
-  
-  // const filePath = `${fileBase}/${tableData.path}`;
-  // console.log(filePath);
   
   return (
 <Modal

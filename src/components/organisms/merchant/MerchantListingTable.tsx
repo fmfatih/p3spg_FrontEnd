@@ -199,7 +199,8 @@ export const MerchantListingTable = ({
   //   },
   //   [navigate]
   // );
-  const RenderActionButton = ({merchantId}) => {
+  
+  const RenderActionButton = ({merchantId, disabled}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleOpenModal = () => {
@@ -217,8 +218,9 @@ export const MerchantListingTable = ({
             variant="contained"
             color="primary"
             onClick={handleOpenModal}
-            text="Döküman"
+            text="Doküman"
             sx={{flex:1,height:20,py:4}}
+            disabled={disabled}
         >
         </Button>
         <DocumentDetailModal merchantId={merchantId} isOpen={isModalOpen} handleClose={handleCloseModal} />
@@ -252,7 +254,9 @@ export const MerchantListingTable = ({
         headerName: "Doküman",
         width: 150,
         renderCell: (params) => {
-          return <RenderActionButton merchantId={params.row.merchantId} />
+          const isDisabled = params.row.documents === false;
+
+          return <RenderActionButton merchantId={params.row.merchantId} disabled={isDisabled}/>
         },
       },
       { field: "merchantId", headerName: "İşyeri No", width: 200 },

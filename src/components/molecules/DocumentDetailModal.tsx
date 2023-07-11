@@ -51,12 +51,37 @@ export function DocumentDetailModal({  isOpen, handleClose, merchantId }) {
 
   const handleDeleteConfirm = () => {
     const deleteRequest: DeleteDocumentRequest = { id: selectedRowId };
-
-
+  
     deleteDocument(deleteRequest, {
       onSuccess: (data: any) => {
         if (data.isSuccess) {
-          getDocumentList({ id: merchantId })
+          // Silme işlemi başarılı olduğunda tekrar liste çekilir.
+          getDocumentList({ id: merchantId }, {
+            onSuccess: (data) => {
+              if (data.isSuccess) {
+                setTableData(data.data);
+                setSnackbar({
+                  severity: "success",
+                  isOpen: true,
+                  description: data.message,
+                });
+              } else {
+                setSnackbar({
+                  severity: "error",
+                  description: data.message,
+                  isOpen: true,
+                });
+              }
+            },
+            onError: () => {
+              setSnackbar({
+                severity: "error",
+                description: "Liste çekilirken bir hata oluştu",
+                isOpen: true,
+              });
+            },
+          });
+  
           setSnackbar({
             severity: "success",
             isOpen: true,
@@ -78,7 +103,7 @@ export function DocumentDetailModal({  isOpen, handleClose, merchantId }) {
         });
       },
     });
-
+  
     handleCloseDeleteModal();
   };
 

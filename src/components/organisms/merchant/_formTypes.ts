@@ -75,7 +75,7 @@ export const secondStepFormSchema = zod.object({
   addressLine1: zod
     .string()
     .min(1, { message: "Please enter your phone number" }),
-  addressLine2: zod.string().optional(),
+  addressLine2: zod.any().optional(),
   cityId: zod.any(),
   districtId: zod.string().or(zod.number()),
   mobilePhoneNumber: zod.preprocess(
@@ -333,12 +333,26 @@ export const merchantAuthInitialValues: MerchantAuthFormValuesType = {
 };
 
 export const documentFormSchema = zod.object({
-  merchantId: zod.any(),
+  // merchantId: zod.any(),
+  merchantId: zod
+  .union([
+    zod.number().positive("Please select a merchant"),
+    zod.object({
+      // burada istediğiniz diğer kontrolleri ekleyin
+      label: zod.string(),
+      value: zod.number().positive(),
+    }),
+    zod.number(),  // Eğer merchant değeri 0 olabilirse bu hattı ekleyin.
+  ]),
   posType:zod.any(),
   companyType:zod.any(),
   files:zod.any(),
   taxNumber:zod.any()
-
+//   taxNumber: zod.string().preprocess((val) =>
+//   String(val)
+//     .replaceAll("_", "") // Çizgileri kaldırır
+//     .trim() // Kenar boşluklarını kaldırır
+// ),
 });
 
 export type DocumentFormValuesType = zod.infer<typeof documentFormSchema>;

@@ -46,13 +46,15 @@ import React, { useState } from "react";
 import { Button, TextField } from "@mui/material";
 import { useSetSnackBar } from "../../store/Snackbar.state";
 
-export const DocumentUpload = ({label,documentInfoId, control, setValue,getValues,onDelete}) => {
+export const DocumentUpload = ({label,documentInfoId,mandatory, control, setValue,getValues,onDelete}) => {
   // const [files, setFiles] = useState([]);  
   const setSnackbar = useSetSnackBar();
 
   const handleFileUpload = (documentInfoId: number) => (event: any) => {
     const file = event.target.files[0];
     const validExtensions = ['jpg','png','doc','pdf','xlsx'];
+    
+
     
     // Uzantıyı al ve kontrol et
     const extension = file.name.split('.').pop();
@@ -82,7 +84,16 @@ export const DocumentUpload = ({label,documentInfoId, control, setValue,getValue
       sx={{width:"100%"}}
         type="file"
         id="file"
-        label={label}
+        // label={label}
+        label={
+          mandatory ? (
+            <span>
+              {label} <span style={{ color: 'red' }}>*</span>
+            </span>
+          ) : (
+            label
+          )
+        }
         InputLabelProps={{
           shrink: true,
         }}
@@ -91,7 +102,7 @@ export const DocumentUpload = ({label,documentInfoId, control, setValue,getValue
           multiple: true,
           onChange: handleFileUpload(documentInfoId),
         }}
-        
+        // required={mandatory}
       />
     </form>
   );
