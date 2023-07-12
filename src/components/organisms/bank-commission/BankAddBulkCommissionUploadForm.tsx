@@ -193,7 +193,7 @@ export const BankAddBulkCommissionUploadForm = () => {
   };
 
   const DownloadButton = () => {
-    const fileURL = "/files/Sanal-Pos-Toplu-Komisyon-Yükleme.xlsx"; 
+    const fileURL = "/files/Sanal-Pos-Toplu-Komisyon-Yükleme-Güncelleme.xlsx"; 
     console.log(fileURL);
     
     return (

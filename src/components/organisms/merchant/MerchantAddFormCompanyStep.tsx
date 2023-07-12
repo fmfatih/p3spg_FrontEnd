@@ -132,6 +132,9 @@ export const MerchantAddFormCompanyStep = ({
       }
     );
   }, [rawMerchantTypes?.data]);
+  console.log(merchantTypes);
+  
+  
 
   const merchantStatuses = useMemo(() => {
     return rawMerchantStatus?.data?.map(
@@ -154,6 +157,9 @@ export const MerchantAddFormCompanyStep = ({
       }
     );
   }, [rawPosTypes?.data]);
+
+  console.log(posTypes);
+  
 
   // const merchantList = useMemo(() => {
   //   return rawMerchantList?.data?.map(
@@ -251,6 +257,7 @@ export const MerchantAddFormCompanyStep = ({
       merchantType: +merchantType,
       merchantStatusType,
       mobilePos: false,
+      cepPos:false,
       vpos: false,
       pos: false,
       parentMerchantId: selectedMerchant?.value
@@ -276,6 +283,7 @@ export const MerchantAddFormCompanyStep = ({
       description: "",
       ...posList,
     };
+
 
     if ((merchant && merchant?.id > 0) || (allData && allData?.merchantType)) {
       updateMerchant(
@@ -398,6 +406,7 @@ export const MerchantAddFormCompanyStep = ({
           vpos: merchant?.vpos,
           pos: merchant?.pos,
           mobilePos: merchant?.mobilePos,
+          cepPos:merchant?.cepPos
         },
 
         //foundationDate: dayjs(merchant.foundationDate),

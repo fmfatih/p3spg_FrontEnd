@@ -57,7 +57,7 @@ export const UserAddForm = () => {
 
   const { mutate: userUpdate, isLoading: isUserUpdateLoading } =
     useUpdateUser();
-  const { handleSubmit, control, reset, setValue, watch } =
+  const { handleSubmit, control, reset, setValue, watch,getValues } =
     useForm<UserAddFormValuesType>({
       resolver: zodResolver(addUserFormSchema),
     });
@@ -197,6 +197,7 @@ export const UserAddForm = () => {
 
 
 
+  const merchantId=watch('merchant')
 
   const onSubmit = ({
     email,
@@ -221,7 +222,8 @@ export const UserAddForm = () => {
       phoneNumber: phoneNumber || "",
       userType: Number(userType),
       roleIds: tempRoleIds,
-      merchantId: Number(selectedMerchant?.value) || 0,
+      // merchantId: Number(selectedMerchant?.value) || 0,
+      merchantId:  merchantId || 0,
       status: status,
     };
 
@@ -300,7 +302,11 @@ export const UserAddForm = () => {
 
   const handleBack = () => navigate("/dashboard");
 
-console.log(userTypeList);
+  useEffect(() => {
+    if (user?.id && !isDisabled && selectedMerchant) {
+      setValue("merchant", selectedMerchant.value);
+    }
+  }, [user, isDisabled, selectedMerchant, setValue]);
 
 
   return (
@@ -383,43 +389,43 @@ console.log(userTypeList);
               spacing={3}
             >
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
-                {merchantList && (
-                  <Controller
-                    control={control}
-                    name="merchant"
-                    render={({ field, fieldState }) => {
-                      return (
-                        <>
-                          <Autocomplete
-                            value={user?.id && !isDisabled ? selectedMerchant : null}
-                            onChange={(event, selectedValue) => {
-                              if (!isDisabled) {
-                                setSelectedMerchant(selectedValue);
-                                setValue("merchant", selectedValue?.value || 0);
-                                field.onChange(selectedValue?.value || 0);
-                              }
-                            }}
-                            id="merchant"
-                            options={merchantList}
-                            getOptionLabel={(option: {
-                              label: string;
-                              value: number;
-                            }) => option.label}
-                            disabled={isDisabled}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                label="Üye İşyeri"
-                                error={fieldState.invalid}
-                              />
-                            )}
-                          />
-                        </>
-                      );
-                    }}
-                  />
-                )}
-              </FormControl>
+  {merchantList && (
+    <Controller
+      control={control}
+      name="merchant"
+      render={({ field, fieldState }) => {
+        return (
+          <>
+            <Autocomplete
+              value={merchantList.find(merchant => merchant.value === field.value) || null}
+              onChange={(event, selectedValue) => {
+                if (!isDisabled) {
+                  // // setSelectedMerchant(selectedValue);
+                  // setValue("merchant", selectedValue?.value || 0);
+                  field.onChange(selectedValue?.value || 0);
+                }
+              }}
+              id="merchant"
+              options={merchantList}
+              getOptionLabel={(option: {
+                label: string;
+                value: number;
+              }) => option.label}
+              disabled={isDisabled}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Üye İşyeri"
+                  error={fieldState.invalid}
+                />
+              )}
+            />
+          </>
+        );
+      }}
+    />
+  )}
+</FormControl>
 
               <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
                 {userTypeList && (

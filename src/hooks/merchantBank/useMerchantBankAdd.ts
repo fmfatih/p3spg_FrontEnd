@@ -14,7 +14,7 @@ async function merchantBankAdd(
   data: IMerchantBankAddRequest
 ): Promise<any> {
   try {
-    return (await axiosInstance.post("/MerchantBank/add", {bankType: 1, ...data}))
+    return (await axiosInstance.post("/MerchantBank/add", { ...data}))
       .data;
   } catch (ex) {
     throw ((ex as AxiosError).response?.data as any).error;
@@ -26,3 +26,4 @@ export function useMerchantBankAdd() {
     (variables) => merchantBankAdd(variables)
   );
 }
+// bankType: 1

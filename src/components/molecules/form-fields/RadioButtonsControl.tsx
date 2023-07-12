@@ -57,9 +57,10 @@ export function RadioButtonsControl<TFormFields>(
               row={row}
               value={value}
               onChange={onChange}
+              
             >
               {items.map((item) => (
-                <FormControlLabel key={item.value} value={item.value} control={<Radio />} label={item.label} />
+                <FormControlLabel key={item.value} value={item.value} control={<Radio color={error ? 'error' : 'primary'} />}   label={<Typography color={error ? 'error' : 'initial'}>{item.label}</Typography>} />
               ))}
             </RadioGroup>
           </>

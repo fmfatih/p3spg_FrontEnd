@@ -67,7 +67,7 @@ export const MerchantAddFormPartnerStep = ({
       officialCitizenNumber: formValues.officialCitizenNumber,
       officialMobilePhone: formValues.officialMobilePhone,
       partnerOneFullName: formValues.partnerOneFullName,
-     partnerOneCitizenNumber: formValues.partnerOneCitizenNumber,
+      partnerOneCitizenNumber: formValues.partnerOneCitizenNumber,
       partnerOneMobilePhone: formValues.partnerOneMobilePhone,
       partnerTwoFullName: formValues.partnerTwoFullName,
       partnerTwoCitizenNumber: formValues.partnerTwoCitizenNumber,
@@ -215,7 +215,7 @@ export const MerchantAddFormPartnerStep = ({
             id={mobilePhone}
             allowEmptyFormatting
             mask="_"
-            format="0(###) ### ## ##"
+            format="(###) ### ## ##"
           />
         </FormControl>
       </Stack>

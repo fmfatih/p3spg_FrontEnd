@@ -513,6 +513,30 @@ export const PaymentAndTransactionFilter = () => {
         headerName: "Üye İşyeri Adı",
         width: 300,
       },
+      {
+        field: "mobilePos",
+        headerName: "Mobil Pos",
+        width: 200,
+        valueFormatter: (params) => (params.value ? "Evet" : "Hayır"),
+      },
+      {
+        field: "vpos",
+        headerName: "Sanal Pos",
+        width: 200,
+        valueFormatter: (params) => (params.value ? "Evet" : "Hayır"),
+      },
+      {
+        field: "pos",
+        headerName: "Fiziksel Pos",
+        width: 200,
+        valueFormatter: (params) => (params.value ? "Evet" : "Hayır"),
+      },
+      {
+        field: "cepPos",
+        headerName: "Cep Pos",
+        width: 200,
+        valueFormatter: (params) => (params.value ? "Evet" : "Hayır"),
+      },
       { field: "maskedPan", headerName: "Kart Numarası", width: 200 },
       {
         field: "orderId",
@@ -730,6 +754,9 @@ export const PaymentAndTransactionFilter = () => {
       },
     });
   };
+
+  console.log(tableData?.result);
+  
 
   const onSave = () => {
 
@@ -1023,6 +1050,14 @@ export const PaymentAndTransactionFilter = () => {
                   columns={columns}
                   exportFileName="Ödeme ve İslem Raporu"
                   onSave={() => onSave()}
+                  getRowClassName={(params) => {
+                    if ((params.row.status === 'VOID' && params.row.txnType === 'AUTH') || 
+                        (params.row.status === 'SUCCESS' && params.row.txnType === 'REFUND')) {
+                      return 'red-row';
+                    } else {
+                      return '';
+                    }
+                  }}
                 />
                 <DeleteConfirmModal
                   isOpen={isCancelModalOpen}

@@ -145,6 +145,30 @@ export const thirdStepFormSchema = zod.object({
   accountOwner: zod
     .string()
     .min(1, { message: "Please enter your phone number" }),
+
+    currencyCodeTwo: zod.string().optional(),
+    ibanTwo: zod
+    .string()
+    .optional()
+    .refine(value => 
+      value === "" || 
+      value === "0" || 
+      /^([A-Z]{2}[ '+'\\'+'-]?[0-9]{2})(?=(?:[ '+'\\'+'-]?[A-Z0-9]){9,30}$)((?:[ '+'\\'+'-]?[A-Z0-9]{3,5}){2,7})([ '+'\\'+'-]?[A-Z0-9]{1,3})?$/.test(value), 
+      "Invalid format"),
+
+    bankCodeTwo: zod.string().optional(),
+    accountOwnerTwo: zod.string().optional(),
+    currencyCodeThree: zod.string().optional(),
+    ibanThree: zod
+    .string()
+    .optional()
+    .refine(value => 
+      value === "" || 
+      value === "0" || 
+      /^([A-Z]{2}[ '+'\\'+'-]?[0-9]{2})(?=(?:[ '+'\\'+'-]?[A-Z0-9]){9,30}$)((?:[ '+'\\'+'-]?[A-Z0-9]{3,5}){2,7})([ '+'\\'+'-]?[A-Z0-9]{1,3})?$/.test(value), 
+      "Invalid format"),
+    bankCodeThree: zod.string().optional(),
+    accountOwnerThree: zod.string().optional(),
 });
 
 export type ThirdStepFormValuesType = zod.infer<typeof thirdStepFormSchema>;
@@ -154,6 +178,13 @@ export const thirdStepInitialValues: ThirdStepFormValuesType = {
   bankCode: "",
   iban: "",
   accountOwner: "",
+  ibanTwo: "",
+  bankCodeTwo: "",
+  accountOwnerTwo: "",
+  currencyCodeThree: "",
+  ibanThree: "",
+  bankCodeThree: "",
+  accountOwnerThree: "",
 };
 
 
@@ -202,7 +233,6 @@ export const partnerStepFormSchema = zod.object({
   partnerOneMobilePhone: zod.preprocess(
     (val) =>
       String(val)
-        .slice(1)
         .replaceAll("_", "")
         .replaceAll("(", "")
         .replaceAll(")", "")
@@ -333,26 +363,27 @@ export const merchantAuthInitialValues: MerchantAuthFormValuesType = {
 };
 
 export const documentFormSchema = zod.object({
-  // merchantId: zod.any(),
   merchantId: zod
   .union([
     zod.number().positive("Please select a merchant"),
     zod.object({
-      // burada istediğiniz diğer kontrolleri ekleyin
       label: zod.string(),
       value: zod.number().positive(),
     }),
-    zod.number(),  // Eğer merchant değeri 0 olabilirse bu hattı ekleyin.
+    zod.number(),  
   ]),
-  posType:zod.any(),
-  companyType:zod.any(),
+  posType: zod.union([zod.string(), zod.number().positive()]),
+  companyType: zod.union([zod.string(), zod.number().positive()]),
+
   files:zod.any(),
-  taxNumber:zod.any()
-//   taxNumber: zod.string().preprocess((val) =>
-//   String(val)
-//     .replaceAll("_", "") // Çizgileri kaldırır
-//     .trim() // Kenar boşluklarını kaldırır
-// ),
+  taxNumber: zod.preprocess(
+    (val) =>
+      String(val)
+        .replaceAll("_", "")
+        .trim(),
+    zod.string().optional()
+  ),
+
 });
 
 export type DocumentFormValuesType = zod.infer<typeof documentFormSchema>;

@@ -89,11 +89,19 @@ export const AdminTemplate = ({
         <Header
           {...headerProps}
           headerTitle={
+            (pathName === "dashboard" ? "Ana Ekran" : title) ||
+            headerProps.headerTitle
+          }
+          hideAddButton={hideButtonCondition}
+        />
+        {/* <Header
+          {...headerProps}
+          headerTitle={
             headerProps.headerTitle ||
             (pathName === "dashboard" ? "Ana Ekran" : title)
           }
           hideAddButton={hideButtonCondition}
-        />
+        /> */}
 
         <Stack
           borderRadius={3}

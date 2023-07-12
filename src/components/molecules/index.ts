@@ -11,3 +11,4 @@ export * from "./BankPaymentModal"
 export * from './DashboardWidget';
 export * from './DocumentDetailModal'
 export * from './DocumentViewingModal'
+export * from './MultipleFilter'

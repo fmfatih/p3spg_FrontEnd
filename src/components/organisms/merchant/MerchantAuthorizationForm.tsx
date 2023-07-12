@@ -6,6 +6,7 @@ import {
   useGetMerchantVPosGetListById,
   useTestNonsecure,
   useMerchantVPosUpdate,
+  useMerchantVPosUpdatePage,
 } from '../../../hooks';
 import { Autocomplete, Box, FormControl, Stack, Switch, TextField, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useMemo, useEffect, useState } from 'react';
@@ -28,7 +29,7 @@ export const MerchantAuthorizationForm = () => {
   const { mutate: getMerchantVpostGetListById, isLoading: isMerchantVposGetListById } = useGetMerchantVPosGetListById();
   const { data: rawMerchantList, isLoading: isMerchantListLoading } = useGetAllMerchantList();
   const { mutate: addMerchantVPos, isLoading } = useAddMerchantVPos();
-  const { mutate: merchantVPosUpdate } = useMerchantVPosUpdate();
+  const { mutate: merchantVPosUpdatePage } = useMerchantVPosUpdatePage();
 
   const handleBack = () => navigate('/dashboard');
   const navigate = useNavigate();
@@ -61,9 +62,9 @@ export const MerchantAuthorizationForm = () => {
                 // Find the new data for this bankCode
                 const newDataForBank = newData.data?.find((newBankData: any) => newBankData.bankCode === data.bankCode);
 
-                // If we have new data for this bank, update the defaultBank
+                // If we have new data for this bank, update the status
                 if (newDataForBank) {
-                  return { ...data, defaultBank: newDataForBank.defaultBank };
+                  return { ...data, status: newDataForBank.status };
                 } else {
                   // Otherwise, return the original data
                   return data;
@@ -88,6 +89,7 @@ export const MerchantAuthorizationForm = () => {
   }, [merchantId]);
 
   const setSnackbar = useSetSnackBar();
+console.log(listData);
 
   const merchantList = useMemo(() => {
     if (userInfo.merchantId == 0) {
@@ -114,7 +116,7 @@ export const MerchantAuthorizationForm = () => {
   const onSubmit = (data: any) => {
     const merchantId = data?.merchantId;
     // Tüm default banakları al
-    let defaultBankArray = listData.map((item) => item.defaultBank);
+    let statusArray = listData.map((item) => item.status);
     // tüm bankCodeları al
     let bankCodeArray = listData.map((item) => item.bankCode);
 
@@ -125,12 +127,12 @@ export const MerchantAuthorizationForm = () => {
     };
 
     if (isUpdate) {
-      // Update ise defaultBank Ekle.
-      refactoredData.defaultBank = defaultBankArray;
-      merchantVPosUpdate(refactoredData, {
+      // Update ise status Ekle.
+      refactoredData.status = statusArray;
+      merchantVPosUpdatePage(refactoredData, {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            navigate('/merchant-management/merchant-listing');
+            // navigate('/merchant-management/merchant-listing');
             setSnackbar({
               severity: 'success',
               isOpen: true,
@@ -156,7 +158,7 @@ export const MerchantAuthorizationForm = () => {
       addMerchantVPos(refactoredData, {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            navigate('/merchant-management/merchant-listing');
+            // navigate('/merchant-management/merchant-listing');
             setSnackbar({
               severity: 'success',
               isOpen: true,
@@ -244,12 +246,13 @@ export const MerchantAuthorizationForm = () => {
                           color={!merchantId ? '#ADB6C4' : '#41414D'}>{`${field.bankCode}-${field.bankName}`}</Typography>
                         <Switch
                           disabled={!merchantId}
-                          checked={field.defaultBank ? true : false}
+                          checked={field.status==="ACTIVE" ? true : false}
                           onChange={(e) => {
-                            // Burada tıklanan field'ın defaultBankını, setListData içerisine setleme işlemi
+                            // Burada tıklanan field'ın statusını, setListData içerisine setleme işlemi
                             const newListData = [...listData];
 
-                            newListData[index].defaultBank = e.target.checked;
+                            // newListData[index].status = e.target.checked;
+                            newListData[index].status = e.target.checked ? "ACTIVE" : "PASSIVE";
 
                             setListData(newListData);
                           }}

@@ -20,7 +20,7 @@ import {
   useMerchantBankAdd,
   useMerchantBankUpdate,
 } from "../../../hooks";
-import { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useUserMerchantId } from "./Merchant.state";
 import { useNavigate } from "react-router-dom";
 import { useSetSnackBar } from "../../../store/Snackbar.state";
@@ -86,15 +86,62 @@ export const MerchantAddFormBankStep = ({
     iban,
     bankCode,
     accountOwner,
+    ibanTwo,
+    bankCodeTwo,
+    currencyCodeTwo,
+    accountOwnerTwo,
+    currencyCodeThree,
+    ibanThree,
+    bankCodeThree,
+    accountOwnerThree,
   }: ThirdStepFormValuesType) => {
+    // const request = {
+    //   merchantId,
+    //   currencyCode: Number(currencyCode),
+    //   iban,
+    //   bankCode,
+    //   accountOwner,
+    //   currencyCodeTwo: Number(currencyCodeTwo) || 0,
+    //   ibanTwo: ibanTwo || "",
+    //   bankCodeTwo: bankCodeTwo || "",
+    //   accountOwnerTwo: accountOwnerTwo || "",
+    //   currencyCodeThree: Number(currencyCodeThree) || 0,
+    //   ibanThree: ibanThree || "",
+    //   bankCodeThree: bankCodeThree || "",
+    //   accountOwnerThree: accountOwnerThree || "",
+    // };
+
     const request = {
       merchantId,
-      currencyCode: Number(currencyCode),
-      iban,
-      bankCode,
-      accountOwner,
+      dto: [
+        { 
+          currencyCode: Number(currencyCode), 
+          iban, 
+          bankCode, 
+          accountOwner, 
+          bankType: Number(1)
+        },
+        {
+          currencyCode: Number(currencyCodeTwo) || 0,
+          iban: ibanTwo || "",
+          bankCode: bankCodeTwo || "",
+          accountOwner: accountOwnerTwo || "",
+          bankType: Number(1)
+        },
+        {
+          currencyCode: Number(currencyCodeThree) || 0,
+          iban: ibanThree || "",
+          bankCode: bankCodeThree || "",
+          accountOwner: accountOwnerThree || "",
+          bankType: Number(1)
+        },
+      ],
     };
+    
+
     setAllData({ ...allData, ...request });
+    console.log(allData);
+    
     if (
       (merchant && merchant?.id > 0 && allData?.iban) ||
       (allData && allData?.iban)
@@ -161,14 +208,169 @@ export const MerchantAddFormBankStep = ({
 
   useEffect(() => {
     if (!!merchant && JSON.stringify(merchant) !== "{}") {
+      console.log(merchant)
       reset({
         currencyCode: merchant?.currencyCode?.toString(),
         iban: merchant?.iban || "",
         bankCode: merchant?.bankCode,
         accountOwner: merchant?.accountOwner || "",
+        ibanTwo: merchant?.ibanTwo || "", // Yeni alan
+        ibanThree: merchant?.ibanThree || "", // Yeni alan
+        currencyCodeTwo: merchant?.currencyCodeTwo?.toString(),
+        currencyCodeThree: merchant?.currencyCodeThree?.toString(),
+        bankCodeTwo: merchant?.bankCodeTwo,
+        bankCodeThree: merchant?.bankCodeThree,
+        accountOwnerTwo: merchant?.accountOwnerTwo || "",
+        accountOwnerThree: merchant?.accountOwnerThree || "",
       });
     }
   }, [merchant, reset]);
+  const AccountInput = ({
+    id,
+    currencyCode,
+    iban,
+    bankCode,
+    accountOwner,
+    control,
+    currencyCodeList,
+    bankList,
+  }) => (
+    <Stack py={isDesktop ? 3 : 1} spacing={3}>
+      <Stack
+        width={isDesktop ? 800 : "auto"}
+        spacing={3}
+        direction={isDesktop ? "row" : "column"}
+      >
+        <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+          {currencyCodeList && (
+            <Controller
+              name={currencyCode} // Burada gelen değeri kullanıyoruz
+              control={control}
+              defaultValue=""
+              render={({ field: { onChange, value } }) => {
+                const selectedCurrency = currencyCodeList?.find(
+                  (option) => option.value === value
+                );
+
+                return (
+                  <Autocomplete
+                    id={currencyCode} // Burada gelen değeri kullanıyoruz
+                    options={currencyCodeList}
+                    getOptionSelected={(option, value) =>
+                      option.value === value
+                    }
+                    getOptionLabel={(option) => option.label}
+                    value={selectedCurrency || null}
+                    onChange={(_, newValue) => {
+                      onChange(newValue ? newValue.value : "");
+                    }}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Para Birimi" />
+                    )}
+                  />
+                );
+              }}
+            />
+          )}
+        </FormControl>
+
+        <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+          <InputControl
+            sx={{ mr: isDesktop ? 3 : 0 }}
+            id={iban} // Burada gelen değeri kullanıyoruz
+            control={control}
+            label="IBAN"
+          />
+        </FormControl>
+      </Stack>
+      <Stack
+        pb={isDesktop ? 0 : 2}
+        width={isDesktop ? 800 : "auto"}
+        spacing={3}
+        direction={isDesktop ? "row" : "column"}
+      >
+        <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+          {bankList && (
+            <Controller
+              name={bankCode}
+              control={control}
+              defaultValue=""
+              render={({ field: { onChange, value } }) => {
+                const selectedBank = bankList.find(
+                  (option) => option.value === value
+                );
+
+                return (
+                  <Autocomplete
+                    id={bankCode}
+                    options={bankList}
+                    getOptionSelected={(option, value) =>
+                      option.value === value
+                    }
+                    getOptionLabel={(option) => option.label}
+                    value={selectedBank || null}
+                    onChange={(_, newValue) => {
+                      onChange(newValue ? newValue.value : "");
+                    }}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Banka Adı" />
+                    )}
+                  />
+                );
+              }}
+            />
+          )}
+        </FormControl>
+
+        <FormControl sx={{ width: isDesktop ? "50%" : "100%" }}>
+          <InputControl
+            sx={{ mr: isDesktop ? 3 : 0 }}
+            id={accountOwner}
+            control={control}
+            label="Hesap Sahibi"
+          />
+        </FormControl>
+      </Stack>
+    </Stack>
+  );
+
+  const [accountsCount, setAccountsCount] = React.useState(1);
+
+  const addAccount = () => {
+    if (accountsCount < 3) {
+      setAccountsCount(accountsCount + 1);
+    } else {
+      setSnackbar({
+        severity: "error",
+        isOpen: true,
+        description: "Daha Fazla Hesap Ekleyemezsiniz",
+      });
+    }
+  };
+
+  const renderAccounts = () => {
+    const currencyCodes = ["currencyCodeTwo", "currencyCodeThree"];
+    const ibans = ["ibanTwo", "ibanThree"];
+    const bankCodes = ["bankCodeTwo", "bankCodeThree"];
+    const accountOwners = ["accountOwnerTwo", "accountOwnerThree"];
+    let accounts = [];
+    for (let i = 0; i < accountsCount - 1; i++) {
+      // -1, orijinal formu saymamak için
+      accounts.push(
+        <AccountInput
+          id={i + 2} // +2, orijinal formun id'sini aşmamak için
+          currencyCode={currencyCodes[i]}
+          iban={ibans[i]}
+          bankCode={bankCodes[i]}
+          accountOwner={accountOwners[i]}
+          control={control} // kontrol ve listeleri AccountInput bileşenine aktar
+          currencyCodeList={currencyCodeList}
+          bankList={bankList}
+        />
+      );
+    }
+    return accounts;
+  };
 
   return (
     <>
@@ -273,7 +475,9 @@ export const MerchantAddFormBankStep = ({
               />
             </FormControl>
           </Stack>
+          {renderAccounts()}
         </Stack>
+
         <Stack
           borderTop="1px solid #E6E9ED"
           direction="row"
@@ -282,6 +486,13 @@ export const MerchantAddFormBankStep = ({
           justifyContent="flex-end"
           spacing={2}
         >
+          <Box>
+            <Button
+              variant="contained"
+              onClick={addAccount}
+              text="Hesap Ekle"
+            />
+          </Box>
           <Box>
             <Button variant="contained" text="Geri" onClick={onBack} />
           </Box>

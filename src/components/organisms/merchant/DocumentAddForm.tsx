@@ -90,7 +90,7 @@ export const DocumentAddForm = () => {
   const companyType = Number(watch("companyType"));
   const posType = Number(watch("posType"));
 
-console.log(taxNumber);
+
 
 
   useEffect(() => {
@@ -120,7 +120,7 @@ console.log(taxNumber);
                   value: "",
                   mandatory: item.mandatory
                 };
-                console.log(tempOBJ);
+             
                 
                 append(tempOBJ);
                 items.push(tempOBJ)
@@ -140,7 +140,7 @@ console.log(taxNumber);
     posType,
   ]);
 
-  console.log(merchantId);
+ 
   
 
   const merchantList = useMemo(() => {
@@ -190,6 +190,9 @@ console.log(taxNumber);
       };
     });
   }, []);
+ 
+  console.log(posTypes);
+  
 
   const merchantTypes = useMemo(() => {
     const updatedMerchantTypes = [
@@ -214,7 +217,6 @@ console.log(taxNumber);
   const onSubmit = async (data) => {
     setLoading(true);
 
-    console.log(allFile, data.files);
 
     const dto = data.files.map((item) => ({
       companyType: Number(data.companyType),

@@ -190,18 +190,19 @@ export const BankAddForm = () => {
   ]);
 
   useEffect(() => {
-    if (selectedMerchantId || merchantVPos?.merchantName) {
-      setVPosList(
-        rawAcquirerBankList?.data?.map((acquireBank) => ({
-          label: acquireBank.bankName,
-          value: acquireBank.bankCode,
-        }))
-      );
-    } else {
+    if (selectedMerchantId || merchantVPos?.merchantName) {  
       setVPosList(
         rawMemberVPosList?.data?.map((memberVPos) => ({
           label: memberVPos.bankName,
           value: memberVPos.bankCode,
+        }))
+      );
+    
+    } else {    
+      setVPosList(
+        rawAcquirerBankList?.data?.map((acquireBank) => ({
+          label: acquireBank.bankName,
+          value: acquireBank.bankCode,
         }))
       );
     }

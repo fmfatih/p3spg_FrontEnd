@@ -222,7 +222,8 @@ export const UserListingTable = () => {
           ];
         },
       },
-      { field: "fullName", headerName: "Adı Soyadı", width: 350 },
+      { field: "fullName", headerName: "Adı Soyadı", width: 200 },
+      { field: "userTypeDesc", headerName: "Kullanıcı Tipi", width: 180 },
       {
         renderCell: RenderStatus,
         field: "status",
@@ -254,12 +255,13 @@ export const UserListingTable = () => {
             return data.map((item) => {
               return {
                "Ad Soyad": item?.fullName,
+               "Kullanıcı Tipi":item?.userTypeDesc,
                 "Durum": item?.status,
                 "Email": item?.email,
                 "Telefon": item?.phoneNumber,
                 "Üye İşyeri Numarası": item?.merchantId,
                 "Üye İşyeri Adı": item?.merchantName,
-                "Kullanıcı Tipi": item?.userType,
+                // "Kullanıcı Tipi": item?.userType,
                 "Kullanıcı Rolü": item?.roles,
               };
             });

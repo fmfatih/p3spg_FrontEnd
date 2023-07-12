@@ -36,6 +36,7 @@ export type IMerchant = {
   phoneNumber: string;
   description: string;
   mobilePos: boolean;
+  cepPos:boolean;
   vpos: boolean;
   pos: boolean;
   try:boolean;

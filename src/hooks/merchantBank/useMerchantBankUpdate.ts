@@ -16,7 +16,7 @@ async function merchantBankUpdate(
 ): Promise<any> {
   try {
     return (
-      await axiosInstance.put("/MerchantBank/Update", { bankType: 1, ...data })
+      await axiosInstance.put("/MerchantBank/Update", {  ...data })
     ).data;
   } catch (ex) {
     throw ((ex as AxiosError).response?.data as any).error;
@@ -28,3 +28,5 @@ export function useMerchantBankUpdate() {
     merchantBankUpdate(variables)
   );
 }
+
+// bankType: 1
