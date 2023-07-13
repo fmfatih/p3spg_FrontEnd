@@ -143,13 +143,14 @@ export const MerchantAddFormAddressStep = ({
       countryCode: "TR",
       primaryAddress: true,
     };
+    setAllData({ ...allData, ...request });
     if ((merchant && merchant?.id > 0 && allData?.addressLine1) || (allData && allData?.addressLine1)) {
       updateMerchantAddress(
         { ...request, id: merchant?.id || 0  },
         {
           onSuccess(data) {
             if (data.isSuccess) {
-              setAllData({ ...allData, ...request });
+            
               onNext();
               setSnackbar({
                 severity: "success",
@@ -210,6 +211,7 @@ export const MerchantAddFormAddressStep = ({
       }
       setSelectedDistrict(merchant?.districtId);
       setValue("districtId", selectedDistrict?.toString());
+      console.log(merchant)
       reset({
         addressLine1: merchant?.addressLine1,
         cityId: foundCity?.id || selectedCity,

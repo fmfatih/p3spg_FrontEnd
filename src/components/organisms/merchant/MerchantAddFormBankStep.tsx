@@ -183,7 +183,7 @@ export const MerchantAddFormBankStep = ({
   
   useEffect(() => {
     if (!!merchant && JSON.stringify(merchant) !== "{}") {
-      console.log(merchant?.currencyCode2)        
+      console.log(merchant)        
       reset({
         currencyCode: merchant?.currencyCode?.toString(),
         iban: merchant?.iban || "",
