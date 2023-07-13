@@ -146,8 +146,8 @@ export const thirdStepFormSchema = zod.object({
     .string()
     .min(1, { message: "Please enter your phone number" }),
 
-    currencyCodeTwo: zod.string().optional(),
-    ibanTwo: zod
+    currencyCode1: zod.string().optional(),
+    iban1: zod
     .string()
     .optional()
     .refine(value => 
@@ -156,10 +156,10 @@ export const thirdStepFormSchema = zod.object({
       /^([A-Z]{2}[ '+'\\'+'-]?[0-9]{2})(?=(?:[ '+'\\'+'-]?[A-Z0-9]){9,30}$)((?:[ '+'\\'+'-]?[A-Z0-9]{3,5}){2,7})([ '+'\\'+'-]?[A-Z0-9]{1,3})?$/.test(value), 
       "Invalid format"),
 
-    bankCodeTwo: zod.string().optional(),
-    accountOwnerTwo: zod.string().optional(),
-    currencyCodeThree: zod.string().optional(),
-    ibanThree: zod
+    bankCode1: zod.string().optional(),
+    accountOwner1: zod.string().optional(),
+    currencyCode2: zod.string().optional(),
+    iban2: zod
     .string()
     .optional()
     .refine(value => 
@@ -167,8 +167,8 @@ export const thirdStepFormSchema = zod.object({
       value === "0" || 
       /^([A-Z]{2}[ '+'\\'+'-]?[0-9]{2})(?=(?:[ '+'\\'+'-]?[A-Z0-9]){9,30}$)((?:[ '+'\\'+'-]?[A-Z0-9]{3,5}){2,7})([ '+'\\'+'-]?[A-Z0-9]{1,3})?$/.test(value), 
       "Invalid format"),
-    bankCodeThree: zod.string().optional(),
-    accountOwnerThree: zod.string().optional(),
+    bankCode2: zod.string().optional(),
+    accountOwner2: zod.string().optional(),
 });
 
 export type ThirdStepFormValuesType = zod.infer<typeof thirdStepFormSchema>;
@@ -178,20 +178,20 @@ export const thirdStepInitialValues: ThirdStepFormValuesType = {
   bankCode: "",
   iban: "",
   accountOwner: "",
-  ibanTwo: "",
-  bankCodeTwo: "",
-  accountOwnerTwo: "",
-  currencyCodeThree: "",
-  ibanThree: "",
-  bankCodeThree: "",
-  accountOwnerThree: "",
+  iban1: "",
+  bankCode1: "",
+  accountOwner1: "",
+  currencyCode2: "",
+  iban2: "",
+  bankCode2: "",
+  accountOwner2: "",
 };
 
 
 export const fourthStepFormSchema = zod.object({
-  try: zod.boolean(),
-  usd: zod.boolean(),
-  eur: zod.boolean(),
+  try: zod.any(),
+  usd: zod.any(),
+  eur: zod.any(),
 });
 
 export type FourthStepFormValuesType = zod.infer<typeof fourthStepFormSchema>;

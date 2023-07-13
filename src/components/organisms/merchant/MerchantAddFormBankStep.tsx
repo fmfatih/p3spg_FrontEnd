@@ -86,168 +86,43 @@ export const MerchantAddFormBankStep = ({
     iban,
     bankCode,
     accountOwner,
-    ibanTwo,
-    bankCodeTwo,
-    currencyCodeTwo,
-    accountOwnerTwo,
-    currencyCodeThree,
-    ibanThree,
-    bankCodeThree,
-    accountOwnerThree,
+    iban1,
+    bankCode1,
+    currencyCode1,
+    accountOwner1,
+    currencyCode2,
+    iban2,
+    bankCode2,
+    accountOwner2,
   }: ThirdStepFormValuesType) => {
-    // const request = {
-    //   merchantId,
-    //   currencyCode: Number(currencyCode),
-    //   iban,
-    //   bankCode,
-    //   accountOwner,
-    //   currencyCodeTwo: Number(currencyCodeTwo) || 0,
-    //   ibanTwo: ibanTwo || "",
-    //   bankCodeTwo: bankCodeTwo || "",
-    //   accountOwnerTwo: accountOwnerTwo || "",
-    //   currencyCodeThree: Number(currencyCodeThree) || 0,
-    //   ibanThree: ibanThree || "",
-    //   bankCodeThree: bankCodeThree || "",
-    //   accountOwnerThree: accountOwnerThree || "",
-    // };
-
-    // const request = 
-    //   [
-    //     { 
-    //       currencyCode: Number(currencyCode), 
-    //       iban, 
-    //       bankCode, 
-    //       accountOwner, 
-    //       bankType: Number(1),
-    //       merchantId,
-    //     },
-    //     {
-    //       currencyCode: Number(currencyCodeTwo) || 0,
-    //       iban: ibanTwo || "",
-    //       bankCode: bankCodeTwo || "",
-    //       accountOwner: accountOwnerTwo || "",
-    //       bankType: Number(1),
-    //       merchantId,
-    //     },
-    //     {
-    //       currencyCode: Number(currencyCodeThree) || 0,
-    //       iban: ibanThree || "",
-    //       bankCode: bankCodeThree || "",
-    //       accountOwner: accountOwnerThree || "",
-    //       bankType: Number(1),
-    //       merchantId,
-    //     },
-    //   ]
-
-      const request = [
-        { 
-          currencyCode: Number(currencyCode), 
-          iban, 
-          bankCode, 
-          accountOwner, 
-          bankType: Number(1),
-          merchantId,
-        }
-      ];
-      
-      if (currencyCodeTwo || ibanTwo || bankCodeTwo || accountOwnerTwo) {
-        request.push({
-          currencyCode: Number(currencyCodeTwo) || 0,
-          iban: ibanTwo || "",
-          bankCode: bankCodeTwo || "",
-          accountOwner: accountOwnerTwo || "",
-          bankType: Number(1),
-          merchantId,
-        });
-      }
-      
-      if (currencyCodeThree || ibanThree || bankCodeThree || accountOwnerThree) {
-        request.push({
-          currencyCode: Number(currencyCodeThree) || 0,
-          iban: ibanThree || "",
-          bankCode: bankCodeThree || "",
-          accountOwner: accountOwnerThree || "",
-          bankType: Number(1),
-          merchantId,
-        });
-      }
-      
-    
-      // const requestUpdate = {
-      //   merchantBanks:[
-      //     { 
-      //       currencyCode: Number(currencyCode), 
-      //       iban, 
-      //       bankCode, 
-      //       accountOwner, 
-      //       bankType: Number(1),
-      //       merchantId,
-      //     },
-      //     {
-      //       currencyCode: Number(currencyCodeTwo) || 0,
-      //       iban: ibanTwo || "",
-      //       bankCode: bankCodeTwo || "",
-      //       accountOwner: accountOwnerTwo || "",
-      //       bankType: Number(1),
-      //       merchantId,
-      //     },
-      //     {
-      //       currencyCode: Number(currencyCodeThree) || 0,
-      //       iban: ibanThree || "",
-      //       bankCode: bankCodeThree || "",
-      //       accountOwner: accountOwnerThree || "",
-      //       bankType: Number(1),
-      //       merchantId,
-      //     },
-      //   ]
-      // }
-      const requestUpdate = {
-        merchantBanks: [
-          { 
-            currencyCode: Number(currencyCode), 
-            iban, 
-            bankCode, 
-            accountOwner, 
-            bankType: Number(1),
-            merchantId,
-          }
-        ]
-      };
-      
-      if (currencyCodeTwo || ibanTwo || bankCodeTwo || accountOwnerTwo) {
-        requestUpdate.merchantBanks.push({
-          currencyCode: Number(currencyCodeTwo) || 0,
-          iban: ibanTwo || "",
-          bankCode: bankCodeTwo || "",
-          accountOwner: accountOwnerTwo || "",
-          bankType: Number(1),
-          merchantId,
-        });
-      }
-      
-      if (currencyCodeThree || ibanThree || bankCodeThree || accountOwnerThree) {
-        requestUpdate.merchantBanks.push({
-          currencyCode: Number(currencyCodeThree) || 0,
-          iban: ibanThree || "",
-          bankCode: bankCodeThree || "",
-          accountOwner: accountOwnerThree || "",
-          bankType: Number(1),
-          merchantId,
-        });
-      }
-      
+    const request = {
+      merchantId,
+      currencyCode: Number(currencyCode),
+      iban,
+      bankCode,
+      accountOwner,
+      currencyCode1: Number(currencyCode1) || 0,
+      iban1: iban1 || "",
+      bankCode1: bankCode1 || "",
+      accountOwner1: accountOwner1 || "",
+      currencyCode2: Number(currencyCode2) || 0,
+      iban2: iban2 || "",
+      bankCode2: bankCode2 || "",
+      accountOwner2: accountOwner2 || "",
+      bankType: Number(1),
+      bankType1: Number(1),
+      bankType2: Number(1),
+    };
 
     
-
     setAllData({ ...allData, ...request });
-    console.log(allData);
-    
+
     if (
       (merchant && merchant?.id > 0 && allData?.iban) ||
       (allData && allData?.iban)
     ) {
       merchantBankUpdate(
-        { ...requestUpdate, id: merchant?.id || 0 },
+        { ...request, id: merchant?.id || 0 },
         {
           onSuccess(data) {
             onNext();
@@ -308,20 +183,20 @@ export const MerchantAddFormBankStep = ({
   
   useEffect(() => {
     if (!!merchant && JSON.stringify(merchant) !== "{}") {
-      console.log(merchant[1])
+      console.log(merchant?.currencyCode2)        
       reset({
         currencyCode: merchant?.currencyCode?.toString(),
         iban: merchant?.iban || "",
         bankCode: merchant?.bankCode,
         accountOwner: merchant?.accountOwner || "",
-        ibanTwo: merchant?.[1].ibanTwo || "", // Yeni alan
-        ibanThree: merchant?.ibanThree || "", // Yeni alan
-        currencyCodeTwo: merchant?.[1].currencyCodeTwo?.toString(),
-        currencyCodeThree: merchant?.currencyCodeThree?.toString(),
-        bankCodeTwo: merchant?.[1].bankCodeTwo,
-        bankCodeThree: merchant?.bankCodeThree,
-        accountOwnerTwo: merchant?.[1].accountOwnerTwo || "",
-        accountOwnerThree: merchant?.accountOwnerThree || "",
+        iban1: merchant?.iban1 || "", // Yeni alan
+        iban2: merchant?.iban2 || "", // Yeni alan
+        currencyCode1: merchant?.currencyCode1?.toString(),
+        currencyCode2: merchant?.currencyCode2?.toString(),
+        bankCode1: merchant?.bankCode1,
+        bankCode2: merchant?.bankCode2,
+        accountOwner1: merchant?.accountOwner1 || "",
+        accountOwner2: merchant?.accountOwner2 || "",
       });
     }
   }, [merchant, reset]);
@@ -449,10 +324,10 @@ export const MerchantAddFormBankStep = ({
   };
 
   const renderAccounts = () => {
-    const currencyCodes = ["currencyCodeTwo", "currencyCodeThree"];
-    const ibans = ["ibanTwo", "ibanThree"];
-    const bankCodes = ["bankCodeTwo", "bankCodeThree"];
-    const accountOwners = ["accountOwnerTwo", "accountOwnerThree"];
+    const currencyCodes = ["currencyCode1", "currencyCode2"];
+    const ibans = ["iban1", "iban2"];
+    const bankCodes = ["bankCode1", "bankCode2"];
+    const accountOwners = ["accountOwner1", "accountOwner2"];
     let accounts = [];
     for (let i = 0; i < accountsCount - 1; i++) {
       // -1, orijinal formu saymamak için

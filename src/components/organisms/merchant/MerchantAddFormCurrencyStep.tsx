@@ -63,6 +63,8 @@ export const MerchantAddFormCurrencyStep = ({
     usd: usdCurrency,
     eur: eurCurrency,
   }: FourthStepFormValuesType) => {
+    usdCurrency = usdCurrency == null ? false : usdCurrency;
+    eurCurrency = eurCurrency == null ? false : eurCurrency;
     const request = {
       merchantId,
       try: tryCurrency,
@@ -134,12 +136,13 @@ export const MerchantAddFormCurrencyStep = ({
   useEffect(() => {
     if (!!merchant && JSON.stringify(merchant) !== "{}") {
       reset({
-        try: merchant.try,
+        try: true, // Bu satırı değiştirdik. 
         usd: merchant.usd,
         eur: merchant.eur,
       });
     }
   }, [merchant, reset]);
+
 
   return (
     <>
