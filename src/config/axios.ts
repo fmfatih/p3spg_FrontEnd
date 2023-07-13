@@ -3,7 +3,7 @@ import axios from "axios";
 import { API_ADDRESS } from "./server";
 
 export const axiosInstance = axios.create({
-  baseURL: API_ADDRESS,
+  baseURL: process.env.REACT_APP_API_ADDRESS,
   headers: { "Content-Type": "application/json" },
 });
 

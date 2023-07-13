@@ -80,7 +80,7 @@ export const BankAddForm = () => {
   const [vPosList, setVPosList] = useState(null);
   const { mutate: getMemberVPosList, data: rawMemberVPosList } =
     useGetMemberVPosList();
-
+    const [isUpdate, setIsUpdate] = useState(false);
   const { mutate: getMerchantVPosList, data: rawMerchantVPosList } =
     useGetMerchantVPosList();
 
@@ -123,13 +123,15 @@ export const BankAddForm = () => {
       }
     }
 
+
     if (!!bankCode) {
       getDefaultVposSettingsList(req, {
         onSuccess: (data: {
           data: Array<{ key: string; type: string; value: string }>;
         }) => {
+          setIsUpdate(data?.data?.update);
           remove();
-          data?.data?.map((item) => {
+          data?.data?.defaultVposSetting.map((item) => {
             const tempOBJ: any = {
               key: item.key,
               label: item.label,
@@ -154,7 +156,7 @@ export const BankAddForm = () => {
                 }
               });
             }
-
+            console.log(memberVPos);
             append(tempOBJ);
           });
         },
@@ -167,6 +169,8 @@ export const BankAddForm = () => {
     remove,
     selectedMerchantId,
   ]);
+
+  
 
   useEffect(() => {
     if (selectedMerchantId || merchantVPos?.merchantName) {
@@ -259,7 +263,7 @@ export const BankAddForm = () => {
       };
     });
 
-    if (!!memberVPos?.id) {
+    if (!!memberVPos?.id || isUpdate) {
       memberVPosUpdateWithSettings(
         {
           ...data,
@@ -519,13 +523,20 @@ export const BankAddForm = () => {
           direction="row"
           justifyContent="flex-end"
         >
-          {!!showCreate && (
+          {/* {!!showCreate && (
             <Button
               onClick={handleSubmit(onSubmit)}
               variant="contained"
               text={!!memberVPos?.id ? "Güncelle" : "Kaydet"}
             />
-          )}
+          )} */}
+          {!!showCreate && (
+  <Button
+    onClick={handleSubmit(onSubmit)}
+    variant="contained"
+    text={isUpdate || !!memberVPos?.id ? "Güncelle" : "Kaydet"}
+  />
+)}
           <Button onClick={handleBack} sx={{ mx: 2 }} text={"Iptal"} />
         </Stack>
       </Stack>

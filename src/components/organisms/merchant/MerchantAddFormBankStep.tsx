@@ -111,32 +111,132 @@ export const MerchantAddFormBankStep = ({
     //   accountOwnerThree: accountOwnerThree || "",
     // };
 
-    const request = {
-      merchantId,
-      dto: [
+    // const request = 
+    //   [
+    //     { 
+    //       currencyCode: Number(currencyCode), 
+    //       iban, 
+    //       bankCode, 
+    //       accountOwner, 
+    //       bankType: Number(1),
+    //       merchantId,
+    //     },
+    //     {
+    //       currencyCode: Number(currencyCodeTwo) || 0,
+    //       iban: ibanTwo || "",
+    //       bankCode: bankCodeTwo || "",
+    //       accountOwner: accountOwnerTwo || "",
+    //       bankType: Number(1),
+    //       merchantId,
+    //     },
+    //     {
+    //       currencyCode: Number(currencyCodeThree) || 0,
+    //       iban: ibanThree || "",
+    //       bankCode: bankCodeThree || "",
+    //       accountOwner: accountOwnerThree || "",
+    //       bankType: Number(1),
+    //       merchantId,
+    //     },
+    //   ]
+
+      const request = [
         { 
           currencyCode: Number(currencyCode), 
           iban, 
           bankCode, 
           accountOwner, 
-          bankType: Number(1)
-        },
-        {
+          bankType: Number(1),
+          merchantId,
+        }
+      ];
+      
+      if (currencyCodeTwo || ibanTwo || bankCodeTwo || accountOwnerTwo) {
+        request.push({
           currencyCode: Number(currencyCodeTwo) || 0,
           iban: ibanTwo || "",
           bankCode: bankCodeTwo || "",
           accountOwner: accountOwnerTwo || "",
-          bankType: Number(1)
-        },
-        {
+          bankType: Number(1),
+          merchantId,
+        });
+      }
+      
+      if (currencyCodeThree || ibanThree || bankCodeThree || accountOwnerThree) {
+        request.push({
           currencyCode: Number(currencyCodeThree) || 0,
           iban: ibanThree || "",
           bankCode: bankCodeThree || "",
           accountOwner: accountOwnerThree || "",
-          bankType: Number(1)
-        },
-      ],
-    };
+          bankType: Number(1),
+          merchantId,
+        });
+      }
+      
+    
+      // const requestUpdate = {
+      //   merchantBanks:[
+      //     { 
+      //       currencyCode: Number(currencyCode), 
+      //       iban, 
+      //       bankCode, 
+      //       accountOwner, 
+      //       bankType: Number(1),
+      //       merchantId,
+      //     },
+      //     {
+      //       currencyCode: Number(currencyCodeTwo) || 0,
+      //       iban: ibanTwo || "",
+      //       bankCode: bankCodeTwo || "",
+      //       accountOwner: accountOwnerTwo || "",
+      //       bankType: Number(1),
+      //       merchantId,
+      //     },
+      //     {
+      //       currencyCode: Number(currencyCodeThree) || 0,
+      //       iban: ibanThree || "",
+      //       bankCode: bankCodeThree || "",
+      //       accountOwner: accountOwnerThree || "",
+      //       bankType: Number(1),
+      //       merchantId,
+      //     },
+      //   ]
+      // }
+      const requestUpdate = {
+        merchantBanks: [
+          { 
+            currencyCode: Number(currencyCode), 
+            iban, 
+            bankCode, 
+            accountOwner, 
+            bankType: Number(1),
+            merchantId,
+          }
+        ]
+      };
+      
+      if (currencyCodeTwo || ibanTwo || bankCodeTwo || accountOwnerTwo) {
+        requestUpdate.merchantBanks.push({
+          currencyCode: Number(currencyCodeTwo) || 0,
+          iban: ibanTwo || "",
+          bankCode: bankCodeTwo || "",
+          accountOwner: accountOwnerTwo || "",
+          bankType: Number(1),
+          merchantId,
+        });
+      }
+      
+      if (currencyCodeThree || ibanThree || bankCodeThree || accountOwnerThree) {
+        requestUpdate.merchantBanks.push({
+          currencyCode: Number(currencyCodeThree) || 0,
+          iban: ibanThree || "",
+          bankCode: bankCodeThree || "",
+          accountOwner: accountOwnerThree || "",
+          bankType: Number(1),
+          merchantId,
+        });
+      }
+      
+
     
 
     setAllData({ ...allData, ...request });
@@ -147,7 +247,7 @@ export const MerchantAddFormBankStep = ({
       (allData && allData?.iban)
     ) {
       merchantBankUpdate(
-        { ...request, id: merchant?.id || 0 },
+        { ...requestUpdate, id: merchant?.id || 0 },
         {
           onSuccess(data) {
             onNext();
@@ -205,22 +305,22 @@ export const MerchantAddFormBankStep = ({
       });
     }
   };
-
+  
   useEffect(() => {
     if (!!merchant && JSON.stringify(merchant) !== "{}") {
-      console.log(merchant)
+      console.log(merchant[1])
       reset({
         currencyCode: merchant?.currencyCode?.toString(),
         iban: merchant?.iban || "",
         bankCode: merchant?.bankCode,
         accountOwner: merchant?.accountOwner || "",
-        ibanTwo: merchant?.ibanTwo || "", // Yeni alan
+        ibanTwo: merchant?.[1].ibanTwo || "", // Yeni alan
         ibanThree: merchant?.ibanThree || "", // Yeni alan
-        currencyCodeTwo: merchant?.currencyCodeTwo?.toString(),
+        currencyCodeTwo: merchant?.[1].currencyCodeTwo?.toString(),
         currencyCodeThree: merchant?.currencyCodeThree?.toString(),
-        bankCodeTwo: merchant?.bankCodeTwo,
+        bankCodeTwo: merchant?.[1].bankCodeTwo,
         bankCodeThree: merchant?.bankCodeThree,
-        accountOwnerTwo: merchant?.accountOwnerTwo || "",
+        accountOwnerTwo: merchant?.[1].accountOwnerTwo || "",
         accountOwnerThree: merchant?.accountOwnerThree || "",
       });
     }

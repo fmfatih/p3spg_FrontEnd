@@ -75,7 +75,8 @@ export function DocumentViewingModal({  isOpen, handleClose, merchantId }) {
             if (data.isSuccess) {
               const docType = data.data.docType.toLowerCase();
 
-              let fileBase = API_ADDRESS.replace('/api', '');
+              // let fileBase = API_ADDRESS.replace('/api', '');
+              let fileBase = process.env.REACT_APP_API_ADDRESS.replace('/api', '');
               if(fileBase.includes(':5001')) {
                   fileBase = fileBase.replace(':5001', ':5002');
               }
