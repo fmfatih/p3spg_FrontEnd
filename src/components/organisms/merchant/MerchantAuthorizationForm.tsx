@@ -89,7 +89,7 @@ export const MerchantAuthorizationForm = () => {
   }, [merchantId]);
 
   const setSnackbar = useSetSnackBar();
-console.log(listData);
+
 
   const merchantList = useMemo(() => {
     if (userInfo.merchantId == 0) {

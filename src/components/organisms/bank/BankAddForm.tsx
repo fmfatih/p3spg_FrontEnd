@@ -156,7 +156,7 @@ export const BankAddForm = () => {
                 }
               });
             }
-            console.log(memberVPos);
+       
             append(tempOBJ);
           });
         },

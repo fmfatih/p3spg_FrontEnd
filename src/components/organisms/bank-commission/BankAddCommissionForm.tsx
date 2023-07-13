@@ -141,8 +141,7 @@ export const BankAddCommissionForm = () => {
   }, [rawInstallmentSettingsList?.data]);
 
   const commissionProfileList = useMemo(() => {
-    
-  console.log(rawCommissionProfileList?.data.result);
+
     return rawCommissionProfileList?.data?.result.map(
       (commissionProfule: { name: string; code: string }) => {
         return {

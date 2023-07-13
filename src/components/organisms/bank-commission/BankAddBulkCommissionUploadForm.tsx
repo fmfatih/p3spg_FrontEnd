@@ -108,7 +108,7 @@ export const BankAddBulkCommissionUploadForm = () => {
         },
       });
     }
-    console.log(responseData);
+   
     
     return (
       <>
@@ -194,7 +194,7 @@ export const BankAddBulkCommissionUploadForm = () => {
 
   const DownloadButton = () => {
     const fileURL = "/files/Sanal-Pos-Toplu-Komisyon-Yükleme-Güncelleme.xlsx"; 
-    console.log(fileURL);
+  
     
     return (
         <Button variant="contained" text="KOMİSYON YÜKLEME DOSYASINI İNDİR" color="primary"     startIcon={<GetAppIcon />} href={fileURL} download        sx={{ height: '55px' }}>

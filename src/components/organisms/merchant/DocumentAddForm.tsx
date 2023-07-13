@@ -191,7 +191,7 @@ export const DocumentAddForm = () => {
     });
   }, []);
  
-  console.log(posTypes);
+
   
 
   const merchantTypes = useMemo(() => {

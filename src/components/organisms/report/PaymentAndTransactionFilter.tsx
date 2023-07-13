@@ -163,7 +163,7 @@ export const PaymentAndTransactionFilter = () => {
 
   useEffect(() => {
     if (userInfo?.merchantId == 0) {
-      console.log("HİT");
+     
       getMemberVPosList(
         {
           orderBy: "CreateDate",
@@ -221,9 +221,6 @@ export const PaymentAndTransactionFilter = () => {
 
   
 
-  console.log(userInfo.merchantId);
-
-  console.log(bankList);
 
   const onSubmit = (data: PaymentAndTransactionValuesType) => {
     setTableData(undefined);
@@ -755,7 +752,7 @@ export const PaymentAndTransactionFilter = () => {
     });
   };
 
-  console.log(tableData?.result);
+
   
 
   const onSave = () => {
@@ -819,7 +816,7 @@ export const PaymentAndTransactionFilter = () => {
     }
   }, 500);
 
-  console.log(bankList);
+ 
 
   const hasLoading =
     isGetPaymentAndTransactionLoading ||

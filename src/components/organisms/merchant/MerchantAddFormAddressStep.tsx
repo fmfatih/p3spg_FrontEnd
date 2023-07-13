@@ -211,7 +211,7 @@ export const MerchantAddFormAddressStep = ({
       }
       setSelectedDistrict(merchant?.districtId);
       setValue("districtId", selectedDistrict?.toString());
-      console.log(merchant)
+     
       reset({
         addressLine1: merchant?.addressLine1,
         cityId: foundCity?.id || selectedCity,

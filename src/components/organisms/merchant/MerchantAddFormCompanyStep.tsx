@@ -132,7 +132,7 @@ export const MerchantAddFormCompanyStep = ({
       }
     );
   }, [rawMerchantTypes?.data]);
-  console.log(merchantTypes);
+
   
   
 
@@ -158,7 +158,7 @@ export const MerchantAddFormCompanyStep = ({
     );
   }, [rawPosTypes?.data]);
 
-  console.log(posTypes);
+
   
 
   // const merchantList = useMemo(() => {

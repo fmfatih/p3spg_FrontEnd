@@ -155,7 +155,7 @@ export function DocumentDetailModal({  isOpen, handleClose, merchantId }) {
     }
   
     const handleSubmit = async () => {
-      console.log(file);
+  
 
       if (!file) return;
 
@@ -288,7 +288,7 @@ export function DocumentDetailModal({  isOpen, handleClose, merchantId }) {
       { id: merchantId },
         {
           onSuccess: (data) => {
-            console.log(data);
+            
             
             if (data.isSuccess) {
               setTableData(data.data);

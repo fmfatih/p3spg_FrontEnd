@@ -132,7 +132,7 @@ export const secondStepInitialValues: SecondStepFormValuesType = {
 };
 
 export const thirdStepFormSchema = zod.object({
-  // currencyCode: zod.string(),
+  currencyCode: zod.string(),
   iban: zod
     .string()
     .regex(
@@ -146,7 +146,7 @@ export const thirdStepFormSchema = zod.object({
     .string()
     .min(1, { message: "Please enter your phone number" }),
 
-    // currencyCode1: zod.string().optional(),
+    currencyCode1: zod.any(),
     iban1: zod
     .string()
     .optional()
@@ -156,9 +156,9 @@ export const thirdStepFormSchema = zod.object({
       /^([A-Z]{2}[ '+'\\'+'-]?[0-9]{2})(?=(?:[ '+'\\'+'-]?[A-Z0-9]){9,30}$)((?:[ '+'\\'+'-]?[A-Z0-9]{3,5}){2,7})([ '+'\\'+'-]?[A-Z0-9]{1,3})?$/.test(value), 
       "Invalid format"),
 
-    bankCode1: zod.union([zod.string(), zod.number()]).nullable(),
-    accountOwner1: zod.string().optional(),
-    // currencyCode2: zod.string().optional(),
+    bankCode1: zod.any(),
+    accountOwner1: zod.any(),
+    currencyCode2: zod.any(),
     iban2: zod
     .string()
     .optional()
@@ -167,12 +167,8 @@ export const thirdStepFormSchema = zod.object({
       value === "0" || 
       /^([A-Z]{2}[ '+'\\'+'-]?[0-9]{2})(?=(?:[ '+'\\'+'-]?[A-Z0-9]){9,30}$)((?:[ '+'\\'+'-]?[A-Z0-9]{3,5}){2,7})([ '+'\\'+'-]?[A-Z0-9]{1,3})?$/.test(value), 
       "Invalid format"),
-    bankCode2: zod.union([zod.string(), zod.number()]).nullable(),
-    accountOwner2: zod.string().optional(),
-
-    currencyCode: zod.union([zod.string(), zod.number()]),
-    currencyCode1: zod.union([zod.string(), zod.number()]).nullable(),
-    currencyCode2: zod.union([zod.string(), zod.number()]).nullable(),
+    bankCode2: zod.any(),
+    accountOwner2: zod.any()
 });
 
 export type ThirdStepFormValuesType = zod.infer<typeof thirdStepFormSchema>;
